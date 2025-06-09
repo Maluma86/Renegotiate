@@ -7,3 +7,30 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+
+# Clear existing data
+User.destroy_all
+Product.destroy_all
+
+# Create sample user
+User.create!(
+  email: "user@user.com",
+  password: "user123",
+  role: "procurement", 
+  company_name: "Test",
+  contact: "John Test",
+  contact_email: "john@test.com"
+)
+
+# Create sample product  
+Product.create!(
+  name: "Test Product",
+  category: "test",
+  description: "Sample item",
+  current_price: 100.0,
+  status: "active",
+  contract_end_date: Date.today + 1.year
+)
+
+puts "Seeded 1 user and 1 product"
