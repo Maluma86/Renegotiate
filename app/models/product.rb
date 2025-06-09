@@ -1,5 +1,5 @@
 class Product < ApplicationRecord
-  has_one :user
+  belongs_to :supplier, class_name: 'User'
   has_many :renegotiations
 
   validates :name, presence: true

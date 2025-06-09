@@ -30,7 +30,8 @@ Product.create!(
   description: "Sample item",
   current_price: 100.0,
   status: "active",
-  contract_end_date: Date.today + 1.year
+  contract_end_date: Date.today + 1.year,
+  supplier_id: User.first.id
 )
 
 puts "Seeded 1 user and 1 product"
