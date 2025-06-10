@@ -151,19 +151,20 @@
             color: #92400e; // Amber-800
           }
 
-          &.active {
-            background-color: #dbeafe; // Blue-100
+          &.ongoing {
+            background-color: #a0adf3; // Blue-100
             color: #1e40af; // Blue-800
           }
 
           &.done {
-            background-color: #dcfce7; // Green-100
+            background-color: #91bba0; // Green-100
             color: #166534; // Green-800
           }
 
-          &.rejected {
-            background-color: #fee2e2; // Red-100
+          &.ask_for_a_human {
+            background-color: #eda1a1; // Red-100
             color: #991b1b; // Red-800
+            width: 70px;
           }
       }
     }
