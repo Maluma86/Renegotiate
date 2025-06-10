@@ -1,8 +1,4 @@
-/* -----------------------
-   avatar + navbar overrides (updated)
-   ----------------------- */
 
-/* Global page background – white */
 body {
   background: #FFFFFF !important;
   color: $body-color;
@@ -10,28 +6,29 @@ body {
 
 /* ---------- NAVBAR ---------- */
 .navbar {
-  background: $secondary;       /* dark indigo-blue strip */
-  color: $light;                /* white text */
+  background: $secondary;
+  color: $navbar-dark-color;
+
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  // ensure all links in navbar are white
   .nav-link {
-    color: $light !important;
+    color: $navbar-dark-color !important;
+
     &:hover,
     &:focus {
-      color: lighten($light, 20%) !important;
+      color: $navbar-dark-hover-color !important;
     }
   }
 
-  // brand text (if used) also white
   .navbar-brand {
-    color: $light !important;
+    color: $navbar-dark-color !important;
+
     &:hover,
     &:focus {
-      color: $light !important;
+      color: $navbar-dark-hover-color !important;
     }
   }
 }
@@ -42,7 +39,7 @@ body {
   width: auto;
 }
 
-// align menu items (Home, Messages, Avatar) to the right
+// align menu items to the right
 .navbar-nav {
   margin-left: auto;
   display: flex;

@@ -10,10 +10,21 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body><%= render "shared/navbar" %>
-<%= render "shared/flashes" %>
+  <body>
+    <%= render "shared/navbar" %>
+    <%= render "shared/flashes" %>
 
     <%= yield %>
-    
+
+    <!-- Footer -->
+    <footer class="footer">
+      <ul class="footer__links">
+        <li><a href="/about">Our Story</a></li>
+        <li><a href="/contact">Contact Us</a></li>
+      </ul>
+      <div class="footer__copyright">
+        &copy; <%= Time.current.year %> Your Company. All rights reserved.
+      </div>
+    </footer>
   </body>
 </html>
