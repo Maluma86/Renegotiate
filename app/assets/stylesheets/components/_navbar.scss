@@ -1,12 +1,82 @@
-.navbar-lewagon {
+/* -----------------------
+   avatar + navbar overrides (updated)
+   ----------------------- */
+
+/* Global page background – white */
+body {
+  background: #FFFFFF !important;
+  color: $body-color;
+}
+
+/* ---------- NAVBAR ---------- */
+.navbar {
+  background: $secondary;       /* dark indigo-blue strip */
+  color: $light;                /* white text */
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  background: white;
+
+  // ensure all links in navbar are white
+  .nav-link {
+    color: $light !important;
+    &:hover,
+    &:focus {
+      color: lighten($light, 20%) !important;
+    }
+  }
+
+  // brand text (if used) also white
+  .navbar-brand {
+    color: $light !important;
+    &:hover,
+    &:focus {
+      color: $light !important;
+    }
+  }
 }
 
-.navbar-lewagon .navbar-collapse {
-  flex-grow: 0;
+// Logo image – height matches avatar
+.navbar-brand img {
+  height: 56px;
+  width: auto;
 }
 
-.navbar-lewagon .navbar-brand img {
-  width: 40px;
+// align menu items (Home, Messages, Avatar) to the right
+.navbar-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ---------- AVATARS ---------- */
+.avatar {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+.avatar-large {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-bordered {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid #fff;
+}
+.avatar-square {
+  width: 56px;
+  height: 56px;
+  border-radius: 0;
+  object-fit: cover;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid #fff;
 }
