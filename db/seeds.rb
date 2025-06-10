@@ -60,11 +60,11 @@ products = []
   # Low-priced items: higher volume spending
   # High-priced items: lower volume spending
   if unit_price < 200
-    volume_spending = Faker::Number.between(from: 1000, to: 25000)  # $1K-$25K
+    volume_spending = Faker::Number.between(from: 1000, to: 25_000)  # $1K-$25K
   elsif unit_price < 1000
-    volume_spending = Faker::Number.between(from: 2000, to: 40000)  # $2K-$40K
+    volume_spending = Faker::Number.between(from: 2000, to: 40_000)  # $2K-$40K
   else
-    volume_spending = Faker::Number.between(from: 5000, to: 100000) # $5K-$100K
+    volume_spending = Faker::Number.between(from: 5000, to: 100_000) # $5K-$100K
   end
 
   products << Product.create!(
@@ -73,7 +73,7 @@ products = []
     description: Faker::Quote.famous_last_words,
     current_price: unit_price,
     last_month_volume: volume_spending,
-    status: ["active", "expired", "under_negotiation"].sample,
+    status: ["Ongoing", "Done", "Ask for a Human", "Pending"].sample,
     contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
     supplier: supplier_users.sample
   )
@@ -93,7 +93,7 @@ renegotiations = []
   max_target = current_price * 0.9  # 10% discount min
 
   renegotiations << Renegotiation.create!(
-    status: ["initiated", "in_progress", "completed", "cancelled"].sample,
+    status: ["Initiated", "In Progress", "Completed", "Cancelled"].sample,
     thread: Faker::Quote.matz,
     tone: ["collaborative", "neutral", "aggressive"].sample,
     min_target: min_target,
@@ -129,7 +129,7 @@ demo_supplier = User.create!(
 # Create demo products
 demo_products = []
 demo_prices = [100, 250, 500, 1000, 1500]
-demo_volumes = [5000, 8000, 15000, 25000, 30000]  # Realistic spending volumes
+demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
 
 5.times do |i|
   demo_products << Product.create!(
@@ -137,7 +137,7 @@ demo_volumes = [5000, 8000, 15000, 25000, 30000]  # Realistic spending volumes
     category: categories.sample,
     description: "This is a demo product for testing the renegotiation platform",
     current_price: demo_prices[i],
-    last_month_volume: demo_volumes[i],  # Total spent last month
+    last_month_volume: demo_volumes[i], # Total spent last month
     status: "active",
     contract_end_date: 6.months.from_now,
     supplier: demo_supplier
@@ -147,7 +147,7 @@ end
 # Create demo renegotiation
 Renegotiation.create!(
   status: "in_progress",
-  thread: "Hello, we'd like to discuss pricing for our upcoming contract renewal. We've been a loyal customer and would appreciate better terms.",
+  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
   max_target: 900,
