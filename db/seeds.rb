@@ -17,13 +17,22 @@ Product.destroy_all
 User.create!(
   email: "user@user.com",
   password: "user123",
-  role: "procurement", 
+  role: "procurement",
   company_name: "Test",
   contact: "John Test",
   contact_email: "john@test.com"
 )
 
-# Create sample product  
+User.create!(
+  email: "sdsdsd@user.com",
+  password: "user1235",
+  role: "supplier",
+  company_name: "Collgate",
+  contact: "Max Max",
+  contact_email: "Max@test.com"
+)
+
+# Create sample product
 Product.create!(
   name: "Test Product",
   category: "test",
@@ -31,7 +40,17 @@ Product.create!(
   current_price: 100.0,
   status: "active",
   contract_end_date: Date.today + 1.year,
-  supplier_id: User.first.id
+  supplier_id: User.second.id
+)
+
+Product.create!(
+  name: "Test 2",
+  category: "Shampoo",
+  description: "Sample item",
+  current_price: 140.0,
+  status: "active",
+  contract_end_date: Date.today + 1.year,
+  supplier_id: User.second.id
 )
 
 puts "Seeded 1 user and 1 product"
