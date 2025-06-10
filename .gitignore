@@ -39,3 +39,35 @@
 # Ignore Mac and Linux file system files
 *.swp
 .DS_Store
+
+# === AI TOOLS & TASK MANAGEMENT (DO NOT COMMIT) ===
+# Task Master AI configuration and data
+.taskmaster/
+.taskmaster-backup/
+task-master-setup.sh
+
+# Cursor AI IDE configuration
+.cursor/
+
+# Roo AI assistant configuration  
+.roo/
+.roomodes
+
+# Windsurf AI configuration
+.windsurfrules
+
+# Memory bank (AI conversation history)
+memory-bank/
+
+# Task Master generated files
+tasks.json
+tasks/
+.taskmaster.local.json
+.taskmaster/logs/
+.taskmaster/cache/
+
+# AI tool logs and temporary files
+*.ai-log
+*.ai-temp
+ai-debug.log
+dev-debug.log 
