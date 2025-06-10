@@ -1,0 +1,79 @@
+<div class="renegotiation-confirmation">
+  <!-- Page Header -->
+  <header>
+    <h1>Confirm Renegotiation Target</h1>
+    <p>Review AI recommendations and set your negotiation parameters</p>
+  </header>
+
+  <!-- Product & Renegotiation Info -->
+  <section class="renegotiation-details">
+    <h2>Renegotiation Details</h2>
+    <dl>
+      <dt>Renegotiation ID:</dt>
+      <dd>#<%= @renegotiation.id %></dd>
+      
+      <dt>Current Status:</dt>
+      <dd><%= @renegotiation.status %></dd>
+      
+      <dt>Current Range:</dt>
+      <dd>€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></dd>
+      
+      <% if @renegotiation.product %>
+        <dt>Product:</dt>
+        <dd><%= @renegotiation.product.name %></dd>
+      <% end %>
+    </dl>
+  </section>
+
+  <!-- AI Suggestion Section -->
+  <%= render 'shared/ai_suggestion', suggestion: @ai_suggestion %>
+
+  <!-- Market Data Section -->  
+  <%= render 'shared/market_data', data: @market_data %>
+
+  <!-- Target Confirmation Form -->
+  <section class="target-form">
+    <h2>Set Your Target</h2>
+    
+    <%= form_with url: set_target_renegotiation_path(@renegotiation), 
+                  method: :post, 
+                  local: true do |form| %>
+      
+      <!-- Target Price Inputs -->
+      <fieldset class="price-inputs">
+        <legend>Target Price Range</legend>
+        
+        <div class="input-group">
+          <label for="target_price">Primary Target Price (€):</label>
+          <%= form.number_field :target_price, 
+                                step: 0.01, 
+                                value: @ai_suggestion[:recommended_target],
+                                required: true %>
+        </div>
+        
+        <div class="input-group">
+          <label for="min_price">Minimum Acceptable (€):</label>
+          <%= form.number_field :min_price, 
+                                step: 0.01,
+                                required: true %>
+        </div>
+        
+        <div class="input-group">
+          <label for="max_price">Maximum Offer (€):</label>
+          <%= form.number_field :max_price, 
+                                step: 0.01,
+                                required: true %>
+        </div>
+      </fieldset>
+
+      <!-- Tone Selection -->
+      <%= render 'shared/tone_selector', tones: @available_tones, form: form %>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <%= link_to "← Back", :back, class: "back-link" %>
+        <%= form.submit "Confirm Target", class: "submit-button" %>
+      </div>
+    <% end %>
+  </section>
+</div>
