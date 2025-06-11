@@ -1,79 +1,112 @@
-
-body {
-  background: #FFFFFF !important;
-  color: $body-color;
-}
-
-/* ---------- NAVBAR ---------- */
+/* ---------- NAVBAR as Left Sidebar ---------- */
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;               // adjust width as needed
+  height: 100vh;
   background: $secondary;
   color: $navbar-dark-color;
-
-  padding: 0.75rem 1.5rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.5rem 1rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 
-  .nav-link {
-    color: $navbar-dark-color !important;
+  /* Brand / Logo */
+  &-brand {
+    margin-bottom: 2rem;
 
-    &:hover,
-    &:focus {
-      color: $navbar-dark-hover-color !important;
+    a {
+      display: block;
+    }
+
+    img {
+      height: 56px;
+      width: auto;
     }
   }
 
-  .navbar-brand {
-    color: $navbar-dark-color !important;
+  /* Vertical nav list */
+  .navbar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex-grow: 1;
 
-    &:hover,
-    &:focus {
-      color: $navbar-dark-hover-color !important;
+    .nav-item {
+      width: 100%;
+
+      .nav-link {
+        color: $navbar-dark-color !important;
+        text-decoration: none;
+        display: block;
+        padding: 0.5rem 0;
+
+        &:hover,
+        &:focus {
+          color: $navbar-dark-hover-color !important;
+        }
+      }
+
+      /* Dropdown inside sidebar */
+      &.dropdown {
+        .dropdown-menu {
+          position: static;
+          background: transparent;
+          border: none;
+          margin-top: 0.5rem;
+          padding-left: 1rem;
+
+          .dropdown-item {
+            color: $navbar-dark-color !important;
+            padding: 0.4rem 0;
+            display: block;
+
+            &:hover,
+            &:focus {
+              color: $navbar-dark-hover-color !important;
+              background: transparent;
+            }
+          }
+        }
+      }
     }
   }
-}
 
-// Logo image – height matches avatar
-.navbar-brand img {
-  height: 56px;
-  width: auto;
-}
-
-// align menu items to the right
-.navbar-nav {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* ---------- AVATARS ---------- */
-.avatar {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-}
-.avatar-large {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.avatar-bordered {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  border: 1px solid #fff;
-}
-.avatar-square {
-  width: 56px;
-  height: 56px;
-  border-radius: 0;
-  object-fit: cover;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  border: 1px solid #fff;
+  /* Avatars */
+  .avatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+  .avatar-large {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .avatar-bordered {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid #fff;
+  }
+  .avatar-square {
+    width: 56px;
+    height: 56px;
+    border-radius: 0;
+    object-fit: cover;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid #fff;
+  }
 }

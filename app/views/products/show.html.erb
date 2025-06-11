@@ -1,73 +1,69 @@
 <!-- app/views/products/show.html.erb -->
 
-<div class="product-show">
+<div class="product-page-container">
 
-  <!-- LEFT NAVBAR -->
-  <nav class="sidebar">
-    <%= link_to products_path, class: "nav-button active" do %>
-      <i class="fas fa-list"></i>
-    <% end %>
-    <%= link_to "#", class: "nav-button" do %>
-      <i class="fas fa-chart-line"></i>
-    <% end %>
-  </nav>
-
-  <!-- MAIN CONTENT -->
-  <div class="content text-center mx-auto max-w-5xl">
-
-    <!-- HEADER -->
-    <div class="header">
-      <h1 class="text-center"><%= @product.name %></h1>
-      <% supplier = @product.supplier %>
-      <p>
-        <strong>Supplier:</strong>
-        <% if supplier %>
-          <%= link_to supplier.company_name, product_path(@product) %>
-          &mdash;
-          <%= mail_to supplier.contact_email %>
+  <!-- Sticky header with title + supplier -->
+  <div class="wrapper-that-freezes-things">
+    <div class="products-header">
+      <h1 class="product-title"><%= @product.name %></h1>
+      <div class="product-supplier">
+        Supplier:
+        <% if (s = @product.supplier) %>
+          <%= link_to s.company_name, "#",
+                      class: "product-supplier-link" %>
         <% else %>
-          <span class="text-gray-500">Unknown supplier</span>
+          <span class="text-gray-500">Unknown</span>
         <% end %>
-      </p>
-    </div> <!-- /.header -->
-
-    <!-- GRID OF CARDS -->
-    <div class="grid">
-      <!-- DESCRIPTION (spans 2 cols) -->
-      <div class="card description-card">
-        <h3 class="text-center underline">Description</h3>
-        <p><%= @product.description %></p>
       </div>
+    </div>
+  </div>
 
-      <!-- PRODUCT INFO -->
-      <div class="card">
-        <h3 class="text-center underline">Product Info</h3>
-        <p><strong>SKU:</strong>
-           <%= @product.respond_to?(:sku) ? @product.sku : "SKU-#{@product.id.to_s.rjust(6,'0')}" %>
-        </p>
-        <p><strong>Category:</strong> <%= @product.category %></p>
+  <!-- 2×2 grid of cards -->
+  <div class="product-show-grid">
+    <!-- DESCRIPTION -->
+    <div class="product-card">
+      <div class="product-card__header">Description</div>
+      <div class="product-card__body">
+        <%= @product.description.presence || "No description available." %>
       </div>
+    </div>
 
-      <!-- CONTRACT DETAILS -->
-      <div class="card">
-        <h3 class="text-center underline">Contract Details</h3>
-        <ul class="list-none p-0 m-0">
-          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
-          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
-          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
-        </ul>
+    <!-- CONTRACT DETAILS -->
+    <div class="product-card">
+      <div class="product-card__header">Contract Details</div>
+      <div class="product-card__body">
+        <p><strong>Current Price:</strong>
+           <%= number_to_currency(@product.current_price) %></p>
+        <p><strong>Ends:</strong>
+           <%= l(@product.contract_end_date) %></p>
+        <p><strong>Status:</strong>
+           <%= @product.status.capitalize %></p>
       </div>
+    </div>
 
-      <!-- PURCHASE VOLUMES -->
-      <div class="card">
-        <h3 class="text-center underline">Purchase Volumes</h3>
-        <ul class="list-none p-0 m-0">
-          <li><strong>Last 30 Days:</strong> <%= @product.last_month_volume %> units</li>
-          <li><strong>Last 12 Months:</strong> <%= @product.last_year_volume %> units</li>
-        </ul>
+    <!-- SUPPLIER INFO -->
+    <div class="product-card">
+      <div class="product-card__header">Supplier Info</div>
+      <div class="product-card__body">
+        <% if s %>
+          <p><strong><%= s.company_name %></strong></p>
+          <p><%= mail_to s.contact_email %></p>
+        <% else %>
+          <p>No supplier on record.</p>
+        <% end %>
       </div>
-    </div> <!-- /.grid -->
+    </div>
 
-  </div> <!-- /.content -->
+    <!-- PURCHASE VOLUMES -->
+    <div class="product-card">
+      <div class="product-card__header">Purchase Volumes</div>
+      <div class="product-card__body">
+        <p><strong>Last 30 days:</strong>
+           <%= @product.last_month_volume %> units</p>
+        <p><strong>Last 12 months:</strong>
+           <%= @product.last_year_volume %> units</p>
+      </div>
+    </div>
+  </div>
 
-</div> <!-- /.product-show -->
+</div>
