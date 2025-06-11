@@ -1,9 +1,11 @@
 require 'csv'
 
 class ProductsController < ApplicationController
+  # before_action :authenticate_user!
+  before_action :set_product, only: [:show]
 
-  # function for the page showing the list of products
   def index
+    @products = Product.all.order(:name)
     # that's for the search
     if params[:query].present?
       sql_subquery = <<~SQL
@@ -133,4 +135,14 @@ class ProductsController < ApplicationController
     %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
   end
 
+  def show
+    @supplier       = @product.supplier
+    @renegotiations = @product.renegotiations.order(created_at: :desc)
+  end
+
+  private
+
+  def set_product
+    @product = Product.find(params[:id])
+  end
 end

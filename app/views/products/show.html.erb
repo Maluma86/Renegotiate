@@ -1,0 +1,73 @@
+<!-- app/views/products/show.html.erb -->
+
+<div class="product-show">
+
+  <!-- LEFT NAVBAR -->
+  <nav class="sidebar">
+    <%= link_to products_path, class: "nav-button active" do %>
+      <i class="fas fa-list"></i>
+    <% end %>
+    <%= link_to "#", class: "nav-button" do %>
+      <i class="fas fa-chart-line"></i>
+    <% end %>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="content text-center mx-auto max-w-5xl">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h1 class="text-center"><%= @product.name %></h1>
+      <% supplier = @product.supplier %>
+      <p>
+        <strong>Supplier:</strong>
+        <% if supplier %>
+          <%= link_to supplier.company_name, product_path(@product) %>
+          &mdash;
+          <%= mail_to supplier.contact_email %>
+        <% else %>
+          <span class="text-gray-500">Unknown supplier</span>
+        <% end %>
+      </p>
+    </div> <!-- /.header -->
+
+    <!-- GRID OF CARDS -->
+    <div class="grid">
+      <!-- DESCRIPTION (spans 2 cols) -->
+      <div class="card description-card">
+        <h3 class="text-center underline">Description</h3>
+        <p><%= @product.description %></p>
+      </div>
+
+      <!-- PRODUCT INFO -->
+      <div class="card">
+        <h3 class="text-center underline">Product Info</h3>
+        <p><strong>SKU:</strong>
+           <%= @product.respond_to?(:sku) ? @product.sku : "SKU-#{@product.id.to_s.rjust(6,'0')}" %>
+        </p>
+        <p><strong>Category:</strong> <%= @product.category %></p>
+      </div>
+
+      <!-- CONTRACT DETAILS -->
+      <div class="card">
+        <h3 class="text-center underline">Contract Details</h3>
+        <ul class="list-none p-0 m-0">
+          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
+          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
+          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
+        </ul>
+      </div>
+
+      <!-- PURCHASE VOLUMES -->
+      <div class="card">
+        <h3 class="text-center underline">Purchase Volumes</h3>
+        <ul class="list-none p-0 m-0">
+          <li><strong>Last 30 Days:</strong> <%= @product.last_month_volume %> units</li>
+          <li><strong>Last 12 Months:</strong> <%= @product.last_year_volume %> units</li>
+        </ul>
+      </div>
+    </div> <!-- /.grid -->
+
+  </div> <!-- /.content -->
+
+</div> <!-- /.product-show -->
