@@ -20,4 +20,8 @@ class Product < ApplicationRecord
   def last_year_volume
     read_attribute(:last_year_volume) || 0
   end
+
+  def last_year_volume
+    last_month_volume.to_f * 12
+  end
 end
