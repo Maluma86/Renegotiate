@@ -18,23 +18,23 @@
   </div>
 
   <!-- Everything related to the table -->
-  <table class="products-table">
-    <!-- First row -->
-    <thead class="products-table-head">
-      <tr>
-        <th class="products-table-title">Name</th>
-        <th class="products-table-title">Supplier</th>
-        <th class="products-table-title">Category</th>
-        <th class="products-table-title">Current price/unit</th>
-        <th class="products-table-title">Contract end date</th>
-        <th class="products-table-title">Last month volume</th>
-        <th class="products-table-title">Status</th>
-        <th class="products-table-title">Actions</th>
-      </tr>
-    </thead>
+  <div class="table-scroll-wrapper"> <!-- This wrapper is used to make it sticky / frozen at the top -->
+    <table class="products-table">
+      <!-- First row -->
+      <thead class="products-table-head">
+        <tr>
+          <th class="products-table-title"><%= sort_link("name", "Name") %></th>
+          <th class="products-table-title"><%= sort_link("supplier", "Supplier") %></th>
+          <th class="products-table-title"><%= sort_link("category", "Category") %></th>
+          <th class="products-table-title"><%= sort_link("price", "Current price/unit") %></th>
+          <th class="products-table-title"><%= sort_link("contract_end", "Contract end date") %></th>
+          <th class="products-table-title"><%= sort_link("volume", "Last month volume") %></th>
+          <th class="products-table-title"><%= sort_link("status", "Status") %></th>
+          <th class="products-table-title">Actions</th> <!-- No sorting here -->
+        </tr>
+      </thead>
 
-    <!-- All the rows below ; each row will be clickable and linking to Mal's SHOW page -->
-    <div class="table-scroll-wrapper">
+      <!-- All the rows below ; each row will be clickable and linking to Mal's SHOW page -->
       <tbody class="products-table-body">
         <% @products.each do |product| %>
           <tr class="products-line">
@@ -59,6 +59,6 @@
           </tr>
         <% end %>
       </tbody>
-    </div>
-  </table>
+    </table>
+  </div>
 </div>
