@@ -43,7 +43,7 @@
                         product_path(product),
                         class: "hover:underline text-blue-600" %>
           </td>
-
+          <td class="products-line-text"><%= product.supplier.company_name %></td>
           <td class="products-line-text"><%= product.category %></td>
           <td class="products-line-text"><%= number_to_currency(product.current_price) %></td>
           <td class="products-line-text"><%= product.contract_end_date.strftime("%b %d, %Y") %></td>
