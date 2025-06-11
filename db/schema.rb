@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_09_144932) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_11_130430) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_09_144932) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "supplier_id", null: false
+    t.bigint "procurement_id", null: false
+    t.index ["procurement_id"], name: "index_products_on_procurement_id"
     t.index ["supplier_id"], name: "index_products_on_supplier_id"
   end
 
@@ -61,6 +63,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_09_144932) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "products", "users", column: "procurement_id"
   add_foreign_key "products", "users", column: "supplier_id"
   add_foreign_key "renegotiations", "products"
   add_foreign_key "renegotiations", "users", column: "buyer_id"
