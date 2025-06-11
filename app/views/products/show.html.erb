@@ -1,4 +1,5 @@
 <!-- app/views/products/show.html.erb -->
+
 <div class="product-show">
 
   <!-- LEFT NAVBAR -->
@@ -11,29 +12,34 @@
     <% end %>
   </nav>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTENT -->
   <div class="content">
 
     <!-- HEADER -->
     <div class="header">
       <h1><%= @product.name %></h1>
+      <% supplier = @product.supplier %>
       <p>
-        Supplier:
-        <%= link_to @supplier.company_name, product_path(@product) %>
-        &mdash;
-        <%= mail_to @supplier.contact_email %>
+        <strong>Supplier:</strong>
+        <% if supplier %>
+          <%= link_to supplier.company_name, product_path(@product) %>
+          &mdash;
+          <%= mail_to supplier.contact_email %>
+        <% else %>
+          <span class="text-gray-500">Unknown supplier</span>
+        <% end %>
       </p>
-    </div>
+    </div> <!-- /.header -->
 
     <!-- GRID OF CARDS -->
     <div class="grid">
-      <!-- Description -->
+      <!-- DESCRIPTION (spans 2 cols) -->
       <div class="card description-card">
         <h3>Description</h3>
         <p><%= @product.description %></p>
       </div>
 
-      <!-- Product Info -->
+      <!-- PRODUCT INFO -->
       <div class="card">
         <h3>Product Info</h3>
         <p><strong>SKU:</strong>
@@ -42,7 +48,7 @@
         <p><strong>Category:</strong> <%= @product.category %></p>
       </div>
 
-      <!-- Contract Details -->
+      <!-- CONTRACT DETAILS -->
       <div class="card">
         <h3>Contract Details</h3>
         <ul>
@@ -53,7 +59,7 @@
         </ul>
       </div>
 
-      <!-- Purchase Volumes -->
+      <!-- PURCHASE VOLUMES -->
       <div class="card">
         <h3>Purchase Volumes</h3>
         <ul>
@@ -63,6 +69,8 @@
           </li>
         </ul>
       </div>
-    </div>
-  </div>
-</div>
+    </div> <!-- /.grid -->
+
+  </div> <!-- /.content -->
+
+</div> <!-- /.product-show -->
