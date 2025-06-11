@@ -1,28 +1,22 @@
-// This is where you override default Bootstrap variables
-// 1. Find all Bootstrap variables that you can override at the end of each component's documentation under the `Sass variables` anchor
-// e.g. here are the ones you can override for the navbar https://getbootstrap.com/docs/5.2/components/navbar/#sass-variables
-// 2. These variables are defined with default value (see https://robots.thoughtbot.com/sass-default)
-// 3. You can override them below!
+// app/assets/stylesheets/config/_bootstrap_variables.scss
 
-// General style
-$font-family-sans-serif: $body-font;
-$headings-font-family:   $headers-font;
-$body-bg:                $light-gray;
-$font-size-base:         1rem;
+// Brand & page colours
+$body-bg:        #0A0F2E;
+$body-color:     #E5E4E2;
+$primary:        #FF7518;
+$secondary:      #131B3F;
+$dark:           #0A0F2E;
+$light:          #FFFFFF;
 
-// Colors
-$body-color: $gray;
-$primary:    $blue;
-$success:    $green;
-$info:       $yellow;
-$danger:     $red;
-$warning:    $orange;
+// Navbar (dark‐theme defaults)
+$navbar-dark-color:         #E5E4E2;
+$navbar-dark-hover-color:   #FF7518;
+// **Quoted** so escape-svg() sees a string
+$navbar-dark-toggler-icon-bg: "#E5E4E2";
 
-// Buttons & inputs' radius
-$border-radius-sm:            .0625rem;
-$border-radius:               .125rem;
-$border-radius-lg:            .25rem;
-$border-radius-xl:            .5rem;
-$border-radius-xxl:           1rem;
-
-// Override other variables below!
+// Links & buttons
+$link-color:                #FF7518;
+$link-hover-color:          #FF7518;
+$btn-primary-color:         #E5E4E2;
+$btn-primary-bg:            #FF7518;
+$btn-primary-hover-bg:      #131B3F;

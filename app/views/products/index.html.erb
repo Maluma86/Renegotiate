@@ -1,0 +1,61 @@
+<!-- The container for the entire page-->
+<div class="product-page-container">
+
+  <!-- The container for the title and import button-->
+  <div class="products-header">
+    <h1 class="product-title">All your products:</h1>
+    <%= button_to "Import product(s)", "#", method: :get, class: "import-btn" %>
+  </div>
+
+  <!-- Search bar -->
+  <div class="product-search-wrapper">
+    <%= form_with url: products_path, method: :get, local: true, class: "product-search-form" do %>
+      <%= text_field_tag :query, params[:query], placeholder: "Search products...", class: "product-search-input" %>
+      <%= submit_tag "Search", class: "product-search-button" %>
+    <% end %>
+  </div>
+
+
+  <!-- Everything related to the table -->
+  <table class="products-table">
+    <!-- First row -->
+    <thead class="products-table-head">
+      <tr>
+        <th class="products-table-title">Name</th>
+        <th class="products-table-title">Supplier</th>
+        <th class="products-table-title">Category</th>
+        <th class="products-table-title">Current price/unit</th>
+        <th class="products-table-title">Contract end date</th>
+        <th class="products-table-title">Last month volume</th>
+        <th class="products-table-title">Status</th>
+        <th class="products-table-title">Actions</th>
+      </tr>
+    </thead>
+
+    <!-- All the rows below ; each row will be clickable and linking to Mal's SHOW page -->
+    <tbody class="products-table-body">
+      <% @products.each do |product| %>
+        <tr class="products-line">
+          <td class="products-line-text"><%= product.name %></td>
+          <td class="products-line-text"><%= product.supplier.company_name %></td>
+          <td class="products-line-text"><%= product.category %></td>
+          <td class="products-line-text"><%= product.current_price %></td>
+          <td class="products-line-text"><%= product.contract_end_date.strftime("%b %d, %Y")  %></td>
+          <td class="products-line-text"><%= product.last_month_volume %></td>
+          <td class="products-line-text">
+            <!-- With the line below it automatically assign the class depending on the status eg. ongoing, done, pending etc-->
+            <span class="status <%= product.status.downcase.tr(' ', '_') %>">
+              <%= product.status.capitalize %>
+            </span>
+          </td>
+          <!-- Renegotiate button below to be linked to the renegotiate confirmation page with price buckets -->
+          <td class="products-line-text">
+            <button type="submit" class="renegotiate-btn">
+              Renegotiate
+            </button>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
