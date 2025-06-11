@@ -10,29 +10,19 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <nav class="flex space-x-4">
-  <% if user_signed_in? %>
-    <%= link_to "Logout", destroy_user_session_path, method: :delete %>
-  <% else %>
-    <%= link_to "Login", new_user_session_path %> |
-    <%= link_to "Sign up", new_user_registration_path %>
-  <% end %>
-</nav>
+  <body>
+    <!-- left‐side navbar -->
+    <%= render "shared/navbar" %>
 
-  <body><%= render "shared/navbar" %>
-<%= render "shared/flashes" %>
+    <!-- flash messages -->
+    <%= render "shared/flashes" %>
 
-    <%= yield %>
+    <!-- main page content, shifted right by .content style -->
+    <main class="content">
+      <%= yield %>
+    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <ul class="footer__links">
-        <li><a href="/about">Our Story</a></li>
-        <li><a href="/contact">Contact Us</a></li>
-      </ul>
-      <div class="footer__copyright">
-        &copy; <%= Time.current.year %> Your Company. All rights reserved.
-      </div>
-    </footer>
+    <!-- footer -->
+    <%= render "shared/footer" %>
   </body>
 </html>
