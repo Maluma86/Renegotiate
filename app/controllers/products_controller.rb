@@ -55,7 +55,6 @@ class ProductsController < ApplicationController
     @renegotiations = @product.renegotiations.order(created_at: :desc)
   end
 
-  private
 
   def set_product
     @product = Product.find(params[:id])
