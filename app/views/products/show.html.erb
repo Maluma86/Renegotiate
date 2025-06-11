@@ -1,78 +1,68 @@
 <!-- app/views/products/show.html.erb -->
-<div class="flex min-h-screen bg-gray-100">
+<div class="product-show">
 
-  <!-- LEFT NAVBAR (80px wide) -->
-  <nav class="w-20 bg-white border-r border-gray-200 py-8 flex flex-col items-center space-y-6">
-    <!-- Products list button -->
-    <%= link_to products_path, class: "p-3 hover:bg-gray-200 rounded-lg transition" do %>
-      <i class="fas fa-list text-3xl text-black"></i>
+  <!-- LEFT NAVBAR -->
+  <nav class="sidebar">
+    <%= link_to products_path, class: "nav-button active" do %>
+      <i class="fas fa-list"></i>
     <% end %>
-
-    <!-- Analytics icon -->
-    <%= link_to "#", class: "p-3 hover:bg-gray-200 rounded-lg transition" do %>
-      <i class="fas fa-chart-line text-3xl text-black"></i>
+    <%= link_to "#", class: "nav-button" do %>
+      <i class="fas fa-chart-line"></i>
     <% end %>
   </nav>
 
-  <!-- MAIN CONTENT -->
-  <main class="flex-1 p-10 space-y-10">
-    <!-- PAGE TITLE + SUPPLIER -->
-    <div class="bg-white shadow-lg rounded-3xl px-8 py-10 text-center">
-      <h1 class="text-5xl font-extrabold text-black mb-3">
-        <%= @product.name %>
-      </h1>
-      <p class="text-lg text-black">
+  <!-- MAIN -->
+  <div class="content">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h1><%= @product.name %></h1>
+      <p>
         Supplier:
-        <%= link_to @supplier.company_name,
-                    product_path(@product),
-                    class: "text-blue-700 hover:underline" %>
+        <%= link_to @supplier.company_name, product_path(@product) %>
         &mdash;
-        <%= mail_to @supplier.contact_email, nil,
-                    class: "text-blue-700 hover:underline" %>
+        <%= mail_to @supplier.contact_email %>
       </p>
     </div>
 
-    <!-- DESCRIPTION + SIDEBAR GRID -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- DESCRIPTION CARD (2 cols) -->
-      <div class="md:col-span-2 bg-white shadow-lg rounded-3xl p-8">
-        <h2 class="text-2xl font-semibold text-black mb-4">Description</h2>
-        <p class="text-black leading-relaxed">
-          <%= @product.description %>
-        </p>
+    <!-- GRID OF CARDS -->
+    <div class="grid">
+      <!-- Description -->
+      <div class="card description-card">
+        <h3>Description</h3>
+        <p><%= @product.description %></p>
       </div>
 
-      <!-- SIDEBAR CARDS -->
-      <div class="space-y-8">
-        <!-- Product Info -->
-        <div class="bg-white shadow-lg rounded-3xl p-6">
-          <h3 class="text-xl font-semibold text-black mb-2">Product Info</h3>
-          <p class="text-black"><strong>SKU:</strong>
-            <%= @product.respond_to?(:sku) ? @product.sku : "SKU-#{@product.id.to_s.rjust(6,'0')}" %>
-          </p>
-          <p class="text-black mt-1"><strong>Category:</strong> <%= @product.category %></p>
-        </div>
+      <!-- Product Info -->
+      <div class="card">
+        <h3>Product Info</h3>
+        <p><strong>SKU:</strong>
+           <%= @product.respond_to?(:sku) ? @product.sku : "SKU-#{@product.id.to_s.rjust(6,'0')}" %>
+        </p>
+        <p><strong>Category:</strong> <%= @product.category %></p>
+      </div>
 
-        <!-- Contract Details -->
-        <div class="bg-white shadow-lg rounded-3xl p-6">
-          <h3 class="text-xl font-semibold text-black mb-2">Contract Details</h3>
-          <ul class="list-disc list-inside text-black space-y-1 text-sm">
-            <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
-            <li><strong>Target Margin:</strong> <%= number_to_percentage(@product.target_margin || 35, precision: 0) %></li>
-            <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
-            <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
-          </ul>
-        </div>
+      <!-- Contract Details -->
+      <div class="card">
+        <h3>Contract Details</h3>
+        <ul>
+          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
+          <li><strong>Target Margin:</strong> <%= number_to_percentage(@product.target_margin || 35, precision: 0) %></li>
+          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
+          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
+        </ul>
+      </div>
 
-        <!-- Purchase Volumes -->
-        <div class="bg-white shadow-lg rounded-3xl p-6">
-          <h3 class="text-xl font-semibold text-black mb-2">Purchase Volumes</h3>
-          <ul class="list-disc list-inside text-black space-y-1 text-sm">
-            <li><strong>Last 30 Days:</strong> <%= @product.last_month_volume %> units</li>
-            <li><strong>Last 12 Months:</strong> <%= @product.respond_to?(:last_year_volume) ? @product.last_year_volume : 0 %> units</li>
-          </ul>
-        </div>
+      <!-- Purchase Volumes -->
+      <div class="card">
+        <h3>Purchase Volumes</h3>
+        <ul>
+          <li><strong>Last 30 Days:</strong> <%= @product.last_month_volume %> units</li>
+          <li><strong>Last 12 Months:</strong>
+            <%= @product.respond_to?(:last_year_volume) ? @product.last_year_volume : 0 %> units
+          </li>
+        </ul>
       </div>
     </div>
-  </main>
+  </div>
 </div>
