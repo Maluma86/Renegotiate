@@ -10,6 +10,8 @@ class User < ApplicationRecord
   # Renegotiation associations
   has_many :buyer_renegotiations, class_name: 'Renegotiation', foreign_key: :buyer_id
   has_many :supplier_renegotiations, class_name: 'Renegotiation', foreign_key: :supplier_id
+  has_many :supplied_products, class_name: "Product", foreign_key: "supplier_id"
+
 
   validates :company_name, presence: true
   validates :role, presence: true
