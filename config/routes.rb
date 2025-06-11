@@ -13,5 +13,11 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   # creating the routes related to products
-  resources :products, only: [:index]
+  resources :products, only: [:index] do
+    # below used for importing
+    collection do
+      get :import   # shows the import form
+      post :upload  # uploaidng
+    end
+  end
 end
