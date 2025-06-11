@@ -1,79 +1,100 @@
-<div class="renegotiation-confirmation">
+<div class="renegotiation-confirmation-container">
+  
   <!-- Page Header -->
-  <header>
-    <h1>Confirm Renegotiation Target</h1>
-    <p>Review AI recommendations and set your negotiation parameters</p>
+  <header class="renegotiation-header">
+    <h1 class="renegotiation-title">Confirm Renegotiation Target</h1>
+    <p class="renegotiation-subtitle">Review AI recommendations and set your negotiation parameters</p>
   </header>
 
-  <!-- Product & Renegotiation Info -->
-  <section class="renegotiation-details">
-    <h2>Renegotiation Details</h2>
-    <dl>
-      <dt>Renegotiation ID:</dt>
-      <dd>#<%= @renegotiation.id %></dd>
-      
-      <dt>Current Status:</dt>
-      <dd><%= @renegotiation.status %></dd>
-      
-      <dt>Current Range:</dt>
-      <dd>€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></dd>
-      
-      <% if @renegotiation.product %>
-        <dt>Product:</dt>
-        <dd><%= @renegotiation.product.name %></dd>
-      <% end %>
-    </dl>
-  </section>
+  <!-- Renegotiation Details Card -->
+  <div class="renegotiation-card">
+    <div class="renegotiation-card-header">
+      <h2 class="renegotiation-card-title">Renegotiation Details</h2>
+    </div>
+    <div class="renegotiation-card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <strong>ID:</strong> #<%= @renegotiation.id %><br>
+          <strong>Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span><br>
+          <strong>Current Range:</strong> €<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %>
+        </div>
+        <div class="col-md-6">
+          <strong>Product:</strong> 
+          <% if @renegotiation.product %>
+            <%= @renegotiation.product.name %>
+          <% else %>
+            Not specified
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- AI Suggestion Section -->
-  <%= render 'shared/ai_suggestion', suggestion: @ai_suggestion %>
+  <!-- AI Suggestion Card -->
+  <div class="renegotiation-card ai-suggestion-card">
+    <%= render 'shared/ai_suggestion', suggestion: @ai_suggestion %>
+  </div>
 
-  <!-- Market Data Section -->  
-  <%= render 'shared/market_data', data: @market_data %>
+  <!-- Market Data Card -->
+  <div class="renegotiation-card market-data-card">
+    <%= render 'shared/market_data', data: @market_data %>
+  </div>
 
-  <!-- Target Confirmation Form -->
-  <section class="target-form">
-    <h2>Set Your Target</h2>
-    
-    <%= form_with url: set_target_renegotiation_path(@renegotiation), 
-                  method: :post, 
-                  local: true do |form| %>
-      
-      <!-- Target Price Inputs -->
-      <fieldset class="price-inputs">
-        <legend>Target Price Range</legend>
+  <!-- Target Form Card -->
+  <div class="renegotiation-card renegotiation-form-card">
+    <div class="renegotiation-card-header">
+      <h2 class="renegotiation-card-title">Set Your Target</h2>
+    </div>
+    <div class="renegotiation-card-body">
+      <%= form_with url: set_target_renegotiation_path(@renegotiation), 
+                    method: :post, 
+                    local: true do |form| %>
         
-        <div class="input-group">
-          <label for="target_price">Primary Target Price (€):</label>
+        <!-- Primary Target Price -->
+        <div class="form-input-group">
+          <label class="form-label-custom">Primary Target Price (€)</label>
           <%= form.number_field :target_price, 
                                 step: 0.01, 
                                 value: @ai_suggestion[:recommended_target],
+                                class: "form-input-custom",
+                                placeholder: "Enter target price",
                                 required: true %>
+        </div>
+
+        <!-- Additional Price Fields -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-input-group">
+              <label class="form-label-custom">Minimum Acceptable (€)</label>
+              <%= form.number_field :min_price, 
+                                    step: 0.01,
+                                    class: "form-input-custom",
+                                    placeholder: "Minimum price",
+                                    required: true %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-input-group">
+              <label class="form-label-custom">Maximum Offer (€)</label>
+              <%= form.number_field :max_price, 
+                                    step: 0.01,
+                                    class: "form-input-custom",
+                                    placeholder: "Maximum price",
+                                    required: true %>
+            </div>
+          </div>
         </div>
         
-        <div class="input-group">
-          <label for="min_price">Minimum Acceptable (€):</label>
-          <%= form.number_field :min_price, 
-                                step: 0.01,
-                                required: true %>
-        </div>
+        <!-- Tone Selector -->
+        <%= render 'shared/tone_selector', tones: @available_tones, form: form %>
         
-        <div class="input-group">
-          <label for="max_price">Maximum Offer (€):</label>
-          <%= form.number_field :max_price, 
-                                step: 0.01,
-                                required: true %>
+        <!-- Action Buttons -->
+        <div class="renegotiation-actions">
+          <%= link_to "← Back", :back, class: "back-btn" %>
+          <%= form.submit "Confirm Target", class: "confirm-btn" %>
         </div>
-      </fieldset>
-
-      <!-- Tone Selection -->
-      <%= render 'shared/tone_selector', tones: @available_tones, form: form %>
-
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <%= link_to "← Back", :back, class: "back-link" %>
-        <%= form.submit "Confirm Target", class: "submit-button" %>
-      </div>
-    <% end %>
-  </section>
+      <% end %>
+    </div>
+  </div>
+  
 </div>
