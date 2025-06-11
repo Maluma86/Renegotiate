@@ -1,3 +1,5 @@
+<!-- app/views/devise/registrations/new.html.erb -->
+
 <h2>Sign up</h2>
 
 <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
@@ -15,6 +17,12 @@
     <%= f.input :password_confirmation,
                 required: true,
                 input_html: { autocomplete: "new-password" } %>
+
+    <!-- your custom fields -->
+    <%= f.input :company_name, required: true %>
+    <%= f.input :role,         required: true %>
+    <%= f.input :contact,      required: true %>
+    <%= f.input :contact_email,required: true, input_html: { autocomplete: "email" } %>
   </div>
 
   <div class="form-actions">
