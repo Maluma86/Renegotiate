@@ -1,0 +1,155 @@
+<div class="min-h-screen bg-gray-50 flex">
+  <!-- Sidebar -->
+  <aside class="w-16 bg-white shadow-lg flex flex-col items-center py-6 space-y-4">
+    <%= link_to products_path, class: "p-2 hover:bg-gray-100 rounded-lg" do %>
+      <%= image_tag "icons/content.svg", class: "h-6 w-6 text-gray-600" %>
+    <% end %>
+    <%= link_to product_path(@product), class: "p-2 hover:bg-gray-100 rounded-lg" do %>
+      <%= image_tag "icons/combo_chart.svg", class: "h-6 w-6 text-gray-600" %>
+    <% end %>
+  </aside>
+
+  <!-- Main area -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header Bar -->
+    <header class="bg-gray-200 h-16 px-6 flex items-center justify-between shadow-inner">
+      <div class="flex items-center space-x-4">
+        <div class="h-10 w-10 bg-gray-400 rounded"></div>
+        <h1 class="text-lg font-medium text-gray-700">
+          Automate and track supplier renegotiations at scale
+        </h1>
+      </div>
+      <div class="h-8 w-8 bg-gray-400 rounded-full"></div>
+    </header>
+
+    <!-- Content -->
+    <main class="p-8 space-y-10">
+      <!-- Title -->
+      <h2 class="text-4xl font-bold text-gray-900"><%= @product.name %></h2>
+
+      <!-- Stats + Description Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Stats cards -->
+        <div class="space-y-6">
+          <%# Current Price %>
+          <div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase">
+              Current Price
+            </h3>
+            <p class="mt-2 text-2xl font-bold text-gray-800">
+              <%= number_to_currency(@product.current_price) %>
+            </p>
+          </div>
+
+          <%# Last Month Volume %>
+          <div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase">
+              Last Month Volume
+            </h3>
+            <p class="mt-2 text-2xl font-bold text-gray-800">
+              <%= number_with_delimiter(@product.last_month_volume) %> units
+            </p>
+          </div>
+
+          <%# Contract End Date %>
+          <div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase">
+              Contract Ends
+            </h3>
+            <p class="mt-2 text-2xl font-bold text-gray-800">
+              <%= @product.contract_end_date.strftime("%b %-d, %Y") %>
+            </p>
+          </div>
+        </div>
+
+        <%# Description card (spans two columns on lg screens) %>
+        <div class="lg:col-span-2">
+          <div class="bg-white p-8 rounded-xl shadow">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Product Briefing</h3>
+            <p class="text-gray-600 leading-relaxed">
+              <%= simple_format(@product.description) %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+     <div class="products-show">
+  <aside class="sidebar">
+    <%= image_tag "icons/content.svg",      class: "h-6 w-6 text-gray-600" %>
+    <%= image_tag "icons/combo_chart.svg", class: "h-6 w-6 text-gray-600" %>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <!-- your header content -->
+    </header>
+
+    <div class="content">
+      <h2 class="content__title"><%= @product.name %></h2>
+
+      <div class="content__grid">
+        <div class="card card--stat">
+          <h3>Current Price</h3>
+          <p><%= number_to_currency(@product.current_price) %></p>
+        </div>
+        <!-- other stat cards… -->
+        <div class="card card--desc content__desc">
+          <h3>Product Briefing</h3>
+          <p><%= simple_format(@product.description) %></p>
+        </div>
+      </div>
+
+      <!-- supplier + renegotiations… -->
+
+      <div class="actions">
+        <%= link_to "← Back to Products", products_path, class: "btn btn--secondary" %>
+        <%= link_to "Start Renegotiation →", new_product_renegotiation_path(@product),
+                    class: "btn btn--primary" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+        <%# Renegotiations card %>
+        <div class="bg-white p-8 rounded-xl shadow flex flex-col space-y-4">
+          <h3 class="text-xl font-semibold text-gray-700">Renegotiations</h3>
+          <% if @renegotiations.any? %>
+            <ul class="space-y-4 overflow-auto max-h-64">
+              <% @renegotiations.each do |rn| %>
+                <li class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded">
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium"><%= rn.status.titleize %></span>
+                    <span class="text-sm text-gray-500">
+                      <%= rn.created_at.strftime("%b %-d, %Y") %>
+                    </span>
+                  </div>
+                  <p class="mt-1 text-gray-700">
+                    Proposed: <%= number_to_currency(rn.min_target) %> –
+                    <%= number_to_currency(rn.max_target) %>
+                  </p>
+                  <% if rn.new_price %>
+                    <p class="mt-1 text-gray-700">
+                      Latest Offer: <%= number_to_currency(rn.new_price) %>
+                    </p>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-gray-500 italic">No renegotiations started yet.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="flex justify-between mt-8">
+        <%= link_to "← Back to Products", products_path,
+              class: "px-6 py-3 bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition" %>
+
+        <%= link_to "Start Renegotiation →", new_product_renegotiation_path(@product),
+              class: "px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition" %>
+      </div>
+    </main>
+  </div>
+</div>
