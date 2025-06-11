@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  # creating the routes related to products
-  resources :products, only: [:index]
+   # Products & nested renegotiations
+  resources :products, only: [:index, :show] do
+    resources :renegotiations, only: [:new, :create]
+  end
 end
