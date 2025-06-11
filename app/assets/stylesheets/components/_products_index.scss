@@ -91,27 +91,38 @@
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border-collapse: collapse;
-  overflow: hidden;
   background-color: $secondary;
 
-  thead.products-table-head {
-    background-color: darken($secondary, 3%);
+thead.products-table-head {
+  background-color: darken($secondary, 3%);
 
-    .products-table-title {
-      position: sticky;
-      top: 0;    /* required so it knows where to stick it to */
-      text-align: left;
-      padding: 0.75rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: $body-color;
-      border-bottom: 1px solid lighten($secondary, 10%);
+  .products-table-title {
+    position: sticky;
+    top: 0;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    border-bottom: 1px solid lighten($secondary, 10%);
+
+    a {
+      color: inherit;
+      font-weight: inherit;
+      text-decoration: none;
+
+      &:hover {
+        color: lighten(white, 10%);
+      }
     }
   }
+}
 
   .table-scroll-wrapper {
     max-height: 70vh;      // or whatever height you want
-    overflow-y: auto;
+    overflow-y: auto; // that allows scrolling
+    overflow-x: auto;
+
   }
 
   tbody.products-table-body {
