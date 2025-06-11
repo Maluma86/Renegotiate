@@ -75,7 +75,8 @@ products = []
     last_month_volume: volume_spending,
     status: ["Ongoing", "Done", "Human required", "Pending"].sample,
     contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
-    supplier: supplier_users.sample
+    supplier: supplier_users.sample,
+    procurement: procurement_users.sample
   )
 end
 puts "✅ Created #{products.count} products"
@@ -140,7 +141,8 @@ demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
     last_month_volume: demo_volumes[i], # Total spent last month
     status: "active",
     contract_end_date: 6.months.from_now,
-    supplier: demo_supplier
+    supplier: demo_supplier,
+    procurement: demo_procurement
   )
 end
 
