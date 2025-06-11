@@ -18,6 +18,18 @@
   @media (min-width: 1024px) { padding-left: 6rem; padding-right: 6rem; }
 }
 
+
+/* ----------FREEZES title, search bar and import button---------- */
+
+.wrapper-that-freezes-things {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  padding-bottom: 10px;
+}
+
+
 /* ---------- header row (title + import button) ---------- */
 .products-header {
   display: flex;
@@ -79,20 +91,38 @@
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border-collapse: collapse;
-  overflow: hidden;
   background-color: $secondary;
 
-  thead.products-table-head {
-    background-color: darken($secondary, 3%);
+thead.products-table-head {
+  background-color: darken($secondary, 3%);
 
-    .products-table-title {
-      text-align: left;
-      padding: 0.75rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: $body-color;
-      border-bottom: 1px solid lighten($secondary, 10%);
+  .products-table-title {
+    position: sticky;
+    top: 0;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    border-bottom: 1px solid lighten($secondary, 10%);
+
+    a {
+      color: inherit;
+      font-weight: inherit;
+      text-decoration: none;
+
+      &:hover {
+        color: lighten(white, 10%);
+      }
     }
+  }
+}
+
+  .table-scroll-wrapper {
+    max-height: 70vh;      // or whatever height you want
+    overflow-y: auto; // that allows scrolling
+    overflow-x: auto;
+
   }
 
   tbody.products-table-body {
@@ -118,7 +148,7 @@
         &.pending         { background: #fef9c3; color: #92400e; }
         &.ongoing         { background: #a0adf3; color: #1e40af; }
         &.done            { background: #91bba0; color: #166534; }
-        &.ask_for_a_human { background: #eda1a1; color: #991b1b; width: 70px; }
+        &.human_required { background: #eda1a1; color: #991b1b; width: 70px; }
       }
     }
 

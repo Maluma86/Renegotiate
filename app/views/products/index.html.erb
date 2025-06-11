@@ -3,34 +3,37 @@
 <!-- The container for the entire page-->
 <div class="product-page-container">
 
-  <!-- The container for the title and import button-->
-  <div class="products-header">
-    <h1 class="product-title">All your products:</h1>
-    <%= button_to "Import product(s)", "#", method: :get, class: "import-btn" %>
-  </div>
+  <div class="wrapper-that-freezes-things">
+    <!-- The container for the title and import button-->
+    <div class="products-header">
+      <h1 class="product-title">All your products:</h1>
+      <%= button_to "Import product(s)", "#", method: :get, class: "import-btn" %>
+    </div>
 
-  <!-- Search bar -->
-  <div class="product-search-wrapper">
-    <%= form_with url: products_path, method: :get, local: true, class: "product-search-form" do %>
-      <%= text_field_tag :query, params[:query], placeholder: "Search products...", class: "product-search-input" %>
-      <%= submit_tag "Search", class: "product-search-button" %>
-    <% end %>
+    <!-- Search bar -->
+    <div class="product-search-wrapper">
+      <%= form_with url: products_path, method: :get, local: true, class: "product-search-form" do %>
+        <%= text_field_tag :query, params[:query], placeholder: "Search for a supplier, a category...", class: "product-search-input" %>
+        <%= submit_tag "Search", class: "product-search-button" %>
+      <% end %>
+    </div>
   </div>
 
   <!-- Everything related to the table -->
   <table class="products-table">
-    <thead class="products-table-head">
-      <tr>
-        <th class="products-table-title">Name</th>
-        <th class="products-table-title">Supplier</th>
-        <th class="products-table-title">Category</th>
-        <th class="products-table-title">Current price/unit</th>
-        <th class="products-table-title">Contract end date</th>
-        <th class="products-table-title">Last month volume</th>
-        <th class="products-table-title">Status</th>
-        <th class="products-table-title">Actions</th>
-      </tr>
-    </thead>
+      <!-- First row -->
+      <thead class="products-table-head">
+        <tr>
+          <th class="products-table-title"><%= sort_link("name", "Name") %></th>
+          <th class="products-table-title"><%= sort_link("supplier", "Supplier") %></th>
+          <th class="products-table-title"><%= sort_link("category", "Category") %></th>
+          <th class="products-table-title"><%= sort_link("price", "Current price/unit") %></th>
+          <th class="products-table-title"><%= sort_link("contract_end", "Contract end date") %></th>
+          <th class="products-table-title"><%= sort_link("volume", "Last month volume") %></th>
+          <th class="products-table-title"><%= sort_link("status", "Status") %></th>
+          <th class="products-table-title">Actions</th> <!-- No sorting here -->
+        </tr>
+      </thead>
 
     <tbody class="products-table-body">
       <% @products.each do |product| %>
