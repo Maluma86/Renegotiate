@@ -1,0 +1,44 @@
+<section class="ai-suggestion">
+  <header>
+    <h2>AI Recommendation</h2>
+  </header>
+
+  <div class="ai-content">
+    <!-- Main AI Recommendation -->
+    <div class="recommended-price">
+      <h3>Suggested Target Price</h3>
+      <p class="price-value">€<%= suggestion[:recommended_target] %></p>
+    </div>
+
+    <!-- Confidence Score -->
+    <div class="confidence-score">
+      <h4>AI Confidence Level</h4>
+      <p class="confidence-value">
+        <%= (suggestion[:confidence_score] * 100).to_i %>% confident
+      </p>
+
+      <!-- Simple text-based confidence indicator -->
+      <div class="confidence-bar">
+        <% confidence_percentage = (suggestion[:confidence_score] * 100).to_i %>
+        <% if confidence_percentage >= 80 %>
+          <span class="confidence-high">■■■■■ High Confidence</span>
+        <% elsif confidence_percentage >= 60 %>
+          <span class="confidence-medium">■■■□□ Medium Confidence</span>
+        <% else %>
+          <span class="confidence-low">■■□□□ Low Confidence</span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- AI Reasoning -->
+    <div class="ai-reasoning">
+      <h4>Why this target?</h4>
+      <p><%= suggestion[:reasoning] %></p>
+    </div>
+
+    <!-- Action Hint -->
+    <div class="ai-hint">
+      <p><em>💡 Tip: You can adjust this target in the form below based on your business needs.</em></p>
+    </div>
+  </div>
+</section>

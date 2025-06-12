@@ -9,6 +9,15 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # CRUD Renegotiation workflow with AI-powered target confirmation
+  resources :renegotiations do
+    member do
+      get :confirm_target          # GET /renegotiations/:id/confirm_target
+      post :set_target             # POST /renegotiations/:id/set_target
+      post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
+    end
+  end
+
   # Defines the root path route ("/")
   # root "posts#index"
 
