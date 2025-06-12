@@ -73,7 +73,7 @@ products = []
     description: Faker::Quote.famous_last_words,
     current_price: unit_price,
     last_month_volume: volume_spending,
-    status: ["Ongoing", "Done", "Human required", "Pending"].sample,
+    status: ["Ongoing", "Done", "Human_required", "Pending"].sample,
     contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
     supplier: supplier_users.sample,
     procurement: procurement_users.sample

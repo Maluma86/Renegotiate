@@ -4,7 +4,22 @@ class RenegotiationsController < ApplicationController
   before_action :set_renegotiation, only: %i[confirm_target set_target save_discount_targets]
 
   def new
-    @renegotiation = @product.renegotiations.build
+    @renegotiation = @product.renegotiations.new(
+      buyer: current_user,
+      supplier_id: @product.supplier_id,
+      status: "ongoing",
+      min_target: calculate_min_target(@product),
+      max_target: calculate_max_target(@product),
+      tone: "collaborative"
+    )
+
+    if @renegotiation.save
+      Rails.logger.info "Successfully created renegotiation with ID=#{@renegotiation.id}"
+      redirect_to confirm_target_renegotiation_path(@renegotiation)
+    else
+      Rails.logger.error "Failed to save renegotiation: #{@renegotiation.errors.full_messages}"
+      redirect_to product_path(@product), alert: "Failed to create renegotiation"
+    end
   end
 
   def create
@@ -45,33 +60,33 @@ class RenegotiationsController < ApplicationController
     # Extract parameters
     target_percentage = params[:target_discount_percentage].to_f
     min_percentage = params[:min_discount_percentage].to_f
-    
+
     # Authorization check (only buyer can set targets)
     unless @renegotiation.buyer_id == current_user.id
       return render json: { success: false, error: 'Not authorized' }, status: :forbidden
     end
-    
+
     # Validation
     if target_percentage < 0 || target_percentage > 100 || min_percentage < 0 || min_percentage > 100
       return render json: { success: false, error: 'Percentages must be between 0 and 100' }, status: :unprocessable_entity
     end
-    
+
     if min_percentage > target_percentage
       return render json: { success: false, error: 'Minimum cannot be greater than target' }, status: :unprocessable_entity
     end
-    
+
     # Save using our model method
     begin
       @renegotiation.lock_targets!(target_percentage, min_percentage, current_user)
-      render json: { 
-        success: true, 
+      render json: {
+        success: true,
         message: 'Discount targets saved successfully',
-        locked: true 
+        locked: true
       }
     rescue => e
-      render json: { 
-        success: false, 
-        error: e.message 
+      render json: {
+        success: false,
+        error: e.message
       }, status: :unprocessable_entity
     end
   end
@@ -92,5 +107,14 @@ class RenegotiationsController < ApplicationController
 
   def discount_target_params
     params.permit(:target_discount_percentage, :min_discount_percentage)
+  end
+
+  # below is the fill the new renegotiation instance with a min_target and max_target before the user can set it
+  def calculate_min_target(product)
+    (product.current_price * 0.90).round(2)
+  end
+
+  def calculate_max_target(product)
+    (product.current_price * 0.95).round(2)
   end
 end
