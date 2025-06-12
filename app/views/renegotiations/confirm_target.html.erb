@@ -44,24 +44,38 @@
             <div class="discount-targets-section">
               <div class="discount-input-group">
                 <strong>Target Discount:</strong>
-                <%= form.number_field :target_discount_percentage,
-                                      id: "target-discount",
-                                      step: 0.5,
-                                      placeholder: "0.0",
-                                      class: "discount-input",
-                                      value: @renegotiation.current_target_discount_percentage,
-                                      disabled: @renegotiation.discount_targets_locked? %> %
+                <div class="discount-input-wrapper">
+                  <%= form.number_field :target_discount_percentage,
+                                        id: "target-discount",
+                                        step: 0.5,
+                                        placeholder: "0.0",
+                                        class: "discount-input no-spinners",
+                                        value: @renegotiation.current_target_discount_percentage,
+                                        disabled: @renegotiation.discount_targets_locked? %>
+                  <span class="percent-sign">%</span>
+                  <div class="custom-arrows">
+                    <button type="button" class="arrow-btn arrow-up" data-target="target-discount">▲</button>
+                    <button type="button" class="arrow-btn arrow-down" data-target="target-discount">▼</button>
+                  </div>
+                </div>
               </div>
               
               <div class="discount-input-group">
                 <strong>Min Discount:</strong>
-                <%= form.number_field :min_discount_percentage,
-                                      id: "min-discount",
-                                      step: 0.5,
-                                      placeholder: "0.0",
-                                      class: "discount-input",
-                                      value: @renegotiation.current_min_discount_percentage,
-                                      disabled: @renegotiation.discount_targets_locked? %> %
+                <div class="discount-input-wrapper">
+                  <%= form.number_field :min_discount_percentage,
+                                        id: "min-discount",
+                                        step: 0.5,
+                                        placeholder: "0.0",
+                                        class: "discount-input no-spinners",
+                                        value: @renegotiation.current_min_discount_percentage,
+                                        disabled: @renegotiation.discount_targets_locked? %>
+                  <span class="percent-sign">%</span>
+                  <div class="custom-arrows">
+                    <button type="button" class="arrow-btn arrow-up" data-target="min-discount">▲</button>
+                    <button type="button" class="arrow-btn arrow-down" data-target="min-discount">▼</button>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -71,10 +85,12 @@
                       style="display: <%= @renegotiation.discount_targets_locked? ? 'none' : 'inline-block' %>;">
                 Save Targets
               </button>
-              <button type="button" id="new-targets-btn" class="btn btn-secondary btn-sm"
-                      style="display: <%= @renegotiation.discount_targets_locked? ? 'inline-block' : 'none' %>;">
-                New Targets
-              </button>
+              <div class="new-targets-section" style="display: <%= @renegotiation.discount_targets_locked? ? 'inline-block' : 'none' %>;">
+                <button type="button" id="new-targets-btn" class="btn btn-primary btn-sm">
+                  New Targets
+                </button>
+                <span id="success-message" class="alert alert-success d-inline-block ms-3 py-1 px-2" style="display: none !important;">Targets Saved</span>
+              </div>
             </div>
             
             <!-- Message Areas -->
@@ -83,7 +99,6 @@
                 <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                 Saving targets...
               </div>
-              <div id="success-message" class="alert alert-success" style="display: none;"></div>
               <div id="error-message" class="alert alert-danger" style="display: none;"></div>
             </div>
             
