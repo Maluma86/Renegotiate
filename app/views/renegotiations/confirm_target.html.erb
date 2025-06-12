@@ -1,0 +1,163 @@
+<div class="renegotiation-confirmation-container">
+
+  <!-- Page Header -->
+  <header class="renegotiation-header">
+    <h1 class="renegotiation-title">Confirm Renegotiation Target</h1>
+    <p class="renegotiation-subtitle">Review AI recommendations and set your negotiation parameters</p>
+  </header>
+
+  <!-- Renegotiation Details Card -->
+  <div class="renegotiation-card">
+    <div class="renegotiation-card-header">
+      <h2 class="renegotiation-card-title">Renegotiation Details</h2>
+    </div>
+    <div class="renegotiation-card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <strong>Pro-ID:</strong> #<%= @renegotiation.product.id %><br>
+          <strong>Rene-ID:</strong> #<%= @renegotiation.id %><br>
+          <strong>Pro-Status:</strong> <span class="badge bg-success"><%= @renegotiation.product.status.capitalize %></span><br>
+          <strong>Rene-Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span><br>
+          <strong>Pro-Price:</strong> €<span id="current-price"><%= @renegotiation.product.current_price %></span><br>
+          <strong>Current Range:</strong> <span id="calculated-range">€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></span>
+        </div>
+        <div class="col-md-6">
+          <strong>Product:</strong>
+          <% if @renegotiation.product %>
+            <%= @renegotiation.product.name %>
+          <% else %>
+            Not specified
+          <% end %><br>
+          <strong>Supplier:</strong>
+          <% if @renegotiation.product&.supplier %>
+            <%= @renegotiation.product.supplier.company_name %>
+          <% else %>
+            Not specified
+          <% end %><br>
+          
+          <!-- AJAX Discount Targets Form -->
+          <%= form_with url: save_discount_targets_renegotiation_path(@renegotiation),
+                        method: :post,
+                        id: "discount-targets-form",
+                        local: false do |form| %>
+            
+            <div class="discount-targets-section">
+              <div class="discount-input-group">
+                <strong>Target Discount:</strong>
+                <%= form.number_field :target_discount_percentage,
+                                      id: "target-discount",
+                                      step: 0.5,
+                                      placeholder: "0.0",
+                                      class: "discount-input",
+                                      value: @renegotiation.current_target_discount_percentage,
+                                      disabled: @renegotiation.discount_targets_locked? %> %
+              </div>
+              
+              <div class="discount-input-group">
+                <strong>Min Discount:</strong>
+                <%= form.number_field :min_discount_percentage,
+                                      id: "min-discount",
+                                      step: 0.5,
+                                      placeholder: "0.0",
+                                      class: "discount-input",
+                                      value: @renegotiation.current_min_discount_percentage,
+                                      disabled: @renegotiation.discount_targets_locked? %> %
+              </div>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div class="discount-targets-controls">
+              <button type="submit" id="save-targets-btn" class="btn btn-primary btn-sm" 
+                      style="display: <%= @renegotiation.discount_targets_locked? ? 'none' : 'inline-block' %>;">
+                Save Targets
+              </button>
+              <button type="button" id="new-targets-btn" class="btn btn-secondary btn-sm"
+                      style="display: <%= @renegotiation.discount_targets_locked? ? 'inline-block' : 'none' %>;">
+                New Targets
+              </button>
+            </div>
+            
+            <!-- Message Areas -->
+            <div id="discount-targets-messages">
+              <div id="loading-message" class="alert alert-info" style="display: none;">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Saving targets...
+              </div>
+              <div id="success-message" class="alert alert-success" style="display: none;"></div>
+              <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            </div>
+            
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Suggestion Card -->
+  <div class="renegotiation-card ai-suggestion-card">
+    <%= render 'shared/ai_suggestion', suggestion: @ai_suggestion %>
+  </div>
+
+  <!-- Market Data Card -->
+  <div class="renegotiation-card market-data-card">
+    <%= render 'shared/market_data', data: @market_data %>
+  </div>
+
+  <!-- Target Form Card -->
+  <div class="renegotiation-card renegotiation-form-card">
+    <div class="renegotiation-card-header">
+      <h2 class="renegotiation-card-title">Set Your Target</h2>
+    </div>
+    <div class="renegotiation-card-body">
+      <%= form_with url: set_target_renegotiation_path(@renegotiation),
+                    method: :post,
+                    local: true do |form| %>
+
+        <!-- Primary Target Price -->
+        <div class="form-input-group">
+          <label class="form-label-custom">Primary Target Price (€)</label>
+          <%= form.number_field :target_price,
+                                step: 0.01,
+                                value: @ai_suggestion[:recommended_target],
+                                class: "form-input-custom",
+                                placeholder: "Enter target price",
+                                required: true %>
+        </div>
+
+        <!-- Additional Price Fields -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-input-group">
+              <label class="form-label-custom">Minimum Acceptable (€)</label>
+              <%= form.number_field :min_price,
+                                    step: 0.01,
+                                    class: "form-input-custom",
+                                    placeholder: "Minimum price",
+                                    required: true %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-input-group">
+              <label class="form-label-custom">Maximum Offer (€)</label>
+              <%= form.number_field :max_price,
+                                    step: 0.01,
+                                    class: "form-input-custom",
+                                    placeholder: "Maximum price",
+                                    required: true %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tone Selector -->
+        <%= render 'shared/tone_selector', tones: @available_tones, form: form %>
+
+        <!-- Action Buttons -->
+        <div class="renegotiation-actions">
+          <%= link_to "← Back", :back, class: "back-btn" %>
+          <%= form.submit "Confirm Target", class: "confirm-btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+</div>
