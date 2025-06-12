@@ -1,5 +1,5 @@
 <div class="renegotiation-confirmation-container">
-  
+
   <!-- Page Header -->
   <header class="renegotiation-header">
     <h1 class="renegotiation-title">Confirm Renegotiation Target</h1>
@@ -14,17 +14,30 @@
     <div class="renegotiation-card-body">
       <div class="row">
         <div class="col-md-6">
-          <strong>ID:</strong> #<%= @renegotiation.id %><br>
-          <strong>Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span><br>
-          <strong>Current Range:</strong> €<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %>
+          <strong>Pro-ID:</strong> #<%= @renegotiation.product.id %><br>
+          <strong>Rene-ID:</strong> #<%= @renegotiation.id %><br>
+          <strong>Pro-Status:</strong> <span class="badge bg-success"><%= @renegotiation.product.status.capitalize %></span><br>
+          <strong>Rene-Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span><br>
+          <strong>Pro-Price:</strong> €<span id="current-price"><%= @renegotiation.product.current_price %></span><br>
+          <strong>Current Range:</strong> <span id="calculated-range">€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></span>
         </div>
         <div class="col-md-6">
-          <strong>Product:</strong> 
+          <strong>Product:</strong>
           <% if @renegotiation.product %>
             <%= @renegotiation.product.name %>
           <% else %>
             Not specified
-          <% end %>
+          <% end %><br>
+          <strong>Supplier:</strong>
+          <% if @renegotiation.product&.supplier %>
+            <%= @renegotiation.product.supplier.company_name %>
+          <% else %>
+            Not specified
+          <% end %><br>
+          <strong>Target Discount:</strong>
+          <input id="target-discount" type="number" step="0.5" placeholder="0.0" class="discount-input"> %<br>
+          <strong>Min Discount:</strong>
+          <input id="min-discount" type="number" step="0.5" placeholder="0.0" class="discount-input"> %
         </div>
       </div>
     </div>
@@ -46,15 +59,15 @@
       <h2 class="renegotiation-card-title">Set Your Target</h2>
     </div>
     <div class="renegotiation-card-body">
-      <%= form_with url: set_target_renegotiation_path(@renegotiation), 
-                    method: :post, 
+      <%= form_with url: set_target_renegotiation_path(@renegotiation),
+                    method: :post,
                     local: true do |form| %>
-        
+
         <!-- Primary Target Price -->
         <div class="form-input-group">
           <label class="form-label-custom">Primary Target Price (€)</label>
-          <%= form.number_field :target_price, 
-                                step: 0.01, 
+          <%= form.number_field :target_price,
+                                step: 0.01,
                                 value: @ai_suggestion[:recommended_target],
                                 class: "form-input-custom",
                                 placeholder: "Enter target price",
@@ -66,7 +79,7 @@
           <div class="col-md-6">
             <div class="form-input-group">
               <label class="form-label-custom">Minimum Acceptable (€)</label>
-              <%= form.number_field :min_price, 
+              <%= form.number_field :min_price,
                                     step: 0.01,
                                     class: "form-input-custom",
                                     placeholder: "Minimum price",
@@ -76,7 +89,7 @@
           <div class="col-md-6">
             <div class="form-input-group">
               <label class="form-label-custom">Maximum Offer (€)</label>
-              <%= form.number_field :max_price, 
+              <%= form.number_field :max_price,
                                     step: 0.01,
                                     class: "form-input-custom",
                                     placeholder: "Maximum price",
@@ -84,10 +97,10 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Tone Selector -->
         <%= render 'shared/tone_selector', tones: @available_tones, form: form %>
-        
+
         <!-- Action Buttons -->
         <div class="renegotiation-actions">
           <%= link_to "← Back", :back, class: "back-btn" %>
@@ -96,5 +109,5 @@
       <% end %>
     </div>
   </div>
-  
+
 </div>

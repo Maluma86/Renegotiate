@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-   # Products & nested renegotiations
+  # Products & nested renegotiations
   resources :products, only: [:index, :show] do
     resources :renegotiations, only: [:new, :create]
   end

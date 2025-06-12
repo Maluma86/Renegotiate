@@ -1,22 +1,22 @@
 <section class="ai-suggestion">
   <header>
-    <h2>🤖 AI Recommendation</h2>
+    <h2>AI Recommendation</h2>
   </header>
-  
+
   <div class="ai-content">
     <!-- Main AI Recommendation -->
     <div class="recommended-price">
       <h3>Suggested Target Price</h3>
       <p class="price-value">€<%= suggestion[:recommended_target] %></p>
     </div>
-    
+
     <!-- Confidence Score -->
     <div class="confidence-score">
       <h4>AI Confidence Level</h4>
       <p class="confidence-value">
         <%= (suggestion[:confidence_score] * 100).to_i %>% confident
       </p>
-      
+
       <!-- Simple text-based confidence indicator -->
       <div class="confidence-bar">
         <% confidence_percentage = (suggestion[:confidence_score] * 100).to_i %>
@@ -29,13 +29,13 @@
         <% end %>
       </div>
     </div>
-    
+
     <!-- AI Reasoning -->
     <div class="ai-reasoning">
       <h4>Why this target?</h4>
       <p><%= suggestion[:reasoning] %></p>
     </div>
-    
+
     <!-- Action Hint -->
     <div class="ai-hint">
       <p><em>💡 Tip: You can adjust this target in the form below based on your business needs.</em></p>
