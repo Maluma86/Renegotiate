@@ -16,5 +16,4 @@ class User < ApplicationRecord
   validates :company_name, presence: true
   validates :role, presence: true
   validates :contact, presence: true
-  validates :contact_email, presence: true
 end
