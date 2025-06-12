@@ -1,0 +1,39 @@
+@import "config/bootstrap_variables";  // your color vars
+
+/* ================================================================
+   Elegant Two‐Tone Card Component
+   ================================================================ */
+
+.card-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;       // top/bottom breathing room
+  padding: 0 1rem;      // side padding on small screens
+}
+
+.card-pro {
+  background: linear-gradient(
+    135deg,
+    #131B3F 0%,
+    #0A0F2E 100%
+  );                    // two‐tone indigo gradient
+  color: #FFFFFF;       // white text
+  border-radius: 1rem;  // rounded corners
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  max-width: 400px;     // card max width
+  width: 100%;          // fluid on mobile
+  padding: 2rem;        // inner spacing
+
+  &__title {
+    margin: 0 0 1rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  &__content {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}

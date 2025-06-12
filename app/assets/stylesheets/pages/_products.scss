@@ -1,4 +1,10 @@
-@import "config/bootstrap_variables";  // your color palette
+// app/assets/stylesheets/components/_products.scss
+
+@import "config/bootstrap_variables";  // your color vars
+
+/* ================================================================
+   Product Show – reuse .card-pro & style action buttons
+   ================================================================ */
 
 /* overall page padding */
 .product-page-container {
@@ -27,7 +33,7 @@
       margin: 0;
       font-size: 1.75rem;
       font-weight: 700;
-      color: $dark !important;    // force dark text
+      color: $dark !important;
     }
 
     .product-supplier {
@@ -35,7 +41,7 @@
       color: $dark;
 
       .product-supplier-link {
-        color: $primary;          // orange accent
+        color: $primary;
         text-decoration: none;
 
         &:hover {
@@ -46,55 +52,19 @@
   }
 }
 
-/* single centered detail card */
-.product-show-card {
-  max-width: 800px;
-  margin: 2rem auto;
-  background-color: $body-bg;            // solid page-grey bg
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+/* center the two-tone card */
+.card-wrapper {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  justify-content: center;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
 
-  /* card body: stacked content sections */
-  &__body {
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  /* each content section */
-  &__section {
-    h3 {
-      margin-bottom: 0.5rem;
-      font-size: 1.5rem;
-      color: $dark;                   // dark section titles
-    }
-    p, li {
-      margin: 0.25rem 0;
-      color: $dark;                   // dark body text
-      line-height: 1.6;
-    }
-    ul {
-      padding-left: 1rem;
-      margin: 0;
-    }
-  }
-
-  /* card footer: action buttons */
-  &__actions {
-    background: $light;                // white strip for buttons
-    padding: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-
-    .import-btn {
-      @extend .btn-theme;              // grey bg, orange on hover
-      padding: 0.75rem 2rem;
-      font-weight: 600;
-    }
-  }
+/* style the import-btns inside your card to match app buttons */
+.card-pro__actions .import-btn {
+  @extend .btn-theme;                // uses grey default + orange on hover
+  padding: 0.75rem 1.5rem;           // match other import-btn sizing
+  font-weight: 600;
+  border-radius: 0.375rem;
+  margin: 0 0.5rem;                  // space between the two buttons
 }

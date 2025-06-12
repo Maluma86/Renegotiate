@@ -17,55 +17,47 @@
     </div>
   </div>
 
-  <!-- Single centered detail card -->
-  <div class="product-show-card">
-    <div class="product-show-card__body">
-      <!-- Description -->
-      <section class="product-show-card__section">
-        <h3>Description</h3>
-        <p><%= @product.description.presence || "No description available." %></p>
-      </section>
+  <!-- Single centered card -->
+  <div class="card-wrapper">
+    <div class="card-pro">
+      <h2 class="card-pro__title"><%= @product.name %></h2>
 
-      <!-- Contract Details -->
-      <section class="product-show-card__section">
-        <h3>Contract Details</h3>
-        <ul>
-          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
-          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
-          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
-        </ul>
-      </section>
-
-      <!-- Supplier Info -->
-      <section class="product-show-card__section">
-        <h3>Supplier Info</h3>
+      <p class="card-pro__content">
+        <strong>Supplier:</strong>
         <% if s %>
-          <p><strong><%= s.company_name %></strong></p>
-          <p><%= mail_to s.contact_email %></p>
+          <%= s.company_name %> (<%= mail_to s.contact_email %>)
         <% else %>
-          <p>No supplier on record.</p>
+          Unknown
         <% end %>
-      </section>
+      </p>
 
-      <!-- Purchase Volumes -->
-      <section class="product-show-card__section">
-        <h3>Purchase Volumes</h3>
-        <ul>
-          <li><strong>Last 30 days:</strong> <%= @product.last_month_volume %> units</li>
-          <li><strong>Last 12 months:</strong> <%= @product.last_year_volume %> units</li>
-        </ul>
-      </section>
-    </div>
+      <hr>
 
-    <!-- Footer with both buttons centered -->
-    <div class="product-show-card__actions">
-      <%= link_to "← Back to results",
-                  products_path,
-                  class: "import-btn" %>
-      <%= link_to "Renegotiate",
-                  new_product_renegotiation_path(@product),
-                  class: "import-btn" %>
+      <p class="card-pro__content">
+        <strong>Description:</strong><br>
+        <%= @product.description.presence || "No description available." %>
+      </p>
+
+      <p class="card-pro__content">
+        <strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %><br>
+        <strong>Ends:</strong> <%= l(@product.contract_end_date) %><br>
+        <strong>Status:</strong> <%= @product.status.capitalize %>
+      </p>
+
+      <p class="card-pro__content">
+        <strong>Last 30 days:</strong> <%= @product.last_month_volume %> units<br>
+        <strong>Last 12 months:</strong> <%= @product.last_year_volume %> units
+      </p>
+
+      <!-- action buttons -->
+      <div class="card-pro__content" style="text-align: center; margin-top: 1.5rem;">
+        <%= link_to "← Back to results",
+                    products_path,
+                    class: "import-btn" %>
+        <%= link_to "Renegotiate",
+                    new_product_renegotiation_path(@product),
+                    class: "import-btn" %>
+      </div>
     </div>
   </div>
-
 </div>
