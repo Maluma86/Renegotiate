@@ -12,6 +12,8 @@ class User < ApplicationRecord
   has_many :supplier_renegotiations, class_name: 'Renegotiation', foreign_key: :supplier_id
   has_many :supplied_products, class_name: "Product", foreign_key: "supplier_id"
 
+  # DISCOUNT TARGET ASSOCIATIONS
+  has_many :discount_target_histories, foreign_key: :set_by_user_id, dependent: :nullify
 
   validates :company_name, presence: true
   validates :role, presence: true

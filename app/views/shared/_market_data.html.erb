@@ -1,0 +1,49 @@
+<section class="market-data">
+  <header>
+    <h2>📊 Market Intelligence</h2>
+  </header>
+  
+  <div class="market-content">
+    <!-- Market Average Price -->
+    <div class="market-average">
+      <h3>Market Average Price</h3>
+      <p class="market-price">€<%= data[:average_price] %></p>
+      <p class="market-note">What most companies currently pay</p>
+    </div>
+    
+    <!-- Price Range -->
+    <div class="market-range">
+      <h3>Market Price Range</h3>
+      <div class="range-display">
+        <span class="range-min">
+          <strong>Minimum:</strong> €<%= data[:price_range][0] %>
+        </span>
+        <span class="range-separator"> — </span>
+        <span class="range-max">
+          <strong>Maximum:</strong> €<%= data[:price_range][1] %>
+        </span>
+      </div>
+      
+      <!-- Simple text-based range visualization -->
+      <div class="range-visualization">
+        <p>Price Range: €<%= data[:price_range][0] %> ◄──────●──────► €<%= data[:price_range][1] %></p>
+        <p style="margin-left: 80px;">↑ Market Average: €<%= data[:average_price] %></p>
+      </div>
+    </div>
+    
+    <!-- Market Context -->
+    <div class="market-context">
+      <h4>What this means:</h4>
+      <ul>
+        <li>The market average is €<%= data[:average_price] %></li>
+        <li>Prices typically range from €<%= data[:price_range][0] %> to €<%= data[:price_range][1] %></li>
+        <li>Your negotiation target should consider these market conditions</li>
+      </ul>
+    </div>
+    
+    <!-- Data Source Info -->
+    <div class="data-source">
+      <p><em>📈 Market data updated regularly from industry sources</em></p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,35 @@
+<fieldset class="tone-selection">
+  <legend>Communication Tone</legend>
+  <p>Choose how you want to approach this supplier:</p>
+  
+  <div class="tone-options">
+    <% tones.each_with_index do |tone, index| %>
+      <div class="tone-option">
+        <%= form.radio_button :tone, tone, 
+                              id: "tone_#{tone}",
+                              checked: (index == 0) %>
+        <%= form.label "tone_#{tone}", class: "tone-label" do %>
+          <span class="tone-name"><%= tone.capitalize %></span>
+          <span class="tone-description">
+            <% case tone %>
+            <% when 'collaborative' %>
+              - Partnership-focused, friendly approach
+            <% when 'direct' %>
+              - Clear, straightforward communication
+            <% when 'formal' %>
+              - Professional, structured messaging
+            <% when 'urgent' %>
+              - Time-sensitive, priority-focused
+            <% else %>
+              - Standard business communication
+            <% end %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="tone-help">
+    <p><em>💬 Tip: Consider your relationship with this supplier when selecting tone.</em></p>
+  </div>
+</fieldset>
