@@ -47,7 +47,7 @@ puts "✅ Created #{supplier_users.count} supplier users"
 categories = [
   "Office Supplies", "Technology", "Manufacturing Equipment",
   "Raw Materials", "Packaging", "Logistics", "Software Licenses",
-  "Consulting Services", "Marketing Materials", "Industrial Tools"
+  "Fun tools", "Marketing Materials", "Industrial Tools"
 ]
 
 # Create Products
@@ -109,13 +109,21 @@ puts "✅ Created #{renegotiations.count} renegotiations"
 
 # Create some demo users with known credentials
 puts "🎭 Creating demo users..."
-demo_procurement = User.create!(
-  email: "buyer@demo.com",
+demo_procurement1 = User.create!(
+  email: "buyer@Walmart.com",
   password: "demo123",
   role: "procurement",
-  company_name: "Demo Manufacturing Corp",
+  company_name: "Walmart",
   contact: "Jane Buyer",
-  contact_email: "jane@demo.com"
+  contact_email: "buyer@Walmart.com"
+)
+demo_procurement2 = User.create!(
+  email: "buyer@Carrefour.com",
+  password: "demo123",
+  role: "procurement",
+  company_name: "Walmart",
+  contact: "jean Dupont",
+  contact_email: "buyer@Carrefour.com"
 )
 
 demo_supplier = User.create!(
@@ -139,10 +147,10 @@ demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
     description: "This is a demo product for testing the renegotiation platform",
     current_price: demo_prices[i],
     last_month_volume: demo_volumes[i], # Total spent last month
-    status: "active",
+    status: "pending",
     contract_end_date: 6.months.from_now,
     supplier: demo_supplier,
-    procurement: demo_procurement
+    procurement: demo_procurement1
   )
 end
 
@@ -155,7 +163,7 @@ Renegotiation.create!(
   max_target: 900,
   new_price: nil,
   product: demo_products.first,
-  buyer: demo_procurement,
+  buyer: demo_procurement1,
   supplier: demo_supplier
 )
 
@@ -171,7 +179,8 @@ puts "
 - #{Renegotiation.count} Renegotiations
 
 🧪 Demo Accounts:
-- Buyer: buyer@demo.com / demo123
+- Buyer1: buyer@Walmart.com / demo123 -> has already 5 products attached
+- Buyer2: buyer@Carrefour.com / demo123 -> no products attached. Need to import. Should not see the products from Carrefour.
 - Supplier: supplier@demo.com / demo123
 
 🚀 Run 'rails server' and start testing!
