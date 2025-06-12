@@ -2,7 +2,11 @@
 
 @import "config/bootstrap_variables";
 
-/* ── Page padding ───────────────────────────────────────────── */
+/* ================================================================
+   Product Show – page padding & sticky header
+   ================================================================ */
+
+/* overall page padding */
 .product-page-container {
   padding: 2rem;
 
@@ -10,11 +14,11 @@
   @media (min-width: 1024px) { padding: 6rem; }
 }
 
-/* ── Sticky header (product title + supplier) ───────────────── */
+/* sticky header (product title + supplier) */
 .wrapper-that-freezes-things {
   position: sticky;
   top: 0;
-  background: $light;
+  background: $light;            // white background
   z-index: 10;
   padding-bottom: 0.5rem;
 
@@ -29,27 +33,30 @@
       margin: 0;
       font-size: 1.75rem;
       font-weight: 700;
-      color: $dark;
+      color: $dark;             // dark text on white
     }
 
     .product-supplier {
       font-size: 1rem;
-      color: $dark;
+      color: $dark;             // dark text on white
 
-      .product-supplier-link,
-      .product-email-link {
-        color: $primary;
+      a.product-supplier-link,
+      a.product-email-link {
+        color: $primary;        // accent link
         text-decoration: none;
 
         &:hover {
           text-decoration: underline;
+          color: darken($primary, 10%);
         }
       }
     }
   }
 }
 
-/* ── Centered card wrapper ──────────────────────────────────── */
+/* ================================================================
+   Centered card wrapper
+   ================================================================ */
 .card-wrapper {
   display: flex;
   justify-content: center;
@@ -57,7 +64,10 @@
   padding: 0 1rem;
 }
 
-/* ── Buttons (renegotiate & back) ───────────────────────────── */
+/* ================================================================
+   Unified import-btn styling
+   (applies to both Renegotiate & Back to results)
+   ================================================================ */
 .import-btn {
   @extend .btn-theme;            // grey bg + orange on hover
   padding: 0.75rem 1.5rem;
@@ -65,4 +75,5 @@
   border-radius: 0.375rem;
   display: inline-block;
   text-align: center;
+  color: $light !important;      // force white text on dark bg
 }
