@@ -16,7 +16,7 @@
 .wrapper-that-freezes-things {
   position: sticky;
   top: 0;
-  background: $light;   // white
+  background: #FFFFFF;   // white
   z-index: 10;
   padding-bottom: 0.5rem;
 
@@ -25,21 +25,21 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-    border-bottom: 1px solid lighten($secondary, 20%);
+    border-bottom: 1px solid lighten(#131B3F, 20%);
 
     .product-title {
       margin: 0;
       font-size: 1.75rem;
       font-weight: 700;
-      color: $dark;    // black-ish
+      color: #0A0F2E;    // black-ish
     }
 
     .product-supplier {
       font-size: 1rem;
-      color: $dark;
+      color: #0A0F2E;
 
       .product-supplier-link {
-        color: $primary;         // orange
+        color: #FF7518;         // orange
         text-decoration: none;
 
         &:hover {
@@ -65,8 +65,8 @@
 
 /* ---------- individual card ---------- */
 .product-card {
-  background: $light;
-  border: 1px solid lighten($secondary, 10%);
+  background: #FFFFFF;
+  border: 1px solid lighten(#131B3F, 10%);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   overflow: hidden;
@@ -74,8 +74,8 @@
   flex-direction: column;
 
   &__header {
-    background: $secondary;  // dark indigo
-    color: $light;           // white text
+    background: #131B3F;  // dark indigo
+    color: #FFFFFF;           // white text
     padding: 1rem;
     font-size: 1.125rem;
     font-weight: 600;
@@ -84,7 +84,7 @@
   &__body {
     padding: 1rem;
     flex: 1;
-    color: $dark;            // black-ish text
+    color: #0A0F2E;            // black-ish text
     font-size: 1rem;
     line-height: 1.6;
   }
