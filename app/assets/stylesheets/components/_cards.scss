@@ -1,39 +1,46 @@
-@import "config/bootstrap_variables";  // your color vars
+// app/assets/stylesheets/components/_cards.scss
+
+@import "config/bootstrap_variables";  // bring in your color vars
 
 /* ================================================================
-   Elegant Two‐Tone Card Component
+   Card Component – no button overrides, uses global .btn-theme
    ================================================================ */
 
 .card-wrapper {
   display: flex;
   justify-content: center;
-  margin: 2rem 0;       // top/bottom breathing room
-  padding: 0 1rem;      // side padding on small screens
+  margin: 2rem 0;       // vertical spacing
+  padding: 0 1rem;      // side padding on mobile
 }
 
 .card-pro {
-  background: linear-gradient(
-    135deg,
-    #131B3F 0%,
-    #0A0F2E 100%
-  );                    // two‐tone indigo gradient
-  color: #FFFFFF;       // white text
-  border-radius: 1rem;  // rounded corners
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  max-width: 400px;     // card max width
-  width: 100%;          // fluid on mobile
-  padding: 2rem;        // inner spacing
+  max-width: 400px;
+  width: 100%;
+  background: $secondary;           // dark indigo
+  color:      $light;               // white text
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 2rem;
 
   &__title {
-    margin: 0 0 1rem;
+    margin: 0 0 1.5rem;
     font-size: 1.75rem;
     font-weight: 600;
-    line-height: 1.2;
+    text-align: center;
+    color: $light;
   }
 
   &__content {
-    margin: 0;
+    margin-bottom: 1rem;
     font-size: 1rem;
     line-height: 1.6;
+    color: $light;
+  }
+
+  &__actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;        // space between buttons
   }
 }

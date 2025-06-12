@@ -3,7 +3,7 @@
 @import "config/bootstrap_variables";  // your color vars
 
 /* ================================================================
-   Product Show – reuse .card-pro & style action buttons
+   Product Show – page padding & header
    ================================================================ */
 
 /* overall page padding */
@@ -40,7 +40,8 @@
       font-size: 1rem;
       color: $dark;
 
-      .product-supplier-link {
+      .product-supplier-link,
+      .product-email-link {
         color: $primary;
         text-decoration: none;
 
@@ -52,7 +53,10 @@
   }
 }
 
-/* center the two-tone card */
+/* ================================================================
+   Card wrapper
+   ================================================================ */
+
 .card-wrapper {
   display: flex;
   justify-content: center;
@@ -60,11 +64,16 @@
   padding: 0 1rem;
 }
 
-/* style the import-btns inside your card to match app buttons */
-.card-pro__actions .import-btn {
-  @extend .btn-theme;                // uses grey default + orange on hover
-  padding: 0.75rem 1.5rem;           // match other import-btn sizing
+/* ================================================================
+   Global import-btn styling
+   (applies to both Renegotiate inside card & Back to results below)
+   ================================================================ */
+
+.import-btn {
+  @extend .btn-theme;            // grey background + orange on hover
+  padding: 0.75rem 1.5rem;       // match your other import-btns
   font-weight: 600;
   border-radius: 0.375rem;
-  margin: 0 0.5rem;                  // space between the two buttons
+  display: inline-block;         // ensure block-level padding
+  text-align: center;            // center the label
 }
