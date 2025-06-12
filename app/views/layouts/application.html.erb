@@ -11,18 +11,18 @@
   </head>
 
   <body>
-    <!-- left‐side navbar -->
+    <!-- Left‐side navbar -->
     <%= render "shared/navbar" %>
 
-    <!-- flash messages -->
+    <!-- Flash messages -->
     <%= render "shared/flashes" %>
 
-    <!-- main page content, shifted right by .content style -->
+    <!-- Main content area (includes footer for alignment) -->
     <main class="content">
       <%= yield %>
-    </main>
 
-    <!-- footer -->
-    <%= render "shared/footer" %>
+      <!-- Footer rendered inside .content so it lines up -->
+      <%= render "shared/footer" %>
+    </main>
   </body>
 </html>

@@ -1,42 +1,44 @@
-// app/assets/stylesheets/_footer.scss
+@import "config/bootstrap_variables";    // bring in your colors
 
 .footer {
-  background-color: $secondary;
-  color: $body-color;
-  margin-top: 3rem;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  background-color: $secondary;        // full-width indigo
+  color: $body-color;                  // light text
+  margin-top: 3rem;                    // gap above footer
 
-  a {
-    color: $body-color;                // default link color
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &:hover,
-    &:focus {
-      color: $navbar-dark-hover-color;  // orange on hover
-      text-decoration: underline;
-    }
+  /* ── inner container with explicit max-width ── */
+  &__inner {
+    max-width: 1200px;                 // match your main content width
+    margin: 0 auto;                    // center inside the footer
+    padding: 2rem 1.5rem;              // vertical + side padding
   }
 
+  /* ── links row ── */
   &__links {
     list-style: none;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
-    display: inline-flex;
+    display: flex;
+    justify-content: center;
     gap: 3rem;
     font-size: 1.125rem;
 
-    li {
-      margin: 0;
+    a {
+      color: $body-color;
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover,
+      &:focus {
+        color: $navbar-dark-hover-color;
+        text-decoration: underline;
+      }
     }
   }
 
+  /* ── copyright ── */
   &__copyright {
-    margin-top: 2.5rem;
-    font-size: 1rem;
-    color: lighten($body-color, 20%);
+    margin-top: 0;
+    font-size: 0.875rem;
+    opacity: 0.8;
   }
 }
