@@ -1,3 +1,6 @@
+// Import your color variables
+@import "config/bootstrap_variables";
+
 /* ================================================================
    Product Show – theme-aligned (reuse index styles)
    ================================================================ */
@@ -16,7 +19,7 @@
 .wrapper-that-freezes-things {
   position: sticky;
   top: 0;
-  background: #FFFFFF;   // white
+  background: $light;   // now defined!
   z-index: 10;
   padding-bottom: 0.5rem;
 
@@ -31,7 +34,7 @@
       margin: 0;
       font-size: 1.75rem;
       font-weight: 700;
-      color: #0A0F2E;    // black-ish
+      color: $dark;
     }
 
     .product-supplier {
@@ -39,7 +42,7 @@
       color: #0A0F2E;
 
       .product-supplier-link {
-        color: #FF7518;         // orange
+        color: $primary;
         text-decoration: none;
 
         &:hover {
@@ -56,7 +59,6 @@
   gap: 2rem;
   padding-top: 2rem;
 
-  /* 1 column on mobile, 2 on tablet+ */
   grid-template-columns: 1fr;
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
@@ -74,8 +76,8 @@
   flex-direction: column;
 
   &__header {
-    background: #131B3F;  // dark indigo
-    color: #FFFFFF;           // white text
+    background: $secondary;
+    color: $light;
     padding: 1rem;
     font-size: 1.125rem;
     font-weight: 600;
@@ -84,7 +86,7 @@
   &__body {
     padding: 1rem;
     flex: 1;
-    color: #0A0F2E;            // black-ish text
+    color: $dark;
     font-size: 1rem;
     line-height: 1.6;
   }
