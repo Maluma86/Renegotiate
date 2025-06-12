@@ -10,7 +10,8 @@ class Product < ApplicationRecord
   validates :description, presence: true
   validates :current_price, presence: true
   validates :contract_end_date, presence: true
-  # …
+
+  # … used in the SHOW page
   def sku
     "SKU-#{id.to_s.rjust(6,'0')}"
   end
@@ -26,4 +27,31 @@ class Product < ApplicationRecord
   def last_year_volume
     last_month_volume.to_f * 12
   end
+
+  # WHAT IT IS : below is the function to automatically update the status.
+    # So when you upload it it is pending = no renegotiation started
+    # then when the user clicks on renegotiation and a negotiation starts, it is "ongoing"
+    # if a user clicked on talk to a human it is "human required"
+    # when it is done it is "done"
+  def renegotiation_status
+    #If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
+    return "pending" if renegotiations.none?
+
+    # here in case one product has multiple renegotiation, we sort them from newst to oldest and take the latest one
+    latest = renegotiations.order(created_at: :desc).first
+
+    case latest.status.to_s.downcase #We now look at the status of that latest renegotiation
+    when "human_required"
+      "human required"
+    when "ongoing", "initialized" #If the latest status is either "in_progress" or "initiated", return "ongoing".
+      "ongoing"
+    when "done" #If the renegotiation is marked "completed", the product is "done".
+      "done"
+    else
+      "pending"
+    end
+  end
+
+
+
 end
