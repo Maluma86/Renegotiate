@@ -1,0 +1,4 @@
+name,category,description,current_price,last_month_volume,status,contract_end_date,supplier_company_name,supplier_contact,supplier_contact_email,supplier_email
+Laura  Premium Paper,Laura category,Laura description,120,8000,Ongoing,31/12/2025,LauraCo,Laura S.,Laura@gmail.com,Laura@gmail.com
+Laura Stapler,Laura category,Laura description,85,2500,Pending,15/02/2026,LauraCo,Laura S.,Laura@gmail.com,Laura@gmail.com
+Laura Laptop Pro 15,Laura category,Laura description,1800,12000,Human required,10/11/2025,LauraCo,Laura S.,Laura@gmail.com,Laura@gmail.com
