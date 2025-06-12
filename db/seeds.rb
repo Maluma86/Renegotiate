@@ -94,7 +94,7 @@ renegotiations = []
   max_target = current_price * 0.9  # 10% discount min
 
   renegotiations << Renegotiation.create!(
-    status: ["Initiated", "In Progress", "Completed", "Cancelled"].sample,
+    status: ["ongoing", "done", "Human required"].sample,
     thread: Faker::Quote.matz,
     tone: ["collaborative", "neutral", "aggressive"].sample,
     min_target: min_target,
@@ -154,9 +154,9 @@ demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
   )
 end
 
-# Create demo renegotiation
+# Create a demo renegotiation linked to the first product of walmart that is ongoing
 Renegotiation.create!(
-  status: "in_progress",
+  status: "ongoing",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
@@ -166,6 +166,31 @@ Renegotiation.create!(
   buyer: demo_procurement1,
   supplier: demo_supplier
 )
+
+Renegotiation.create!(
+  status: "human_required",
+  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
+  tone: "collaborative",
+  min_target: 800,
+  max_target: 900,
+  new_price: nil,
+  product: demo_products.second,
+  buyer: demo_procurement1,
+  supplier: demo_supplier
+)
+
+Renegotiation.create!(
+  status: "done",
+  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
+  tone: "collaborative",
+  min_target: 800,
+  max_target: 900,
+  new_price: nil,
+  product: demo_products.third,
+  buyer: demo_procurement1,
+  supplier: demo_supplier
+)
+
 
 puts "✅ Created demo users and sample data"
 
