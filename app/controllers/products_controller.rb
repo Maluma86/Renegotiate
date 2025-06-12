@@ -22,7 +22,7 @@ class ProductsController < ApplicationController
       @products = Product.joins(:supplier).where(sql_subquery, query: "%#{params[:query]}%")
     else
       # that's if there is no search, the standard index call
-      @products = Product.all
+      @products = Product.where(procurement: current_user)
     end
 
     # Below is everything related to clicking on the header and having elements ranked alphabetically or so
