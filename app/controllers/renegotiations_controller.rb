@@ -1,7 +1,7 @@
 class RenegotiationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_product, only: %i[new create]
-  before_action :set_renegotiation, only: %i[confirm_target set_target]
+  before_action :set_renegotiation, only: %i[confirm_target set_target save_discount_targets]
 
   def new
     @renegotiation = @product.renegotiations.build
@@ -41,6 +41,41 @@ class RenegotiationsController < ApplicationController
                 notice: "Target set to #{target_price} with #{selected_tone} tone"
   end
 
+  def save_discount_targets
+    # Extract parameters
+    target_percentage = params[:target_discount_percentage].to_f
+    min_percentage = params[:min_discount_percentage].to_f
+    
+    # Authorization check (only buyer can set targets)
+    unless @renegotiation.buyer_id == current_user.id
+      return render json: { success: false, error: 'Not authorized' }, status: :forbidden
+    end
+    
+    # Validation
+    if target_percentage < 0 || target_percentage > 100 || min_percentage < 0 || min_percentage > 100
+      return render json: { success: false, error: 'Percentages must be between 0 and 100' }, status: :unprocessable_entity
+    end
+    
+    if min_percentage > target_percentage
+      return render json: { success: false, error: 'Minimum cannot be greater than target' }, status: :unprocessable_entity
+    end
+    
+    # Save using our model method
+    begin
+      @renegotiation.lock_targets!(target_percentage, min_percentage, current_user)
+      render json: { 
+        success: true, 
+        message: 'Discount targets saved successfully',
+        locked: true 
+      }
+    rescue => e
+      render json: { 
+        success: false, 
+        error: e.message 
+      }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_product
@@ -53,5 +88,9 @@ class RenegotiationsController < ApplicationController
 
   def renegotiation_params
     params.require(:renegotiation).permit(:tone, :min_target, :max_target, :thread, :new_price)
+  end
+
+  def discount_target_params
+    params.permit(:target_discount_percentage, :min_discount_percentage)
   end
 end

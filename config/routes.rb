@@ -12,8 +12,9 @@ Rails.application.routes.draw do
   # CRUD Renegotiation workflow with AI-powered target confirmation
   resources :renegotiations do
     member do
-      get :confirm_target # GET /renegotiations/:id/confirm_target
-      post :set_target # POST /renegotiations/:id/set_target
+      get :confirm_target          # GET /renegotiations/:id/confirm_target
+      post :set_target             # POST /renegotiations/:id/set_target
+      post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
     end
   end
 

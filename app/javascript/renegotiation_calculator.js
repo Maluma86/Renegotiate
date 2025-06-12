@@ -106,4 +106,124 @@ document.addEventListener('DOMContentLoaded', function() {
   updateCalculatedRange();
   
   console.log('Renegotiation Calculator initialized successfully');
+  
+  // === AJAX DISCOUNT TARGETS FUNCTIONALITY ===
+  
+  // Get AJAX form elements
+  const discountTargetsForm = document.getElementById('discount-targets-form');
+  const saveTargetsBtn = document.getElementById('save-targets-btn');
+  const newTargetsBtn = document.getElementById('new-targets-btn');
+  const loadingMessage = document.getElementById('loading-message');
+  const successMessage = document.getElementById('success-message');
+  const errorMessage = document.getElementById('error-message');
+  
+  // AJAX form submission handler
+  if (discountTargetsForm) {
+    discountTargetsForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent normal form submission
+      submitDiscountTargets();
+    });
+  }
+  
+  // New Targets button handler
+  if (newTargetsBtn) {
+    newTargetsBtn.addEventListener('click', function() {
+      unlockTargets();
+    });
+  }
+  
+  // Function to submit discount targets via AJAX
+  function submitDiscountTargets() {
+    const formData = new FormData(discountTargetsForm);
+    
+    // Show loading state
+    showLoadingState();
+    
+    // Submit AJAX request
+    fetch(discountTargetsForm.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        handleSaveSuccess(data);
+      } else {
+        handleSaveError(data.error);
+      }
+    })
+    .catch(error => {
+      handleSaveError('Network error. Please try again.');
+      console.error('AJAX Error:', error);
+    });
+  }
+  
+  // Handle successful save
+  function handleSaveSuccess(data) {
+    hideLoadingState();
+    showSuccessMessage(data.message);
+    lockTargets();
+  }
+  
+  // Handle save error
+  function handleSaveError(errorMessage) {
+    hideLoadingState();
+    showErrorMessage(errorMessage);
+  }
+  
+  // Lock inputs and switch to "New Targets" mode
+  function lockTargets() {
+    targetDiscountInput.disabled = true;
+    minDiscountInput.disabled = true;
+    
+    if (saveTargetsBtn) saveTargetsBtn.style.display = 'none';
+    if (newTargetsBtn) newTargetsBtn.style.display = 'inline-block';
+  }
+  
+  // Unlock inputs and switch to "Save Targets" mode  
+  function unlockTargets() {
+    targetDiscountInput.disabled = false;
+    minDiscountInput.disabled = false;
+    
+    if (newTargetsBtn) newTargetsBtn.style.display = 'none';
+    if (saveTargetsBtn) saveTargetsBtn.style.display = 'inline-block';
+    
+    clearMessages();
+  }
+  
+  // Message display functions
+  function showLoadingState() {
+    clearMessages();
+    if (loadingMessage) loadingMessage.style.display = 'block';
+    if (saveTargetsBtn) saveTargetsBtn.disabled = true;
+  }
+  
+  function hideLoadingState() {
+    if (loadingMessage) loadingMessage.style.display = 'none';
+    if (saveTargetsBtn) saveTargetsBtn.disabled = false;
+  }
+  
+  function showSuccessMessage(message) {
+    if (successMessage) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+    }
+  }
+  
+  function showErrorMessage(message) {
+    if (errorMessage) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+  }
+  
+  function clearMessages() {
+    if (loadingMessage) loadingMessage.style.display = 'none';
+    if (successMessage) successMessage.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'none';
+  }
 });

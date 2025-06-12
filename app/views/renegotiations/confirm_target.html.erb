@@ -34,10 +34,61 @@
           <% else %>
             Not specified
           <% end %><br>
-          <strong>Target Discount:</strong>
-          <input id="target-discount" type="number" step="0.5" placeholder="0.0" class="discount-input"> %<br>
-          <strong>Min Discount:</strong>
-          <input id="min-discount" type="number" step="0.5" placeholder="0.0" class="discount-input"> %
+          
+          <!-- AJAX Discount Targets Form -->
+          <%= form_with url: save_discount_targets_renegotiation_path(@renegotiation),
+                        method: :post,
+                        id: "discount-targets-form",
+                        local: false do |form| %>
+            
+            <div class="discount-targets-section">
+              <div class="discount-input-group">
+                <strong>Target Discount:</strong>
+                <%= form.number_field :target_discount_percentage,
+                                      id: "target-discount",
+                                      step: 0.5,
+                                      placeholder: "0.0",
+                                      class: "discount-input",
+                                      value: @renegotiation.current_target_discount_percentage,
+                                      disabled: @renegotiation.discount_targets_locked? %> %
+              </div>
+              
+              <div class="discount-input-group">
+                <strong>Min Discount:</strong>
+                <%= form.number_field :min_discount_percentage,
+                                      id: "min-discount",
+                                      step: 0.5,
+                                      placeholder: "0.0",
+                                      class: "discount-input",
+                                      value: @renegotiation.current_min_discount_percentage,
+                                      disabled: @renegotiation.discount_targets_locked? %> %
+              </div>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div class="discount-targets-controls">
+              <% if @renegotiation.discount_targets_locked? %>
+                <button type="button" id="new-targets-btn" class="btn btn-secondary btn-sm">
+                  New Targets
+                </button>
+              <% else %>
+                <button type="submit" id="save-targets-btn" class="btn btn-primary btn-sm">
+                  Save Targets
+                </button>
+              <% end %>
+            </div>
+            
+            <!-- Message Areas -->
+            <div id="discount-targets-messages">
+              <div id="loading-message" class="alert alert-info" style="display: none;">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Saving targets...
+              </div>
+              <div id="success-message" class="alert alert-success" style="display: none;"></div>
+              <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            </div>
+            
+          <% end %>
         </div>
       </div>
     </div>
