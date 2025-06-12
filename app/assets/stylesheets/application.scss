@@ -7,6 +7,7 @@
 // 2. Components
 @import "components/navbar";
 @import "components/products_index";
+@import "components/devise";
 @import "components/footer";
 @import "components/renegotiation_confirmation";
 
@@ -14,12 +15,43 @@
 @import "pages/index";
 @import "products";
 
-// 4. Utility: shift main content over for the sidebar
-.content {
-  margin-left: 240px;  // match .navbar width
-  padding: 1rem;
+// 4. Utility: global reset & layout tweaks
+
+// make html/body fill viewport and remove default margin
+html, body {
+  height: 100%;
+  margin: 0;
+  background: $body-bg;    // page background behind content
 }
 
+// wrap entire app in a column flexbox
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// shift only the main content (not navbar) for the sidebar
+.content {
+  margin-left: 240px;      // match .navbar width
+  padding: 1rem;
+
+  // turn the content area into a column that fills available height
+  display: flex;
+  flex-direction: column;
+  flex: 1;                 // take up all remaining vertical space
+
+  // kill any extra bottom gap
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+// ensure your show/index container within .content grows to push footer down
+.content > .product-page-container {
+  flex: 1;
+}
+
+// remove default link underlines everywhere
 a {
   text-decoration: none !important;
 }

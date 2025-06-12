@@ -51,74 +51,108 @@ class ProductsController < ApplicationController
     # Just renders the form view
   end
 
+
   def upload
     if params[:file].present?
       begin
         file_content = params[:file].read
 
-        # First parse to clean headers
-        raw_csv = CSV.parse(file_content, headers: true, col_sep: ',', quote_char: '"')
-        cleaned_headers = raw_csv.headers.map { |h| h.to_s.strip }
-
-        # Re-parse with clean headers
+        # Parse CSV and clean headers
+        raw_csv = CSV.parse(file_content, headers: true, col_sep: ',', quote_char: '"', liberal_parsing: true)
+        cleaned_headers = raw_csv.headers.map(&:strip)
         csv = CSV.parse(file_content, headers: cleaned_headers, col_sep: ',', quote_char: '"', liberal_parsing: true)
 
         imported_count = 0
         skipped_count = 0
 
         csv.each_with_index do |row, index|
-          product_data = row.to_h
+          product_data = row.to_h.transform_keys(&:strip)
 
-          # for supplier
-          required_supplier_fields = %w[supplier_email supplier_company_name]
-          if required_supplier_fields.any? { |key| product_data[key].blank? }
-            Rails.logger.warn "Row #{index + 2} skipped: missing supplier info"
+          # Skip empty or clearly invalid rows (e.g. duplicated header row)
+          if product_data["name"].to_s.strip.downcase == "name" || product_data["supplier_email"].to_s.strip.downcase == "supplier_email"
+            Rails.logger.warn "⚠️ Row #{index + 2} skipped: duplicate or invalid header row"
             skipped_count += 1
             next
           end
 
-          supplier = User.find_or_create_by(email: product_data["supplier_email"]) do |user|
-            user.company_name = product_data["supplier_company_name"]
-            user.contact = product_data["supplier_contact"]
-            user.contact_email = product_data["supplier_contact_email"]
-            user.role = "supplier"
-            user.password = "ImportPass123!" # Required by Devise
-          end
+          # Extract and sanitize supplier fields
+          company_name   = product_data["supplier_company_name"].to_s.strip
+          supplier_email = product_data["supplier_email"].to_s.strip
+          contact_name   = product_data["supplier_contact"].to_s.strip
+          contact_email  = product_data["supplier_contact_email"].to_s.strip
 
-          # the procurement_id is the one of the user who is upload it
-          procurement = current_user
-
-          if supplier.nil?
-            Rails.logger.info "➡️ Supplier '#{supplier.company_name}' (id: #{supplier.id}) created or found"
+          if company_name.blank?
+            Rails.logger.warn "❌ Row #{index + 2} skipped: missing supplier company name"
             skipped_count += 1
             next
           end
 
+          # Choose a valid email
+          email = supplier_email.presence || contact_email.presence
+          if email.blank? || email.downcase == "supplier_email" || !(email =~ URI::MailTo::EMAIL_REGEXP)
+            Rails.logger.warn "❌ Row #{index + 2} skipped: missing or invalid email"
+            skipped_count += 1
+            next
+          end
+
+          # Find or create supplier
+          supplier = User.find_or_initialize_by(company_name: company_name, role: "supplier")
+          if supplier.new_record?
+            supplier.assign_attributes(
+              email: email,
+              contact: contact_name,
+              contact_email: contact_email,
+              password: "ImportPass123!" # secure temporary password
+            )
+            supplier.save!
+            Rails.logger.info "✅ Created new supplier '#{supplier.company_name}'"
+          else
+            Rails.logger.info "➡️ Reused existing supplier '#{supplier.company_name}'"
+          end
+
+          # Fallback for development if user not logged in
+          procurement = current_user || User.find_by(role: "procurement") || User.first
+          if procurement.nil?
+            Rails.logger.warn "❌ Row #{index + 2} skipped: current_user (procurement) missing"
+            skipped_count += 1
+            next
+          end
+
+          # Parse contract_end_date
+          begin
+            contract_date = Date.strptime(product_data["contract_end_date"].to_s.strip, "%d/%m/%Y")
+          rescue ArgumentError
+            Rails.logger.warn "❌ Row #{index + 2} skipped: invalid date format '#{product_data["contract_end_date"]}'"
+            skipped_count += 1
+            next
+          end
+
+          # Create and save the product
           product = Product.new(
-            name: product_data["name"],
-            category: product_data["category"],
-            description: product_data["description"],
+            name: product_data["name"].to_s.strip,
+            category: product_data["category"].to_s.strip,
+            description: product_data["description"].to_s.strip,
             current_price: product_data["current_price"],
             last_month_volume: product_data["last_month_volume"],
             status: product_data["status"] || "Pending",
-            contract_end_date: product_data["contract_end_date"],
+            contract_end_date: contract_date,
             supplier: supplier,
             procurement: procurement
           )
 
           if product.save
-            Rails.logger.info "✅ Product '#{product.name}' created successfully."
+            Rails.logger.info "✅ Imported product '#{product.name}'"
             imported_count += 1
           else
-            Rails.logger.warn "❌ Product validation failed on row #{index + 2}: #{product.errors.full_messages.join(', ')}"
+            Rails.logger.warn "❌ Row #{index + 2} skipped: product invalid - #{product.errors.full_messages.join(', ')}"
             skipped_count += 1
           end
         end
 
         notice = "#{imported_count} product(s) imported successfully."
         notice += " #{skipped_count} row(s) skipped." if skipped_count > 0
-
         redirect_to products_path, notice: notice
+
       rescue CSV::MalformedCSVError => e
         redirect_to import_products_path, alert: "CSV format issue: #{e.message}"
       end
@@ -126,8 +160,6 @@ class ProductsController < ApplicationController
       redirect_to import_products_path, alert: "Please upload a CSV file."
     end
   end
-
-
 
   private
 

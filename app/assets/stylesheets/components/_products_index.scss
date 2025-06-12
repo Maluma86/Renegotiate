@@ -118,13 +118,6 @@ thead.products-table-head {
   }
 }
 
-  .table-scroll-wrapper {
-    max-height: 70vh;      // or whatever height you want
-    overflow-y: auto; // that allows scrolling
-    overflow-x: auto;
-
-  }
-
   tbody.products-table-body {
     font-size: 0.875rem;
     color: $body-color;

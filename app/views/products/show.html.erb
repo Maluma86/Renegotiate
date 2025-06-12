@@ -9,8 +9,7 @@
       <div class="product-supplier">
         Supplier:
         <% if (s = @product.supplier) %>
-          <%= link_to s.company_name, "#",
-                      class: "product-supplier-link" %>
+          <%= link_to s.company_name, "#", class: "product-supplier-link" %>
         <% else %>
           <span class="text-gray-500">Unknown</span>
         <% end %>
@@ -18,51 +17,54 @@
     </div>
   </div>
 
-  <!-- 2×2 grid of cards -->
-  <div class="product-show-grid">
-    <!-- DESCRIPTION -->
-    <div class="product-card">
-      <div class="product-card__header">Description</div>
-      <div class="product-card__body">
-        <%= @product.description.presence || "No description available." %>
-      </div>
-    </div>
+  <!-- Single centered detail card -->
+  <div class="product-show-card">
+    <div class="product-show-card__body">
+      <!-- Description -->
+      <section class="product-show-card__section">
+        <h3>Description</h3>
+        <p><%= @product.description.presence || "No description available." %></p>
+      </section>
 
-    <!-- CONTRACT DETAILS -->
-    <div class="product-card">
-      <div class="product-card__header">Contract Details</div>
-      <div class="product-card__body">
-        <p><strong>Current Price:</strong>
-           <%= number_to_currency(@product.current_price) %></p>
-        <p><strong>Ends:</strong>
-           <%= l(@product.contract_end_date) %></p>
-        <p><strong>Status:</strong>
-           <%= @product.status.capitalize %></p>
-      </div>
-    </div>
+      <!-- Contract Details -->
+      <section class="product-show-card__section">
+        <h3>Contract Details</h3>
+        <ul>
+          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
+          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
+          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
+        </ul>
+      </section>
 
-    <!-- SUPPLIER INFO -->
-    <div class="product-card">
-      <div class="product-card__header">Supplier Info</div>
-      <div class="product-card__body">
+      <!-- Supplier Info -->
+      <section class="product-show-card__section">
+        <h3>Supplier Info</h3>
         <% if s %>
           <p><strong><%= s.company_name %></strong></p>
           <p><%= mail_to s.contact_email %></p>
         <% else %>
           <p>No supplier on record.</p>
         <% end %>
-      </div>
+      </section>
+
+      <!-- Purchase Volumes -->
+      <section class="product-show-card__section">
+        <h3>Purchase Volumes</h3>
+        <ul>
+          <li><strong>Last 30 days:</strong> <%= @product.last_month_volume %> units</li>
+          <li><strong>Last 12 months:</strong> <%= @product.last_year_volume %> units</li>
+        </ul>
+      </section>
     </div>
 
-    <!-- PURCHASE VOLUMES -->
-    <div class="product-card">
-      <div class="product-card__header">Purchase Volumes</div>
-      <div class="product-card__body">
-        <p><strong>Last 30 days:</strong>
-           <%= @product.last_month_volume %> units</p>
-        <p><strong>Last 12 months:</strong>
-           <%= @product.last_year_volume %> units</p>
-      </div>
+    <!-- Footer with both buttons centered -->
+    <div class="product-show-card__actions">
+      <%= link_to "← Back to results",
+                  products_path,
+                  class: "import-btn" %>
+      <%= link_to "Renegotiate",
+                  new_product_renegotiation_path(@product),
+                  class: "import-btn" %>
     </div>
   </div>
 
