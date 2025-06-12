@@ -50,7 +50,7 @@
           <td class="products-line-text"><%= product.last_month_volume %></td>
           <td class="products-line-text">
             <span class="status <%= product.status.downcase.tr(' ', '_') %>">
-              <%= product.status.capitalize %>
+              <%= product.renegotiation_status.titleize %>
             </span>
           </td>
           <td class="products-line-text">
