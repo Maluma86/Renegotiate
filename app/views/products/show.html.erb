@@ -2,28 +2,36 @@
 
 <div class="product-page-container">
 
-  <!-- Sticky header with title + supplier email below -->
+  <!-- Sticky header: product name | supplier name | status -->
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
-      <!-- Left side: product name -->
+      <!-- Product name -->
       <h1 class="product-title"><%= @product.name %></h1>
 
-      <!-- Right side: supplier name + email -->
-      <div class="product-supplier">
-        <% if (s = @product.supplier) %>
-          <span class="supplier-label">Supplier:</span><br>
-          <%= link_to s.company_name, "#", class: "product-supplier-link" %><br>
-          <%= mail_to s.contact_email, s.contact_email, class: "product-email-link" %>
-        <% else %>
-          <span class="text-gray-500">Supplier: Unknown</span>
-        <% end %>
-      </div>
+      <!-- Supplier name (same styling as product-title) -->
+      <% if (s = @product.supplier) %>
+        <h1 class="product-title"><%= s.company_name %></h1>
+      <% else %>
+        <h1 class="product-title text-gray-500">Unknown Supplier</h1>
+      <% end %>
+
+      <!-- Status -->
+      <h1 class="product-title"><%= @product.status.capitalize %></h1>
     </div>
   </div>
 
-  <!-- Single centered card -->
+  <!-- Detail card -->
   <div class="card-wrapper">
     <div class="card-pro">
+      <hr>
+
+      <!-- Supplier email -->
+      <% if s && s.contact_email.present? %>
+        <p class="card-pro__content">
+          <strong>Email:</strong>
+          <%= mail_to s.contact_email, s.contact_email, class: "product-email-link" %>
+        </p>
+      <% end %>
 
       <!-- Description -->
       <p class="card-pro__content">
@@ -34,8 +42,7 @@
       <!-- Contract details -->
       <p class="card-pro__content">
         <strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %><br>
-        <strong>Ends:</strong>          <%= l(@product.contract_end_date)      %><br>
-        <strong>Status:</strong>        <%= @product.status.capitalize       %>
+        <strong>Ends:</strong>          <%= l(@product.contract_end_date) %>
       </p>
 
       <!-- Purchase volumes -->
@@ -44,7 +51,7 @@
         <strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units
       </p>
 
-      <!-- Renegotiate button inside the card -->
+      <!-- Renegotiate button -->
       <div class="card-pro__actions">
         <%= link_to "Renegotiate",
                     new_product_renegotiation_path(@product),
@@ -53,7 +60,7 @@
     </div>
   </div>
 
-  <!-- Back to results button below the card -->
+  <!-- Back to results -->
   <div class="text-center" style="margin-top: 1.5rem;">
     <%= link_to "← Back to results",
                 products_path,
