@@ -1,93 +1,93 @@
-// Import your color variables
-@import "config/bootstrap_variables";
+// // Import your color variables
+// @import "config/bootstrap_variables";
 
-/* ================================================================
-   Product Show – theme-aligned (reuse index styles)
-   ================================================================ */
+// /* ================================================================
+//    Product Show – theme-aligned (reuse index styles)
+//    ================================================================ */
 
-/* ---------- overall container ---------- */
-.product-page-container {
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-top: 2rem;
+// /* ---------- overall container ---------- */
+// .product-page-container {
+//   padding-left: 2rem;
+//   padding-right: 2rem;
+//   padding-top: 2rem;
 
-  @media (min-width: 768px)  { padding-left: 3rem; padding-right: 3rem; }
-  @media (min-width: 1024px) { padding-left: 6rem; padding-right: 6rem; }
-}
+//   @media (min-width: 768px)  { padding-left: 3rem; padding-right: 3rem; }
+//   @media (min-width: 1024px) { padding-left: 6rem; padding-right: 6rem; }
+// }
 
-/* ---------- sticky header (title + supplier) ---------- */
-.wrapper-that-freezes-things {
-  position: sticky;
-  top: 0;
-  background: $light;   // now defined!
-  z-index: 10;
-  padding-bottom: 0.5rem;
+// /* ---------- sticky header (title + supplier) ---------- */
+// .wrapper-that-freezes-things {
+//   position: sticky;
+//   top: 0;
+//   background: white;   // now defined!
+//   z-index: 10;
+//   padding-bottom: 0.5rem;
 
-  .products-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid lighten(#131B3F, 20%);
+//   .products-header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 1rem 0;
+//     border-bottom: 1px solid lighten(#131B3F, 20%);
 
-    .product-title {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: $dark;
-    }
+//     .product-title {
+//       margin: 0;
+//       font-size: 1.75rem;
+//       font-weight: 700;
+//       color: $dark;
+//     }
 
-    .product-supplier {
-      font-size: 1rem;
-      color: #0A0F2E;
+//     .product-supplier {
+//       font-size: 1rem;
+//       color: #0A0F2E;
 
-      .product-supplier-link {
-        color: $primary;
-        text-decoration: none;
+//       .product-supplier-link {
+//         color: $primary;
+//         text-decoration: none;
 
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-  }
-}
+//         &:hover {
+//           text-decoration: underline;
+//         }
+//       }
+//     }
+//   }
+// }
 
-/* ---------- grid of cards (2×2) ---------- */
-.product-show-grid {
-  display: grid;
-  gap: 2rem;
-  padding-top: 2rem;
+// /* ---------- grid of cards (2×2) ---------- */
+// .product-show-grid {
+//   display: grid;
+//   gap: 2rem;
+//   padding-top: 2rem;
 
-  grid-template-columns: 1fr;
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+//   grid-template-columns: 1fr;
+//   @media (min-width: 768px) {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+// }
 
-/* ---------- individual card ---------- */
-.product-card {
-  background: #FFFFFF;
-  border: 1px solid lighten(#131B3F, 10%);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+// /* ---------- individual card ---------- */
+// .product-card {
+//   background: #FFFFFF;
+//   border: 1px solid lighten(#131B3F, 10%);
+//   border-radius: 0.5rem;
+//   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+//   overflow: hidden;
+//   display: flex;
+//   flex-direction: column;
 
-  &__header {
-    background: $secondary;
-    color: $light;
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-  }
+//   &__header {
+//     background: $secondary;
+//     color: $light;
+//     padding: 1rem;
+//     font-size: 1.125rem;
+//     font-weight: 600;
+//   }
 
-  &__body {
-    padding: 1rem;
-    flex: 1;
-    color: $dark;
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-}
+//   &__body {
+//     padding: 1rem;
+//     flex: 1;
+//     color: $dark;
+//     font-size: 1rem;
+//     line-height: 1.6;
+//   }
+// }
