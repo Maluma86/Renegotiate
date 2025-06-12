@@ -7,7 +7,7 @@
     <!-- The container for the title and import button-->
     <div class="products-header">
       <h1 class="product-title">All your products:</h1>
-      <%= button_to "Import product(s)", "#", method: :get, class: "import-btn" %>
+      <%= button_to "Import product(s)", import_products_path, method: :get, class: "import-btn" %>
     </div>
 
     <!-- Search bar -->

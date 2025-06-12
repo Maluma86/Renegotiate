@@ -4,9 +4,21 @@
 @import "bootstrap";
 @import "font-awesome";
 
-// 2. Partials
-@import "components/index";
-@import "pages/index";
-
-@import "products";
+// 2. Components
+@import "components/navbar";
+@import "components/products_index";
 @import "components/footer";
+
+// 3. Page‐specific
+@import "pages/index";
+@import "products";
+
+// 4. Utility: shift main content over for the sidebar
+.content {
+  margin-left: 240px;  // match .navbar width
+  padding: 1rem;
+}
+
+a {
+  text-decoration: none !important;
+}

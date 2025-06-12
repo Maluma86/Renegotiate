@@ -1,211 +1,93 @@
-// app/assets/stylesheets/products.scss
+// // Import your color variables
+// @import "config/bootstrap_variables";
 
-.products-show {
-  background: #f9fafb;
-  min-height: 100vh;
-  display: flex;
+// /* ================================================================
+//    Product Show – theme-aligned (reuse index styles)
+//    ================================================================ */
 
-  .sidebar {
-    width: 4rem;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
-  }
+// /* ---------- overall container ---------- */
+// .product-page-container {
+//   padding-left: 2rem;
+//   padding-right: 2rem;
+//   padding-top: 2rem;
 
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+//   @media (min-width: 768px)  { padding-left: 3rem; padding-right: 3rem; }
+//   @media (min-width: 1024px) { padding-left: 6rem; padding-right: 6rem; }
+// }
 
-    .header {
-      height: 4rem;
-      background: #e5e7eb;
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
-    }
+// /* ---------- sticky header (title + supplier) ---------- */
+// .wrapper-that-freezes-things {
+//   position: sticky;
+//   top: 0;
+//   background: white;   // now defined!
+//   z-index: 10;
+//   padding-bottom: 0.5rem;
 
-    .content {
-      flex: 1;
-      padding: 2rem;
+//   .products-header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 1rem 0;
+//     border-bottom: 1px solid lighten(#131B3F, 20%);
 
-      &__title {
-        font-size: 2.25rem;
-        font-weight: 700;
-        margin-bottom: 2rem;
-        color: #111827;
-      }
+//     .product-title {
+//       margin: 0;
+//       font-size: 1.75rem;
+//       font-weight: 700;
+//       color: $dark;
+//     }
 
-      &__grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
+//     .product-supplier {
+//       font-size: 1rem;
+//       color: #0A0F2E;
 
-      @media (min-width: 1024px) {
-        &__grid { grid-template-columns: repeat(3, 1fr); }
-        &__desc { grid-column: span 2; }
-      }
+//       .product-supplier-link {
+//         color: $primary;
+//         text-decoration: none;
 
-      .card {
-        background: #fff;
-        padding: 1.5rem;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        transition: box-shadow .2s;
+//         &:hover {
+//           text-decoration: underline;
+//         }
+//       }
+//     }
+//   }
+// }
 
-        &:hover {
-          box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-        }
+// /* ---------- grid of cards (2×2) ---------- */
+// .product-show-grid {
+//   display: grid;
+//   gap: 2rem;
+//   padding-top: 2rem;
 
-        &--stat {
-          h3 {
-            font-size: 0.875rem; text-transform: uppercase; color: #6b7280;
-          }
-          p {
-            margin-top: 0.5rem; font-size: 1.5rem; font-weight: 700; color: #1f2937;
-          }
-        }
+//   grid-template-columns: 1fr;
+//   @media (min-width: 768px) {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+// }
 
-        &--desc {
-          h3 {
-            font-size: 1.125rem; margin-bottom: 1rem; color: #374151;
-          }
-          p { line-height: 1.6; color: #4b5563; }
-        }
-      }
+// /* ---------- individual card ---------- */
+// .product-card {
+//   background: #FFFFFF;
+//   border: 1px solid lighten(#131B3F, 10%);
+//   border-radius: 0.5rem;
+//   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+//   overflow: hidden;
+//   display: flex;
+//   flex-direction: column;
 
-      .actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 2rem;
+//   &__header {
+//     background: $secondary;
+//     color: $light;
+//     padding: 1rem;
+//     font-size: 1.125rem;
+//     font-weight: 600;
+//   }
 
-        .btn {
-          padding: 0.75rem 1.5rem;
-          border-radius: 0.5rem;
-          font-weight: 500;
-          text-decoration: none;
-          display: inline-block;
-          transition: background .2s, border .2s;
-
-          &--secondary {
-            background: #fff;
-            border: 1px solid #d1d5db;
-            color: #374151;
-
-            &:hover { background: #f9fafb; }
-          }
-
-          &--primary {
-            background: #2563eb;
-            color: #fff;
-
-            &:hover { background: #1d4ed8; }
-          }
-        }
-      }
-    }
-  }
-}
-
-
-.product-show {
-  display: flex;
-  min-height: 100vh;
-  background: #f3f4f6; // very light gray page bg
-
-  // ─── LEFT NAVBAR ───────────────────────
-  .sidebar {
-    width: 5rem; // 80px
-    background: #ffffff;
-    border-right: 1px solid #e2e8f0;
-    padding: 2rem 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-
-    .nav-button {
-      width: 3rem;
-      height: 3rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e5e7eb; // light gray
-      border-radius: 50%;
-      transition: background .2s, transform .2s, box-shadow .2s;
-
-      i {
-        font-size: 1.75rem;
-        color: #1f2937; // dark slate
-      }
-
-      &:hover,
-      &.active {
-        background: #d1d5db;
-        transform: scale(1.1);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
-    }
-  }
-
-  // ─── MAIN CONTENT ─────────────────────
-  .content {
-    flex: 1;
-    padding: 2rem;
-
-    & > .header {
-      background: #ffffff;
-      border-radius: 1.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      padding: 2rem;
-      margin-bottom: 2rem;
-
-      h1 {
-        font-size: 2.75rem;
-        color: #111827; // almost black
-        margin-bottom: .5rem;
-      }
-      p {
-        color: #1f2937;
-        font-size: 1.125rem;
-      }
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-
-      // Description spanning two columns
-      .description-card {
-        grid-column: span 2;
-      }
-
-      .card {
-        background: #ffffff;
-        border-radius: 1.5rem;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        padding: 1.5rem;
-
-        h3 {
-          font-size: 1.25rem;
-          color: #111827;
-          margin-bottom: .75rem;
-        }
-        p, li {
-          color: #1f2937;
-        }
-        ul {
-          padding-left: 1rem;
-          margin: 0;
-        }
-      }
-    }
-  }
-}
+//   &__body {
+//     padding: 1rem;
+//     flex: 1;
+//     color: $dark;
+//     font-size: 1rem;
+//     line-height: 1.6;
+//   }
+// }

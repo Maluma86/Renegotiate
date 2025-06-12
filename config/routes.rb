@@ -20,8 +20,13 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  # Products & nested renegotiations
+  # creating the routes related to products
   resources :products, only: [:index, :show] do
+    collection do
+      get :import   # shows the import form
+      post :upload  # uploading the CSV
+    end
+
     resources :renegotiations, only: [:new, :create]
   end
 end
