@@ -10,14 +10,31 @@
           <strong>Conversation</strong>
         </div>
         <div class="card-body">
+
             <%# Below is for the chatbox %>
           <div class="container chatbot">
             <h1>Chat with us</h1>
+            <!-- initial message from the system to kick the conversation off -->
+            <p class="chat-intro-message">
+              Hi <%= @supplier.contact %>,
+              I’ll be handling the renegotiation on behalf of <%= @renegotiation.buyer.company_name %>.
+              Our current contract for <%= @product.name %> is approaching its renewal date on <%= @product.contract_end_date.strftime("%B %d, %Y") %>.
+
+              We’ve been very satisfied with the quality of the product and value our collaboration so far. However, considering current market trends and our internal cost optimization efforts, we believe a price adjustment is reasonable.
+
+              We propose renewing the contract at a revised unit price of <%= number_to_currency(@renegotiation.max_target) %>.
+              Let us know your thoughts or if there’s any additional context we should consider.
+            </p>
+
+            <!-- And the conversation starts -->
             <div id="questions">
               <%= render @questions %>
             </div>
             <%= render "form", question: @question %>
           </div>
+
+
+
           <!-- your JS widget will mount here -->
           <div id="chat-container">
             <!-- e.g. <chat-widget :renegotiation-id="<%= @renegotiation.id %>"> -->
