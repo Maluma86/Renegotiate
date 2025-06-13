@@ -7,6 +7,8 @@ class RenegotiationsController < ApplicationController
     # we already have @renegotiation from set_renegotiation
     @product  = @renegotiation.product
     @supplier = @product.supplier
+    @questions = current_user.questions
+    @question = Question.new # for form
   end
 
   def new

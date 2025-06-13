@@ -10,6 +10,14 @@
           <strong>Conversation</strong>
         </div>
         <div class="card-body">
+            <%# Below is for the chatbox %>
+          <div class="container chatbot">
+            <h1>Chat with us</h1>
+            <div id="questions">
+              <%= render @questions %>
+            </div>
+            <%= render "form", question: @question %>
+          </div>
           <!-- your JS widget will mount here -->
           <div id="chat-container">
             <!-- e.g. <chat-widget :renegotiation-id="<%= @renegotiation.id %>"> -->
