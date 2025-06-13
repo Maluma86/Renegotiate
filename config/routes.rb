@@ -24,6 +24,10 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
+  # Below for the chatbot
+  resources :questions, only: [:index, :create]
+
+  # creating the routes related to products
   # Products routes
   resources :products, only: [:index, :show] do
     collection do
