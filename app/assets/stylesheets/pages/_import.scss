@@ -1,0 +1,66 @@
+@import "config/bootstrap_variables";
+
+/* ================================================================
+   Import Products – CSV Upload Form styling
+   ================================================================ */
+
+.import-form {
+  max-width: 400px;                // limit form width
+  margin: 4rem auto;               // center + vertical space
+  background: $secondary;          // dark indigo bg
+  padding: 2rem;                   // inner padding
+  border-radius: 0.5rem;           // rounded corners
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  color: $light;                   // white text
+
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: $light;
+  }
+
+  .form-group {
+    label {
+      color: $light;               // white labels
+    }
+
+    .form-control-file {
+      background: lighten($secondary, 10%);
+      border: 1px solid darken($secondary, 10%);
+      color: $light;
+    }
+
+    #selected-filename {
+      margin-top: 0.5rem;
+      font-style: italic;
+      color: rgba($light, 0.7);
+    }
+  }
+
+  .import-btn {
+    @extend .btn-theme;            // reuse your button style
+    background: #282828;           // orange bg
+    color: $light !important;      // white text
+    width: 100%;                   // full-width
+    margin-top: 1rem;
+
+    &:hover {
+      background: darken($primary, 10%);
+    }
+  }
+
+  .download-template {
+    margin-top: 2rem;
+    text-align: center;
+
+    .btn-outline-secondary {
+      color: $light;
+      border-color: rgba($light, 0.8);
+
+      &:hover {
+        background: rgba($light, 0.1);
+        color: $dark;
+      }
+    }
+  }
+}
