@@ -69,6 +69,7 @@ class Renegotiation < ApplicationRecord
   private
 
   def next_version_number
-    (discount_target_histories.maximum(:version_number) || 0) + 1
+    # Force fresh database query to avoid caching issues
+    ((DiscountTargetHistory.where(renegotiation_id: id).maximum(:version_number)) || 0) + 1
   end
 end
