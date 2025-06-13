@@ -25,8 +25,8 @@
           <strong>Summary of the Agreement</strong>
         </div>
         <div class="card-body">
-          <p><strong>Contract value</strong><br>
-             <%= number_to_currency(@product.current_price * @product.last_month_volume) %>
+          <p><strong>Current Price</strong><br>
+             <%= number_to_currency(@product.current_price) %>
           </p>
           <p><strong>Volume</strong><br>
              <%= @product.last_month_volume %> units
@@ -34,9 +34,8 @@
           <p><strong>Contract length</strong><br>
              <%= contract_length_months(Date.today, @product.contract_end_date) %>
           </p>
-          <p><strong>Differences with previous contracts</strong><br>
-             <%= @renegotiation.differences.presence ||
-                   "No differences recorded yet." %>
+          <p><strong>Notes / Thread</strong><br>
+             <%= @renegotiation.thread.presence || "No notes recorded yet." %>
           </p>
         </div>
       </div>
