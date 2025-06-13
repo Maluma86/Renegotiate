@@ -1,0 +1,50 @@
+// app/assets/stylesheets/components/_cards.scss
+
+@import "config/bootstrap_variables";
+
+/* ── Card wrapper to center on‐screen ───────────────────────── */
+.card-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+/* ── Elegant Two‐Tone Card ──────────────────────────────────── */
+.card-pro {
+  max-width: 600px;
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    $card-bg-start 0%,
+    $card-bg-end   100%
+  );
+  color:      $card-text;
+  border-radius: 0.5rem;
+  box-shadow:    0 2px 6px rgba(0,0,0,0.2);
+  padding:       2rem;
+  display:       flex;
+  flex-direction: column;
+
+  &__title {
+    margin-bottom: 1.5rem;
+    font-size:     1.75rem;
+    font-weight:   600;
+    text-align:    center;
+    color:         $card-text;
+  }
+
+  &__content {
+    margin-bottom: 1rem;
+    font-size:     1rem;
+    line-height:   1.6;
+    color:         $card-text;
+  }
+
+  &__actions {
+    margin-top: 1.5rem;
+    display:    flex;
+    justify-content: center;
+    gap:        1rem;
+  }
+}
