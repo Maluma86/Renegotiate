@@ -1,13 +1,3 @@
-/* ================================================================
-   Renegotiation Target Confirmation – theme-aligned
-   ----------------------------------------------------------------
-   Follows the same spacing and theme patterns as products_index.scss
-   Uses variables from _bootstrap_variables.scss:
-     $body-bg        #0A0F2E   (page background)
-     $body-color     #E5E4E2   (base text colour)
-     $primary        #FF7518   (orange accent)
-     $secondary      #131B3F   (indigo / slate accent)
-   ================================================================ */
 
 /* ---------- overall container ---------- */
 .renegotiation-confirmation-container {
@@ -262,18 +252,18 @@
   border: 1px solid lighten($secondary, 8%);
   border-radius: 0.25rem;
   text-align: center;
-  
+
   &:focus {
     outline: none;
     border-color: $primary;
     box-shadow: 0 0 0 2px rgba($primary, 0.25);
   }
-  
+
   &.has-value {
     border-color: $primary;
     background-color: rgba($primary, 0.05);
   }
-  
+
   &::placeholder {
     color: lighten($body-color, 40%);
   }
@@ -284,13 +274,13 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   transition: all 0.3s ease;
-  
+
   &.calculation-active {
     background-color: rgba($primary, 0.1);
     border: 1px solid rgba($primary, 0.3);
     color: $primary;
   }
-  
+
   &.calculation-empty {
     color: lighten($body-color, 30%);
   }
@@ -326,6 +316,25 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba($primary, 0.45);
   }
+}
+
+/* components/_renegotiation_confirmation.scss */
+
+/* Chatbox card spacing */
+#ai-chatbox {
+  height: 500px;         // or whatever fits
+  display: flex;
+  flex-direction: column;
+
+  .card-body {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* Summary card tweaks */
+.renegotiation-show-page .card {
+  margin-bottom: 1.5rem;
 }
 
 /* ---------- custom arrow spinner styling ---------- */
@@ -373,23 +382,23 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: lighten($secondary, 5%);
     border-color: $primary;
     color: $primary;
   }
-  
+
   &:active {
     background: $primary;
     color: white;
     transform: scale(0.95);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    
+
     &:hover {
       background: darken($secondary, 5%);
       border-color: lighten($secondary, 15%);

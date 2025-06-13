@@ -1,22 +1,26 @@
 // app/assets/stylesheets/config/_bootstrap_variables.scss
 
-// Brand & page colours
-$body-bg:        #E5E4E2;
-$body-color:     #E5E4E2;
-$primary:        #FF7518;
-$secondary:      #131B3F;
-$dark:           #0A0F2E;
-$light:          #FFFFFF;
+// ── Brand & page colours ──────────────────────────────────────
+$body-bg:        #E5E4E2; // page background
+$body-color:     #0A0E2E; // base text colour
+$primary:        #FF7518; // accent / hover
+$secondary:      #131B3F; // fallback / generic indigo
+$dark:           #0A0F2E; // headings
+$light:          #E5E4E2; // light text elements
 
-// Navbar (dark‐theme defaults)
-$navbar-dark-color:         #E5E4E2;
-$navbar-dark-hover-color:   #FF7518;
-// **Quoted** so escape-svg() sees a string
-$navbar-dark-toggler-icon-bg: "#E5E4E2";
+// ── Navbar ────────────────────────────────────────────────────
+$navbar-bg:            #131B3F; // sidebar background
+$navbar-text:          #E5E4E2; // sidebar text
+$navbar-hover-text:    #FF7518; // sidebar hover
 
-// Links & buttons
-$link-color:                #E5E4E2;
-$link-hover-color:          #FF7518;
-$btn-primary-color:         #E5E4E2;
-$btn-primary-bg:            #FF7518;
-$btn-primary-hover-bg:      #131B3F;
+// ── Card component ───────────────────────────────────────────
+$card-bg-start:       #131B3F; // top of gradient
+$card-bg-end:         #0A0F2E; // bottom of gradient
+$card-text:           #FFFFFF; // always white on cards
+
+// ── Links & buttons ──────────────────────────────────────────
+$link-color:          $navbar-text;
+$link-hover-color:    $primary;
+$btn-primary-color:   $light;
+$btn-primary-bg:      $primary;
+$btn-primary-hover-bg:$dark;
