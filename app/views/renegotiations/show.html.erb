@@ -1,6 +1,6 @@
 <!-- app/views/renegotiations/show.html.erb -->
 <div class="renegotiation-show-page container">
-  <h1 class="mt-4 mb-3">Renegotiate: <%= @product.name %> with <%= @supplier.company_name %></h1>
+  <h2 class="mt-4 mb-3">Renegotiate: <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %></h2>
 
   <div class="row">
     <!-- 1) Chatbox skeleton -->
@@ -13,7 +13,7 @@
 
             <%# Below is for the chatbox %>
           <div class="container chatbot">
-            <h1>Chat with us</h1>
+            <h3>Chat with our negotiator below to renew the contract:</h3>
             <!-- initial message from the system to kick the conversation off -->
             <p class="chat-intro-message">
               Hi <%= @supplier.contact %>,
