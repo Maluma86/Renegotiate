@@ -317,3 +317,22 @@
     box-shadow: 0 0 0 3px rgba($primary, 0.45);
   }
 }
+
+/* components/_renegotiation_confirmation.scss */
+
+/* Chatbox card spacing */
+#ai-chatbox {
+  height: 500px;         // or whatever fits
+  display: flex;
+  flex-direction: column;
+
+  .card-body {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* Summary card tweaks */
+.renegotiation-show-page .card {
+  margin-bottom: 1.5rem;
+}
