@@ -39,7 +39,7 @@
   .renegotiation-card-header {
     background-color: darken($secondary, 3%);
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid lighten($secondary, 10%);
+    border-bottom: 1px solid lighten($text-white, 10%);
 
     .renegotiation-card-title {
       margin: 0;
@@ -111,7 +111,7 @@
   .ai-dashboard .metrics-row {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .ai-dashboard .analysis-row,
   .ai-dashboard .details-row {
     grid-template-columns: 1fr !important;
