@@ -1,7 +1,13 @@
 class RenegotiationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_product, only: %i[new create]
-  before_action :set_renegotiation, only: %i[confirm_target set_target save_discount_targets]
+  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets]
+
+  def show
+    # we already have @renegotiation from set_renegotiation
+    @product  = @renegotiation.product
+    @supplier = @product.supplier
+  end
 
   def new
     @renegotiation = @product.renegotiations.new(
