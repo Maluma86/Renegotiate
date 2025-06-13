@@ -100,6 +100,45 @@
   }
 }
 
+/* ---------- AI Dashboard Styling ---------- */
+.ai-dashboard .metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ai-dashboard .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .ai-dashboard .analysis-row,
+  .ai-dashboard .details-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.ai-dashboard .metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 117, 24, 0.2);
+  transition: all 0.2s ease;
+}
+
+.ai-dashboard .trend-chart {
+  overflow: hidden;
+}
+
+.ai-dashboard .position-bar::after {
+  content: attr(data-value);
+  position: absolute;
+  top: -25px;
+  left: 73%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #E5E4E2;
+  font-weight: 500;
+}
+
 /* ---------- market data visualization ---------- */
 .market-data-card {
   .market-average-price {
@@ -294,27 +333,30 @@
 /* ---------- shared button theme (matching products_index) ---------- */
 .btn-theme {
   background-color: #282828;
-  color: $body-color;
+  color: #E5E4E2;
   font-weight: 600;
-  border: none;
+  border: 1px solid #FF7518;  /* Orange border for visibility */
   border-radius: 0.375rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   text-decoration: none;
 
   &:hover,
   &:focus-visible {
-    background-color: $primary;
+    background-color: #FF7518;  /* Bright orange background */
     color: white;
+    border-color: #FF8C42;  /* Even brighter orange border */
+    box-shadow: 0 0 8px rgba(255, 117, 24, 0.4);  /* Orange glow */
   }
 
   &:active {
-    background-color: darken($primary, 10%);
+    background-color: #E6650C;  /* Darker orange when clicked */
+    border-color: #E6650C;
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba($primary, 0.45);
+    box-shadow: 0 0 0 3px rgba(255, 117, 24, 0.45);
   }
 }
 
@@ -335,4 +377,74 @@
 /* Summary card tweaks */
 .renegotiation-show-page .card {
   margin-bottom: 1.5rem;
+}
+
+/* ---------- custom arrow spinner styling ---------- */
+.discount-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 0.5rem;
+}
+
+.discount-input.no-spinners {
+  /* Hide default browser spinners */
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+
+.discount-input.no-spinners::-webkit-outer-spin-button,
+.discount-input.no-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.percent-sign {
+  font-weight: 500;
+  color: $body-color;
+  margin-right: 0.75rem;
+}
+
+.custom-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.arrow-btn {
+  width: 24px;
+  height: 18px;
+  border: 1px solid #E5E4E2;
+  background: #131B3F;
+  color: #E5E4E2;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #FF7518;
+    border-color: #FF7518;
+    color: white;
+  }
+
+  &:active {
+    background: #FF7518;
+    color: white;
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      background: #131B3F;
+      border-color: #E5E4E2;
+      color: #E5E4E2;
+    }
+  }
 }

@@ -1,0 +1,25 @@
+<div class="insights-cards-grid">
+  <!-- Current total -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Current Renegotiations</div>
+    <div class="insights-card__value"><%= stats[:current_total] %></div>
+  </div>
+
+  <!-- Completed -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Completed</div>
+    <div class="insights-card__value"><%= stats[:completed] %></div>
+  </div>
+
+  <!-- Avg. Discount -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Avg. Discount</div>
+    <div class="insights-card__value"><%= stats[:avg_discount] %>%</div>
+  </div>
+
+  <!-- Renewing in 30 days -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Renewing in 30 days</div>
+    <div class="insights-card__value"><%= stats[:ending_soon] %></div>
+  </div>
+</div>

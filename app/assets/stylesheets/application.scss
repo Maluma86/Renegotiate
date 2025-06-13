@@ -8,7 +8,6 @@
 @import "components/navbar";
 @import "components/products_index";
 @import "components/devise";
-@import "components/footer";
 @import "components/index";
 @import "components/cards";
 @import "components/renegotiation_confirmation";
@@ -16,6 +15,8 @@
 // 3. Page‐specific
 @import "pages/index";
 // @import "products";
+@import "pages/insights";
+@import "pages/import";
 
 // 4. Utility: global reset & layout tweaks
 

@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # Insights page
+  get "insights", to: "pages#insights"
+
   # CRUD Renegotiation workflow with AI-powered target confirmation
   resources :renegotiations do
     member do
@@ -21,10 +24,14 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
+<<<<<<< HEAD
   # Below for the chatbot
   resources :questions, only: [:index, :create]
 
   # creating the routes related to products
+=======
+  # Products routes
+>>>>>>> master
   resources :products, only: [:index, :show] do
     collection do
       get :import   # shows the import form

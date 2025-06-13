@@ -107,6 +107,51 @@ document.addEventListener('DOMContentLoaded', function() {
   
   console.log('Renegotiation Calculator initialized successfully');
   
+  // === CUSTOM ARROW BUTTONS FUNCTIONALITY ===
+  
+  // Handle custom arrow button clicks
+  const arrowButtons = document.querySelectorAll('.arrow-btn');
+  arrowButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const targetInput = document.getElementById(targetId);
+      const isUp = this.classList.contains('arrow-up');
+      
+      if (targetInput && !targetInput.disabled) {
+        const currentValue = parseFloat(targetInput.value) || 0;
+        const step = parseFloat(targetInput.step) || 0.5;
+        const newValue = isUp ? currentValue + step : Math.max(0, currentValue - step);
+        
+        // Ensure value doesn't exceed 100%
+        const finalValue = Math.min(100, Math.max(0, newValue));
+        targetInput.value = finalValue;
+        
+        // Trigger input event to update calculations
+        targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        // Add visual feedback
+        targetInput.focus();
+      }
+    });
+  });
+  
+  // Update arrow button states when inputs change
+  function updateArrowButtonStates() {
+    [targetDiscountInput, minDiscountInput].forEach(input => {
+      const inputId = input.id;
+      const upButton = document.querySelector(`[data-target="${inputId}"].arrow-up`);
+      const downButton = document.querySelector(`[data-target="${inputId}"].arrow-down`);
+      
+      if (upButton && downButton) {
+        upButton.disabled = input.disabled;
+        downButton.disabled = input.disabled;
+      }
+    });
+  }
+  
+  // Call on page load and when states change
+  updateArrowButtonStates();
+  
   // === AJAX DISCOUNT TARGETS FUNCTIONALITY ===
   
   // Get AJAX form elements
@@ -181,7 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
     minDiscountInput.disabled = true;
     
     if (saveTargetsBtn) saveTargetsBtn.style.display = 'none';
-    if (newTargetsBtn) newTargetsBtn.style.display = 'inline-block';
+    const newTargetsSection = document.querySelector('.new-targets-section');
+    if (newTargetsSection) newTargetsSection.style.display = 'inline-block';
+    
+    // Update arrow button states
+    updateArrowButtonStates();
   }
   
   // Unlock inputs and switch to "Save Targets" mode  
@@ -189,8 +238,12 @@ document.addEventListener('DOMContentLoaded', function() {
     targetDiscountInput.disabled = false;
     minDiscountInput.disabled = false;
     
-    if (newTargetsBtn) newTargetsBtn.style.display = 'none';
+    const newTargetsSection = document.querySelector('.new-targets-section');
+    if (newTargetsSection) newTargetsSection.style.display = 'none';
     if (saveTargetsBtn) saveTargetsBtn.style.display = 'inline-block';
+    
+    // Update arrow button states
+    updateArrowButtonStates();
     
     clearMessages();
   }
@@ -209,8 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function showSuccessMessage(message) {
     if (successMessage) {
-      successMessage.textContent = message;
-      successMessage.style.display = 'block';
+      successMessage.style.display = 'inline-block';
     }
   }
   
