@@ -1,54 +1,46 @@
+// app/assets/stylesheets/components/_products_index.scss
+
+@import "config/bootstrap_variables";
+
 /* ================================================================
-   Product page – theme-aligned
-   ----------------------------------------------------------------
-   Relies on the variables you declared in _bootstrap_variables.scss:
-     $body-bg        #0A0F2E   (page background)
-     $body-color     #E5E4E2   (base text colour)
-     $primary        #FF7518   (orange accent)
-     $secondary      #131B3F   (indigo / slate accent)
+   Products index – theme-aligned
    ================================================================ */
 
 /* ---------- overall container ---------- */
 .product-page-container {
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-top: 2rem;
+  padding: 2rem;
 
-  @media (min-width: 768px)  { padding-left: 3rem; padding-right: 3rem; }
-  @media (min-width: 1024px) { padding-left: 6rem; padding-right: 6rem; }
+  @media (min-width: 768px)  { padding: 3rem; }
+  @media (min-width: 1024px) { padding: 6rem; }
 }
 
-
-/* ----------FREEZES title, search bar and import button---------- */
-
+/* ---------- sticky header (title + import button) ---------- */
 .wrapper-that-freezes-things {
   position: sticky;
   top: 0;
-  background: white;
+  background: $light;       // white bar
   z-index: 10;
-  padding-bottom: 10px;
-}
+  padding-bottom: 0.5rem;
 
+  .products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 
-/* ---------- header row (title + import button) ---------- */
-.products-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+    .product-title {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $dark;        // dark text on white
+    }
 
-  .product-title {
-    margin: 0;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: $body-color;
-  }
-
-  /* import button – gray by default, orange on hover */
-  .import-btn {
-    @extend .btn-theme;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    .import-btn {
+      @extend .btn-theme;   // gray bg, orange on hover
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: $light !important;  // white text
+    }
   }
 }
 
@@ -62,75 +54,84 @@
 .product-search-form {
   display: flex;
   gap: 0.5rem;
-  width: fit-content;
   max-width: 100%;
 }
 
 .product-search-input {
   width: 300px;
-  padding: 0.5rem 0.3rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  color: $body-color;
-  background: $secondary;
+  color: $light;             // white text
+  background: $secondary;    // dark indigo
   border: 1px solid lighten($secondary, 8%);
   border-radius: 0.375rem;
 
-  &::placeholder { color: lighten($body-color, 30%); }
+  &::placeholder {
+    color: rgba($light, 0.7); // semi-transparent white
+  }
 }
 
 .product-search-button {
-  @extend .btn-theme;
+  @extend .btn-theme;        // gray bg, orange on hover
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
+  color: $light !important;  // white text
 }
 
-/* ---------- table ---------- */
+/* ---------- products table ---------- */
 .products-table {
   width: 100%;
   border: 1px solid lighten($secondary, 10%);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-collapse: collapse;
-  background-color: $secondary;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 
-thead.products-table-head {
-  background-color: darken($secondary, 3%);
+  border-collapse: separate; // allow corners to round
+  border-spacing: 0;
+  overflow: hidden;
+  background-color: $secondary; // dark indigo
 
-  .products-table-title {
-    position: sticky;
-    top: 0;
-    text-align: left;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: white;
-    border-bottom: 1px solid lighten($secondary, 10%);
+  thead.products-table-head {
+    background-color: darken($secondary, 5%);
 
-    a {
-      color: inherit;
-      font-weight: inherit;
-      text-decoration: none;
+    .products-table-title {
+      position: sticky;
+      top: 0;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $light;           // white header text
+      border-bottom: 1px solid lighten($secondary, 10%);
 
-      &:hover {
-        color: lighten(white, 10%);
+      a {
+        color: $link-color;     // use your global link color
+        text-decoration: none;
+
+        &:hover {
+          color: $link-hover-color; // orange on hover
+        }
       }
     }
   }
-}
 
   tbody.products-table-body {
     font-size: 0.875rem;
-    color: $body-color;
+    color: $light;             // white row text
 
     .products-line {
-      &:hover { background-color: darken($secondary, 6%); }
+      &:hover {
+        background-color: darken($secondary, 6%);
+      }
 
       .products-line-text {
         padding: 0.75rem 1rem;
         border-bottom: 1px solid lighten($secondary, 10%);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      /* status pills */
+      /* status pills (keep your specific colors) */
       .status {
         display: inline-block;
         padding: 0.25rem 0.5rem;
@@ -141,44 +142,15 @@ thead.products-table-head {
         &.pending         { background: #fef9c3; color: #92400e; }
         &.ongoing         { background: #a0adf3; color: #1e40af; }
         &.done            { background: #91bba0; color: #166534; }
-        &.human_required { background: #eda1a1; color: #991b1b; width: 70px; }
+        &.human_required  { background: #eda1a1; color: #991b1b; }
       }
     }
 
-    /* renegotiate button – same treatment */
     .renegotiate-btn {
-      @extend .btn-theme;
+      @extend .btn-theme;      // gray bg, orange on hover
       padding: 0.25rem 0.5rem;
       font-size: 0.75rem;
+      color: $light !important; // white text
     }
-  }
-}
-
-/* ================================================================
-   Shared button theme
-   ----------------------------------------------------------------
-   Use @extend .btn-theme; inside any element that needs this style.
-   ================================================================ */
-.btn-theme {
-  background-color: #282828;      /* neutral gray default */
-  color: $body-color;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover,
-  &:focus-visible {
-    background-color: $primary;   /* orange on hover / focus */
-  }
-
-  &:active {
-    background-color: darken($primary, 10%);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba($primary, 0.45);
   }
 }
