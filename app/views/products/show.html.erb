@@ -2,70 +2,69 @@
 
 <div class="product-page-container">
 
-  <!-- Sticky header with title + supplier -->
+  <!-- Sticky header: product name | supplier name | status -->
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
+      <!-- Product name -->
       <h1 class="product-title"><%= @product.name %></h1>
-      <div class="product-supplier">
-        Supplier:
-        <% if (s = @product.supplier) %>
-          <%= link_to s.company_name, "#", class: "product-supplier-link" %>
-        <% else %>
-          <span class="text-gray-500">Unknown</span>
-        <% end %>
+
+      <!-- Supplier name (same styling as product-title) -->
+      <% if (s = @product.supplier) %>
+        <h1 class="product-title"><%= s.company_name %></h1>
+      <% else %>
+        <h1 class="product-title text-gray-500">Unknown Supplier</h1>
+      <% end %>
+
+      <!-- Status -->
+      <h1 class="product-title"><%= @product.status.capitalize %></h1>
+    </div>
+  </div>
+
+  <!-- Detail card -->
+  <div class="card-wrapper">
+    <div class="card-pro">
+      <hr>
+
+      <!-- Supplier email -->
+      <% if s && s.contact_email.present? %>
+        <p class="card-pro__content">
+          <strong>Email:</strong>
+          <%= mail_to s.contact_email, s.contact_email, class: "product-email-link" %>
+        </p>
+      <% end %>
+
+      <!-- Description -->
+      <p class="card-pro__content">
+        <strong>Description:</strong><br>
+        <%= @product.description.presence || "No description available." %>
+      </p>
+
+      <!-- Contract details -->
+      <p class="card-pro__content">
+        <strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %><br>
+        <strong>Ends:</strong>          <%= l(@product.contract_end_date) %>
+      </p>
+
+      <!-- Purchase volumes -->
+      <p class="card-pro__content">
+        <strong>Last 30 days:</strong>   <%= @product.last_month_volume %> units<br>
+        <strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units
+      </p>
+
+      <!-- Renegotiate button -->
+      <div class="card-pro__actions">
+        <%= link_to "Renegotiate",
+                    new_product_renegotiation_path(@product),
+                    class: "import-btn" %>
       </div>
     </div>
   </div>
 
-  <!-- Single centered detail card -->
-  <div class="product-show-card">
-    <div class="product-show-card__body">
-      <!-- Description -->
-      <section class="product-show-card__section">
-        <h3>Description</h3>
-        <p><%= @product.description.presence || "No description available." %></p>
-      </section>
-
-      <!-- Contract Details -->
-      <section class="product-show-card__section">
-        <h3>Contract Details</h3>
-        <ul>
-          <li><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></li>
-          <li><strong>Ends:</strong> <%= l(@product.contract_end_date) %></li>
-          <li><strong>Status:</strong> <%= @product.status.capitalize %></li>
-        </ul>
-      </section>
-
-      <!-- Supplier Info -->
-      <section class="product-show-card__section">
-        <h3>Supplier Info</h3>
-        <% if s %>
-          <p><strong><%= s.company_name %></strong></p>
-          <p><%= mail_to s.contact_email %></p>
-        <% else %>
-          <p>No supplier on record.</p>
-        <% end %>
-      </section>
-
-      <!-- Purchase Volumes -->
-      <section class="product-show-card__section">
-        <h3>Purchase Volumes</h3>
-        <ul>
-          <li><strong>Last 30 days:</strong> <%= @product.last_month_volume %> units</li>
-          <li><strong>Last 12 months:</strong> <%= @product.last_year_volume %> units</li>
-        </ul>
-      </section>
-    </div>
-
-    <!-- Footer with both buttons centered -->
-    <div class="product-show-card__actions">
-      <%= link_to "← Back to results",
-                  products_path,
-                  class: "import-btn" %>
-      <%= link_to "Renegotiate",
-                  new_product_renegotiation_path(@product),
-                  class: "import-btn" %>
-    </div>
+  <!-- Back to results -->
+  <div class="text-center" style="margin-top: 1.5rem;">
+    <%= link_to "← Back to results",
+                products_path,
+                class: "import-btn" %>
   </div>
 
 </div>
