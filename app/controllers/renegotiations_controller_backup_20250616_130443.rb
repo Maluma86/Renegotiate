@@ -10,34 +10,21 @@ class RenegotiationsController < ApplicationController
   end
 
   def new
-    # Use Product model method for consistent company-level checking
-    if @product.has_ongoing_renegotiation?(current_user)
-      # Find the existing renegotiation using the same company-level logic
-      @renegotiation = @product.renegotiations
-                              .joins(:buyer)
-                              .find_by(users: { company_name: current_user.company_name }, 
-                                     status: "Ongoing")
-      
-      Rails.logger.info "Found existing renegotiation with ID=#{@renegotiation.id} (created by user #{@renegotiation.buyer_id}), reusing it"
+    @renegotiation = @product.renegotiations.new(
+      buyer: current_user,
+      supplier_id: @product.supplier_id,
+      status: "ongoing",
+      min_target: calculate_min_target(@product),
+      max_target: calculate_max_target(@product),
+      tone: "collaborative"
+    )
+
+    if @renegotiation.save
+      Rails.logger.info "Successfully created renegotiation with ID=#{@renegotiation.id}"
       redirect_to confirm_target_renegotiation_path(@renegotiation)
     else
-      # Create new renegotiation only if none exists for this company
-      @renegotiation = @product.renegotiations.new(
-        buyer: current_user,
-        supplier_id: @product.supplier_id,
-        status: "Ongoing",
-        min_target: calculate_min_target(@product),
-        max_target: calculate_max_target(@product),
-        tone: "collaborative"
-      )
-
-      if @renegotiation.save
-        Rails.logger.info "Successfully created new renegotiation with ID=#{@renegotiation.id} for company #{current_user.company_name}"
-        redirect_to confirm_target_renegotiation_path(@renegotiation)
-      else
-        Rails.logger.error "Failed to save renegotiation: #{@renegotiation.errors.full_messages}"
-        redirect_to product_path(@product), alert: "Failed to create renegotiation"
-      end
+      Rails.logger.error "Failed to save renegotiation: #{@renegotiation.errors.full_messages}"
+      redirect_to product_path(@product), alert: "Failed to create renegotiation"
     end
   end
 

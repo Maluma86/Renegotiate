@@ -85,7 +85,7 @@ user_configs.each_with_index do |config, index|
       description: "#{Faker::Company.catch_phrase}. #{Faker::Company.bs.capitalize}.",
       current_price: unit_price,
       last_month_volume: volume_spending,
-      status: ["Ongoing", "Done", "Human_required", "Pending"].sample,
+      status: ["Ongoing", "Done", "Human_Required", "Pending"].sample,
       contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
       supplier: supplier_users.sample,
       procurement: user
@@ -107,7 +107,7 @@ renegotiations = []
   max_target = current_price * 0.9  # 10% discount min
 
   renegotiations << Renegotiation.create!(
-    status: ["ongoing", "done", "Human required"].sample,
+    status: ["Ongoing", "Done", "Human_Required"].sample,
     thread: Faker::Quote.matz,
     tone: ["collaborative", "neutral", "aggressive"].sample,
     min_target: min_target,
@@ -160,7 +160,7 @@ demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
     description: "This is a demo product for testing the renegotiation platform",
     current_price: demo_prices[i],
     last_month_volume: demo_volumes[i], # Total spent last month
-    status: "pending",
+    status: "Pending",
     contract_end_date: 6.months.from_now,
     supplier: demo_supplier,
     procurement: demo_procurement1
@@ -169,7 +169,7 @@ end
 
 # Create a demo renegotiation linked to the first product of walmart that is ongoing
 Renegotiation.create!(
-  status: "ongoing",
+  status: "Ongoing",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
@@ -181,7 +181,7 @@ Renegotiation.create!(
 )
 
 Renegotiation.create!(
-  status: "human_required",
+  status: "Human_Required",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
@@ -193,7 +193,7 @@ Renegotiation.create!(
 )
 
 Renegotiation.create!(
-  status: "done",
+  status: "Done",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,

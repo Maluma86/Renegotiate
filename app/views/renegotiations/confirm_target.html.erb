@@ -32,10 +32,9 @@
         <div class="col-md-4">
           <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">📊 Current Info</h5>
           <div style="color: #E5E4E2; line-height: 1.6;">
-            <p><strong>Pro-ID:</strong> #<%= @renegotiation.product.id %></p>
-            <p><strong>Rene-ID:</strong> #<%= @renegotiation.id %></p>
-            <p><strong>Pro-Status:</strong> <span class="badge bg-success"><%= @renegotiation.product.status.capitalize %></span></p>
-            <p><strong>Rene-Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span></p>
+            <p><strong>Product ID:</strong> #<%= @renegotiation.product.id %></p>
+            <p><strong>Renegotiation ID:</strong> #<%= @renegotiation.id %></p>
+            <p><strong>Status:</strong> <span class="badge bg-primary"><%= @renegotiation.status %></span></p>
             <p><strong>Pro-Price:</strong> €<span id="current-price" style="color: #E5E4E2; font-weight: 600;"><%= @renegotiation.product.current_price %></span></p>
             <p><strong>Current Range:</strong> <span id="calculated-range" style="color: #E5E4E2; font-weight: 600;">€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></span></p>
           </div>

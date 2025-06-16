@@ -16,7 +16,11 @@
       <% end %>
 
       <!-- Status -->
-      <h1 class="product-title"><%= @product.status.capitalize %></h1>
+      <h1 class="product-title">
+        <span class="status <%= @product.display_status_css_class(current_user) %>">
+          <%= @product.display_status_for_user(current_user) %>
+        </span>
+      </h1>
     </div>
   </div>
 
@@ -53,9 +57,27 @@
 
       <!-- Renegotiate button -->
       <div class="card-pro__actions">
-        <%= link_to "Renegotiate",
-                    new_product_renegotiation_path(@product),
-                    class: "import-btn" %>
+        <% if @product.renegotiation_allowed?(current_user) %>
+          <%= link_to "Renegotiate",
+                      new_product_renegotiation_path(@product),
+                      class: "import-btn" %>
+        <% elsif @product.has_ongoing_renegotiation?(current_user) %>
+          <% ongoing_renegotiation = @product.renegotiations
+                                            .joins(:buyer)
+                                            .find_by(users: { company_name: current_user.company_name }, 
+                                                    status: "Ongoing") %>
+          <%= link_to "Continue Renegotiation",
+                      confirm_target_renegotiation_path(ongoing_renegotiation),
+                      class: "import-btn" %>
+        <% elsif @product.contract_expiring_soon? %>
+          <span class="import-btn disabled" style="background-color: #666; cursor: not-allowed;">
+            Renegotiation in progress
+          </span>
+        <% else %>
+          <span class="import-btn disabled" style="background-color: #666; cursor: not-allowed;">
+            Review on <%= @product.next_review_date&.strftime("%d.%m.%Y") %>
+          </span>
+        <% end %>
       </div>
     </div>
   </div>

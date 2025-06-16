@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_12_131002) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_16_111335) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -65,6 +65,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_12_131002) do
     t.integer "active_discount_target_version_id"
     t.index ["active_discount_target_version_id"], name: "index_renegotiations_on_active_discount_target_version_id"
     t.index ["buyer_id"], name: "index_renegotiations_on_buyer_id"
+    t.index ["product_id", "buyer_id", "status"], name: "unique_ongoing_renegotiation_per_product_buyer", unique: true, where: "((status)::text = 'ongoing'::text)"
     t.index ["product_id"], name: "index_renegotiations_on_product_id"
     t.index ["supplier_id"], name: "index_renegotiations_on_supplier_id"
   end

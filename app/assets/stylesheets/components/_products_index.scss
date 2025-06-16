@@ -139,10 +139,16 @@
         font-weight: 500;
         border-radius: 0.25rem;
 
+        /* Legacy status classes (still used in some places) */
         &.pending         { background: #fef9c3; color: #92400e; }
         &.ongoing         { background: #a0adf3; color: #1e40af; }
         &.done            { background: #91bba0; color: #166534; }
         &.human_required  { background: #eda1a1; color: #991b1b; }
+        
+        /* New business rule-based status classes */
+        &.available       { background: #d1fae5; color: #065f46; } /* Green - ready to start */
+        &.blocked         { background: #fecaca; color: #991b1b; } /* Red - blocked by other company */
+        &.pending_review  { background: #e0e7ff; color: #3730a3; } /* Blue - pending 6-month window */
       }
     }
 
@@ -151,6 +157,55 @@
       padding: 0.25rem 0.5rem;
       font-size: 0.75rem;
       color: $light !important; // white text
+      
+      // Available state - default btn-theme styling
+      &.available {
+        // Inherits btn-theme: gray bg (#282828), orange hover (#FF7518)
+      }
+      
+      // Ongoing state - blue tones for continuation
+      &.ongoing {
+        background-color: #1e40af; // blue background
+        border-color: #3b82f6;     // lighter blue border
+        color: $light !important;
+        
+        &:hover,
+        &:focus-visible {
+          background-color: #3b82f6; // lighter blue on hover
+          border-color: #60a5fa;     // even lighter blue border
+          box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); // blue glow
+        }
+        
+        &:active {
+          background-color: #1d4ed8; // darker blue when clicked
+          border-color: #1d4ed8;
+        }
+      }
+    }
+    
+    // Status labels for non-actionable states
+    .no-action-label,
+    .next-review-label {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 0.25rem;
+      color: $light;
+    }
+    
+    // Blocked state - muted orange/gray
+    .no-action-label {
+      background-color: rgba(255, 117, 24, 0.2); // muted orange
+      border: 1px solid rgba(255, 117, 24, 0.3);
+      color: rgba($light, 0.8); // slightly faded white
+    }
+    
+    // Pending review - soft blue/gray  
+    .next-review-label {
+      background-color: rgba(59, 130, 246, 0.2); // muted blue
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: rgba($light, 0.8); // slightly faded white
     }
   }
 }
