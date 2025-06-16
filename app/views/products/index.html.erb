@@ -48,15 +48,32 @@
           <td class="products-line-text"><%= number_to_currency(product.current_price) %></td>
           <td class="products-line-text"><%= product.contract_end_date.strftime("%b %d, %Y") %></td>
           <td class="products-line-text"><%= product.last_month_volume %></td>
+
+          <!-- Determine the status of the product for the current user -->
+          <% status = product.renegotiation_status(current_user) %>
+
           <td class="products-line-text">
-            <span class="status <%= product.status.downcase.tr(' ', '_') %>">
-              <%= product.renegotiation_status.titleize %>
+            <span class="status <%= status.downcase.tr(' ', '_') %>">
+              <%= status.titleize %>
             </span>
           </td>
+
+          <!-- Determine the action button that appears-->
           <td class="products-line-text">
-            <%= link_to "Renegotiate",
-                        new_product_renegotiation_path(product),
-                        class: "renegotiate-btn" %>
+            <% case status.downcase.tr(' ', '_') %>
+              <% when "ongoing", "done", "completed", "escalated", "human_required" %>
+                <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
+                  <%= link_to "View renegotiation",
+                              renegotiation_path(last_renegotiation),
+                              class: "renegotiate-btn" %>
+                <% else %>
+                  No action
+                <% end %>
+              <% when "pending" %>
+                <%= link_to "Renegotiate",
+                            new_product_renegotiation_path(product),
+                            class: "renegotiate-btn" %>
+            <% end %>
           </td>
         </tr>
       <% end %>

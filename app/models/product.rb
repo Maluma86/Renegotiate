@@ -36,16 +36,19 @@ class Product < ApplicationRecord
     # then when the user clicks on renegotiation and a negotiation starts, it is "ongoing"
     # if a user clicked on talk to a human it is "human required"
     # when it is done it is "done"
-  def renegotiation_status
-    #If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
-    return "pending" if renegotiations.none?
+  def renegotiation_status(current_user)
+    # selects the right renegotiations for the product
+    latest = renegotiations
+      .where(buyer_id: current_user.id)
+      .order(created_at: :desc)
+      .first
 
-    # here in case one product has multiple renegotiation, we sort them from newst to oldest and take the latest one
-    latest = renegotiations.order(created_at: :desc).first
+    #If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
+    return "pending" if latest.nil?
 
     case latest.status.to_s.downcase #We now look at the status of that latest renegotiation
-    when "human_required"
-      "human required"
+    when "escalated"
+      "escalated"
     when "ongoing", "initialized" #If the latest status is either "in_progress" or "initiated", return "ongoing".
       "ongoing"
     when "done" #If the renegotiation is marked "completed", the product is "done".
