@@ -13,17 +13,26 @@ if Rails.env.development?
   puts "✅ Data cleared"
 end
 
-# Create Procurement Users (Buyers)
-puts "👥 Creating procurement users..."
+# Create 4 Specific Procurement Users with known credentials
+puts "👥 Creating specific procurement users..."
 procurement_users = []
-10.times do
+
+# Create 4 users with specific product counts
+user_configs = [
+  { email: "user1@demo.com", products: 10 },
+  { email: "user2@demo.com", products: 25 },
+  { email: "user3@demo.com", products: 25 },
+  { email: "user4@demo.com", products: 20 }
+]
+
+user_configs.each do |config|
   procurement_users << User.create!(
-    email: Faker::Internet.unique.email,
-    password: "password123",
+    email: config[:email],
+    password: "demo123",
     role: "procurement",
     company_name: Faker::Company.name,
     contact: Faker::Name.name,
-    contact_email: Faker::Internet.email
+    contact_email: config[:email]
   )
 end
 puts "✅ Created #{procurement_users.count} procurement users"
@@ -50,43 +59,47 @@ categories = [
   "Fun tools", "Marketing Materials", "Industrial Tools"
 ]
 
-# Create Products
+# Create Products assigned to specific users
 puts "📦 Creating products..."
 products = []
-80.times do
-  unit_price = Faker::Commerce.price(range: 50.0..5000.0)
 
-  # Generate realistic monthly spending volume
-  # Low-priced items: higher volume spending
-  # High-priced items: lower volume spending
-  if unit_price < 200
-    volume_spending = Faker::Number.between(from: 1000, to: 25_000)  # $1K-$25K
-  elsif unit_price < 1000
-    volume_spending = Faker::Number.between(from: 2000, to: 40_000)  # $2K-$40K
-  else
-    volume_spending = Faker::Number.between(from: 5000, to: 100_000) # $5K-$100K
+user_configs.each_with_index do |config, index|
+  user = procurement_users[index]
+  config[:products].times do
+    unit_price = Faker::Commerce.price(range: 50.0..5000.0)
+
+    # Generate realistic monthly spending volume
+    # Low-priced items: higher volume spending
+    # High-priced items: lower volume spending
+    if unit_price < 200
+      volume_spending = Faker::Number.between(from: 1000, to: 25_000)  # $1K-$25K
+    elsif unit_price < 1000
+      volume_spending = Faker::Number.between(from: 2000, to: 40_000)  # $2K-$40K
+    else
+      volume_spending = Faker::Number.between(from: 5000, to: 100_000) # $5K-$100K
+    end
+
+    products << Product.create!(
+      name: Faker::Commerce.product_name,
+      category: categories.sample,
+      description: "#{Faker::Company.catch_phrase}. #{Faker::Company.bs.capitalize}.",
+      current_price: unit_price,
+      last_month_volume: volume_spending,
+      status: ["Ongoing", "Done", "Human_required", "Pending"].sample,
+      contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
+      supplier: supplier_users.sample,
+      procurement: user
+    )
   end
-
-  products << Product.create!(
-    name: Faker::Commerce.product_name,
-    category: categories.sample,
-    description: Faker::Quote.famous_last_words,
-    current_price: unit_price,
-    last_month_volume: volume_spending,
-    status: ["Ongoing", "Done", "Human_required", "Pending"].sample,
-    contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
-    supplier: supplier_users.sample,
-    procurement: procurement_users.sample
-  )
 end
-puts "✅ Created #{products.count} products"
+puts "✅ Created #{products.count} products distributed to specific users"
 
 # Create Renegotiations
 puts "🤝 Creating renegotiations..."
 renegotiations = []
 30.times do
   product = products.sample
-  buyer = procurement_users.sample
+  buyer = product.procurement  # Use the procurement user assigned to the product
 
   # Generate realistic price targets
   current_price = product.current_price
@@ -199,7 +212,7 @@ puts "
 
 📊 Summary:
 - #{User.where(role: 'procurement').count} Procurement Users
-- #{User.where(role: 'supplier').count} Supplier Users
+- #{User.where(role: 'supplier').count} Supplier Users  
 - #{Product.count} Products
 - #{Renegotiation.count} Renegotiations
 
@@ -207,6 +220,12 @@ puts "
 - Buyer1: buyer@Walmart.com / demo123 -> has already 5 products attached
 - Buyer2: buyer@Carrefour.com / demo123 -> no products attached. Need to import. Should not see the products from Carrefour.
 - Supplier: supplier@demo.com / demo123
+
+👥 Test Users (password: demo123):
+- user1@demo.com -> 10 products
+- user2@demo.com -> 25 products
+- user3@demo.com -> 25 products  
+- user4@demo.com -> 20 products
 
 🚀 Run 'rails server' and start testing!
 "
