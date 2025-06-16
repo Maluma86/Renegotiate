@@ -1,4 +1,5 @@
 class Renegotiation < ApplicationRecord
+  has_many :questions, dependent: :destroy
   belongs_to :product
   belongs_to :buyer,    class_name: "User"
   belongs_to :supplier, class_name: "User"

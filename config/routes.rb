@@ -19,11 +19,15 @@ Rails.application.routes.draw do
       post :set_target             # POST /renegotiations/:id/set_target
       post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
     end
+    resources :questions, only: [:index, :create] # LS changed, a question belongs to a renegotiation
   end
 
   # Defines the root path route ("/")
   # root "posts#index"
 
+  # Below for the chatbot
+
+  # creating the routes related to products
   # Products routes
   resources :products, only: [:index, :show] do
     collection do

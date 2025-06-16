@@ -24,9 +24,14 @@ gem "turbo-rails"
 gem "stimulus-rails"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
-gem "jbuilder"
+# gem "jbuilder"
+gem "ruby-openai"
 
+# below is for Turbo
+gem "actioncable-enhanced-postgresql-adapter"
 # gem "heroicons-rails"
+
+gem "solid_queue"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
