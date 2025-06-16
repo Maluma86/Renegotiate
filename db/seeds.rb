@@ -168,7 +168,7 @@ Renegotiation.create!(
 )
 
 Renegotiation.create!(
-  status: "human_required",
+  status: "escalated",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
