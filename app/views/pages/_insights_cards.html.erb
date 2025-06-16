@@ -1,25 +1,55 @@
 <div class="insights-cards-grid">
-  <!-- Current total -->
+  <!-- Current Renegotiations (bar chart) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Current Renegotiations</div>
-    <div class="insights-card__value"><%= stats[:current_total] %></div>
+    <div class="insights-card__value">
+      <%= column_chart @status_data,
+            height: "200px",
+            library: {
+              title: { text: "Status Breakdown", style: { color: "#444" } },
+              legend: { position: "bottom" }
+            } %>
+    </div>
   </div>
 
-  <!-- Completed -->
+  <!-- Completed (line chart over time) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Completed</div>
-    <div class="insights-card__value"><%= stats[:completed] %></div>
+    <div class="insights-card__value">
+      <%= line_chart @completed_over_time,
+            height: "200px",
+            xtitle: "Date",
+            ytitle: "Completed" %>
+    </div>
   </div>
 
-  <!-- Avg. Discount -->
+  <!-- Avg. Discount (area chart) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Avg. Discount</div>
-    <div class="insights-card__value"><%= stats[:avg_discount] %>%</div>
+    <div class="insights-card__value">
+      <%= area_chart @avg_discount_by_week,
+            height: "200px",
+            xtitle: "Week",
+            ytitle: "Avg Discount (%)" %>
+    </div>
   </div>
 
-  <!-- Renewing in 30 days -->
+  <!-- Renewing in 30 days (calendar heatmap) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Renewing in 30 days</div>
-    <div class="insights-card__value"><%= stats[:ending_soon] %></div>
+    <div class="insights-card__value">
+      <%= calendar_chart @renewals_calendar,
+            height: "200px",
+            library: {
+              title: "Contracts Ending Soon",
+              noDataPattern: { color: "#f0f0f0" },
+              calendar: {
+                cellSize: 12,
+                cellColor: { stroke: "#eee", strokeOpacity: 0.5 },
+                monthLabel: { fontName: "Arial", fontSize: 12 },
+                dayOfWeekLabel: { fontName: "Arial", fontSize: 10 }
+              }
+            } %>
+    </div>
   </div>
 </div>

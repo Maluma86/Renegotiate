@@ -77,3 +77,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Gem for datavisualisations
+gem "chartkick"
