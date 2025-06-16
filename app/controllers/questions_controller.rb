@@ -14,17 +14,27 @@ class QuestionsController < ApplicationController
     if @question.save
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.append(:questions, partial: "questions/question",
+          render turbo_stream: turbo_stream.append(:questions, partial: "renegotiations/question",
             locals: { question: @question })
         end
         format.html { redirect_to questions_path }
       end
     else
-     render :index, status: :unprocessable_entity
+      # On failure, reload whatever Renegotiations#show needs…
+      @product   = @renegotiation.product
+      @supplier  = @renegotiation.supplier
+      @questions = @renegotiation.questions.order(:created_at)
+      # and re-render the show view with an HTTP 422
+      render "renegotiations/show", status: :unprocessable_entity
     end
   end
 
   private
+
+   def set_renegotiation
+    # assumes your routes are nested: /renegotiations/:renegotiation_id/questions
+    @renegotiation = Renegotiation.find(params[:renegotiation_id])
+  end
 
   def question_params
     params.require(:question).permit(:user_question)

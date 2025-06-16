@@ -1,6 +1,12 @@
 <%= simple_form_for question,
-      html: { data: { controller: "reset-form",
-                      action:     "turbo:submit-end->reset-form#reset" } } do |f| %>
+      remote: true,
+      html: {
+        data: {
+          turbo:            true,                         # make sure Turbo sees this
+          controller:       "reset-form",
+          action: "turbo:submit-end->reset-form#reset"
+        }
+      } do |f| %>
   <div class="input-group mb-3 w-100">
     <div class="form-floating">
       <%= f.input :user_question, label: false, wrapper: false %>
