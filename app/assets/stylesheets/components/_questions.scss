@@ -4,52 +4,66 @@
   height: calc(100vh - 75px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1;
 
-  h1 {
-    border-bottom: 1px solid $gray-200;
-    margin-bottom: 0;
-    padding: 1rem;
-  }
-
+  /* conversation area */
   #questions {
-    height: 100%;
-    overflow: scroll;
+    flex: 1;
+    overflow-y: auto;
     padding: 1rem;
-  }
-
-  .question {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
   }
 
-  .user-question, .ai-answer {
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    max-width: 70%;
-    width: fit-content;
-    word-wrap: break-word;
+  .message-group {
+    /* 🚩 make the group a flex container! */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 75%;
+
+      /* “You” on the RIGHT */
+      &--user {
+        align-self: flex-end;
+
+        .message__bubble {
+          background: $primary;
+          color: $white;
+        }
+      }
+
+      /* “John” on the LEFT */
+      &--ai {
+        align-self: flex-start;
+
+        .message__bubble {
+          background: $gray-200;
+          color: $gray-700;
+        }
+      }
+
+      .message__sender {
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+        opacity: 0.7;
+      }
+
+      .message__bubble {
+        border-radius: 1rem;
+        padding: 0.5rem 1rem;
+        word-wrap: break-word;
+      }
+    }
   }
 
-  .user-question {
-    align-self: flex-end;
-    background: $blue;
-    color: $light-gray;
-  }
-
-  .ai-answer {
-    align-self: flex-start;
-    background: $gray-200;
-  }
-
+  /* keep the input form pinned at bottom */
   #new_question {
     border-top: 1px solid $gray-200;
     padding: 1rem;
-
-    .form-group {
-      margin-bottom: 0;
-    }
   }
 }
