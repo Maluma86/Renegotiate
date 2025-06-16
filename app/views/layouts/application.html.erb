@@ -6,21 +6,25 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <!-- Chart.js core -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <!-- Date adapter for Chart.js time scales -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Chartkick (uses the global Chart & the adapter above) -->
+    <script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+
+    <!-- All your other JS via importmap -->
     <%= javascript_importmap_tags %>
+
+    <!-- Main stylesheet -->
+    <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
   </head>
 
   <body>
-    <!-- Left‐side navbar -->
     <%= render "shared/navbar" %>
-
-    <!-- Flash messages -->
     <%= render "shared/flashes" %>
-
-    <!-- Main content area (includes footer for alignment) -->
     <main class="content">
       <%= yield %>
-
     </main>
   </body>
 </html>

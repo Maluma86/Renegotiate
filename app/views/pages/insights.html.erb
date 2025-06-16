@@ -1,6 +1,6 @@
 <div class="insights-page-container container">
   <header class="insights-header">
-    <h1 class="page-title">Insights </h1>
+    <%= render "shared/product_title", title_text: "Insights" %>
 
     <div class="timeframe-select">
       <%= form_with url: insights_path, method: :get, local: true do %>
@@ -16,6 +16,6 @@
   </header>
 
   <div class="insights-cards-wrapper">
-    <%= render partial: 'insights_cards', locals: { stats: @stats } %>
+    <%= render "insights_cards", stats: @stats %>
   </div>
 </div>
