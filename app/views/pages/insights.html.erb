@@ -1,6 +1,5 @@
 <div class="insights-page-container container">
   <header class="insights-header">
-    <%# Page title uses shared product_title component %>
     <%= render "shared/product_title", title_text: "Insights" %>
 
     <div class="timeframe-select">
@@ -17,6 +16,6 @@
   </header>
 
   <div class="insights-cards-wrapper">
-    <%= render partial: 'insights_cards', locals: { stats: @stats } %>
+    <%= render "insights_cards", stats: @stats %>
   </div>
 </div>

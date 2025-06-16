@@ -5,21 +5,34 @@
     <div class="insights-card__value">
       <%= column_chart @status_data,
             height: "200px",
-            library: {
-              title: { text: "Status Breakdown", style: { color: "#444" } },
-              legend: { position: "bottom" }
-            } %>
+            library: { legend: { position: "bottom" } } %>
     </div>
   </div>
 
-  <!-- Completed (line chart over time) -->
+  <!-- Completed Renegotiations (bar chart over selected period) -->
   <div class="insights-card card-pro">
-    <div class="insights-card__header">Completed</div>
+    <div class="insights-card__header">Completed Renegotiations</div>
     <div class="insights-card__value">
-      <%= line_chart @completed_over_time,
+      <%= column_chart @completed_over_time,
             height: "200px",
-            xtitle: "Date",
-            ytitle: "Completed" %>
+            library: {
+              scales: {
+                x: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { display: false }           # hide the date labels
+                },
+                y: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { stepSize: 1, beginAtZero: true }  # one‐per unit
+                }
+              },
+              plugins: {
+                legend:  { display: false },
+                tooltip: { enabled: true }
+              }
+            } %>
     </div>
   </div>
 
@@ -34,20 +47,28 @@
     </div>
   </div>
 
-  <!-- Renewing in 30 days (calendar heatmap) -->
+  <!-- Renewing in 30 days (column chart) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Renewing in 30 days</div>
     <div class="insights-card__value">
-      <%= calendar_chart @renewals_calendar,
+      <%= column_chart @renewals_calendar,
             height: "200px",
             library: {
-              title: "Contracts Ending Soon",
-              noDataPattern: { color: "#f0f0f0" },
-              calendar: {
-                cellSize: 12,
-                cellColor: { stroke: "#eee", strokeOpacity: 0.5 },
-                monthLabel: { fontName: "Arial", fontSize: 12 },
-                dayOfWeekLabel: { fontName: "Arial", fontSize: 10 }
+              scales: {
+                x: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { display: false }
+                },
+                y: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { stepSize: 1, beginAtZero: true }
+                }
+              },
+              plugins: {
+                legend:  { display: false },
+                tooltip: { enabled: true }
               }
             } %>
     </div>
