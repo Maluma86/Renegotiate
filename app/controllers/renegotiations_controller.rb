@@ -7,6 +7,8 @@ class RenegotiationsController < ApplicationController
     # we already have @renegotiation from set_renegotiation
     @product  = @renegotiation.product
     @supplier = @product.supplier
+    @questions = @renegotiation.questions.order(:created_at) # LS changed this to try to fix @questions = current_user.questions before
+    @question = Question.new # for form
   end
 
   def new
