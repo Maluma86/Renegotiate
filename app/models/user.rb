@@ -7,7 +7,7 @@ class User < ApplicationRecord
   # Product associations (for suppliers)
   has_many :products, foreign_key: :supplier_id
   # Below for the chatbot
-  has_many :questions
+  has_many :questions, dependent: :destroy
 
   # Renegotiation associations
   has_many :buyer_renegotiations, class_name: 'Renegotiation', foreign_key: :buyer_id

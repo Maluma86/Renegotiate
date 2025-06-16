@@ -6,10 +6,10 @@
 # end
 
 class QuestionsController < ApplicationController
+  before_action :set_renegotiation, only: [:create] # LS added
   # [...]
   def create
-    @questions = current_user.questions # needed in case of validation error
-    @question = Question.new(question_params)
+    @question = @renegotiation.questions.build(question_params) # LS trying to fix, replaced  @question = Question.new(question_params)
     @question.user = current_user
     if @question.save
       respond_to do |format|
@@ -17,7 +17,7 @@ class QuestionsController < ApplicationController
           render turbo_stream: turbo_stream.append(:questions, partial: "renegotiations/question",
             locals: { question: @question })
         end
-        format.html { redirect_to questions_path }
+        format.html { redirect_to renegotiation_path(@renegotiation) }
       end
     else
       # On failure, reload whatever Renegotiations#show needs…

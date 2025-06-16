@@ -1,5 +1,6 @@
 class Question < ApplicationRecord
   belongs_to :user
+  belongs_to :renegotiation #LS added this to fix the error
   validates :user_question, presence: true
   after_create :fetch_ai_answer
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_13_121027) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_16_124455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_13_121027) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "renegotiation_id", null: false
+    t.index ["renegotiation_id"], name: "index_questions_on_renegotiation_id"
     t.index ["user_id"], name: "index_questions_on_user_id"
   end
 
@@ -219,6 +221,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_13_121027) do
   add_foreign_key "discount_target_histories", "users", column: "set_by_user_id"
   add_foreign_key "products", "users", column: "procurement_id"
   add_foreign_key "products", "users", column: "supplier_id"
+  add_foreign_key "questions", "renegotiations"
   add_foreign_key "questions", "users"
   add_foreign_key "renegotiations", "discount_target_histories", column: "active_discount_target_version_id", on_delete: :nullify
   add_foreign_key "renegotiations", "products"
