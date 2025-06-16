@@ -32,68 +32,27 @@ class Product < ApplicationRecord
   end
 
   # WHAT IT IS : below is the function to automatically update the status.
+    # So when you upload it it is pending = no renegotiation started
+    # then when the user clicks on renegotiation and a negotiation starts, it is "ongoing"
+    # if a user clicked on talk to a human it is "human required"
+    # when it is done it is "done"
+  def renegotiation_status(current_user)
+    # selects the right renegotiations for the product
+    latest = renegotiations
+      .where(buyer_id: current_user.id)
+      .order(created_at: :desc)
+      .first
 
-  # Business logic for renegotiation timing
-  def contract_expiring_soon?
-    return false unless contract_end_date
-    contract_end_date <= 6.months.from_now
-  end
+    #If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
+    return "pending" if latest.nil?
 
-  # Check if product has ongoing renegotiation for user's company
-  def has_ongoing_renegotiation?(user)
-    # Check for ongoing renegotiation by anyone from the same company
-    renegotiations.joins(:buyer)
-                  .exists?(users: { company_name: user.company_name }, 
-                          status: "Ongoing")
-  end
-
-  # Calculate when renegotiation becomes available (6 months before expiry)
-  def next_review_date
-    return nil unless contract_end_date
-    # 6 months before contract expires
-    contract_end_date - 6.months
-  end
-
-  # New renegotiation status method that considers user and business rules
-  def renegotiation_status_for_user(user)
-    return :ongoing if has_ongoing_renegotiation?(user)
-    return :available if contract_expiring_soon?
-    return :pending_review # Show next review date
-  end
-
-  # Check if renegotiation is allowed for this user
-  def renegotiation_allowed?(user)
-    return false unless contract_expiring_soon?
-    return false if has_ongoing_renegotiation?(user)
-    true
-  end
-
-  # New business rule-based status display for users
-  def display_status_for_user(user)
-    # Status based on what the user can actually do with this product
-    
-    # Check if user's company has any renegotiation (any status)
-    latest_renegotiation = renegotiations.joins(:buyer)
-                                        .where(users: { company_name: user.company_name })
-                                        .order(created_at: :desc)
-                                        .first
-    
-    if latest_renegotiation
-      case latest_renegotiation.status
-      when "Ongoing"
-        "Ongoing"  # User can continue renegotiation
-      when "Human_Required"
-        "Human_Required"  # Needs human intervention
-      when "Done"
-        # If last renegotiation is done, check if new one is allowed
-        return renegotiation_allowed?(user) ? "Available" : "Pending_Review"
-      else
-        "Ongoing"  # Default for unknown statuses
-      end
-    elsif renegotiation_allowed?(user)
-      "Available"  # User can start new renegotiation
-    elsif contract_expiring_soon?
-      "Blocked"  # Contract expiring but user can't act (other company negotiating)
+    case latest.status.to_s.downcase #We now look at the status of that latest renegotiation
+    when "escalated"
+      "escalated"
+    when "ongoing", "initialized" #If the latest status is either "in_progress" or "initiated", return "ongoing".
+      "ongoing"
+    when "done" #If the renegotiation is marked "completed", the product is "done".
+      "done"
     else
       "Pending_Review"  # Contract not in 6-month window yet
     end

@@ -48,32 +48,31 @@
           <td class="products-line-text"><%= number_to_currency(product.current_price) %></td>
           <td class="products-line-text"><%= product.contract_end_date.strftime("%b %d, %Y") %></td>
           <td class="products-line-text"><%= product.last_month_volume %></td>
+
+          <!-- Determine the status of the product for the current user -->
+          <% status = product.renegotiation_status(current_user) %>
+
           <td class="products-line-text">
-            <span class="status <%= product.display_status_css_class(current_user) %>">
-              <%= product.display_status_for_user(current_user) %>
+            <span class="status <%= status.downcase.tr(' ', '_') %>">
+              <%= status.titleize %>
             </span>
           </td>
+
+          <!-- Determine the action button that appears-->
           <td class="products-line-text">
-            <% if product.renegotiation_allowed?(current_user) %>
-              <%= link_to "Renegotiate",
-                          new_product_renegotiation_path(product),
-                          class: "renegotiate-btn available" %>
-            <% elsif product.has_ongoing_renegotiation?(current_user) %>
-              <% ongoing_renegotiation = product.renegotiations
-                                               .joins(:buyer)
-                                               .find_by(users: { company_name: current_user.company_name }, 
-                                                       status: "Ongoing") %>
-              <%= link_to "Continue Renegotiation",
-                          confirm_target_renegotiation_path(ongoing_renegotiation),
-                          class: "renegotiate-btn ongoing" %>
-            <% elsif product.contract_expiring_soon? %>
-              <span class="no-action-label">
-                Renegotiation in progress
-              </span>
-            <% else %>
-              <span class="next-review-label">
-                Review on <%= product.next_review_date&.strftime("%d.%m.%Y") %>
-              </span>
+            <% case status.downcase.tr(' ', '_') %>
+              <% when "ongoing", "done", "completed", "escalated", "human_required" %>
+                <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
+                  <%= link_to "View renegotiation",
+                              renegotiation_path(last_renegotiation),
+                              class: "renegotiate-btn" %>
+                <% else %>
+                  No action
+                <% end %>
+              <% when "pending" %>
+                <%= link_to "Renegotiate",
+                            new_product_renegotiation_path(product),
+                            class: "renegotiate-btn" %>
             <% end %>
           </td>
         </tr>

@@ -181,7 +181,7 @@ Renegotiation.create!(
 )
 
 Renegotiation.create!(
-  status: "Human_Required",
+  status: "escalated",
   thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
   tone: "collaborative",
   min_target: 800,
@@ -212,7 +212,7 @@ puts "
 
 📊 Summary:
 - #{User.where(role: 'procurement').count} Procurement Users
-- #{User.where(role: 'supplier').count} Supplier Users  
+- #{User.where(role: 'supplier').count} Supplier Users
 - #{Product.count} Products
 - #{Renegotiation.count} Renegotiations
 
@@ -224,7 +224,7 @@ puts "
 👥 Test Users (password: demo123):
 - user1@demo.com -> 10 products
 - user2@demo.com -> 25 products
-- user3@demo.com -> 25 products  
+- user3@demo.com -> 25 products
 - user4@demo.com -> 20 products
 
 🚀 Run 'rails server' and start testing!

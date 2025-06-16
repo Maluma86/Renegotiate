@@ -1,4 +1,5 @@
 class Renegotiation < ApplicationRecord
+  has_many :questions, dependent: :destroy
   belongs_to :product
   belongs_to :buyer,    class_name: "User"
   belongs_to :supplier, class_name: "User"
@@ -22,7 +23,7 @@ class Renegotiation < ApplicationRecord
   scope :in_period,      ->(range)       { range ? where(created_at: range) : all }
   scope :pending,        ->              { where(status: 'pending') }
   scope :ongoing,        ->              { where(status: %w[ongoing initialized]) }
-  scope :human_required, ->              { where(status: 'human_required') }
+  scope :escalated, ->              { where(status: 'escalated') }
   scope :completed,      ->              { where(status: 'done') }
 
   # BUSINESS METHODS
