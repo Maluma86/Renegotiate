@@ -24,10 +24,6 @@ class Product < ApplicationRecord
   end
 
   def last_year_volume
-    read_attribute(:last_year_volume) || 0
-  end
-
-  def last_year_volume
     last_month_volume.to_f * 12
   end
 
@@ -56,6 +52,26 @@ class Product < ApplicationRecord
     else
       "Pending_Review"  # Contract not in 6-month window yet
     end
+  end
+
+  # Check if product has ongoing renegotiation for user's company
+  def has_ongoing_renegotiation?(user)
+    renegotiations.joins(:buyer)
+                  .exists?(users: { company_name: user.company_name }, 
+                          status: "Ongoing")
+  end
+
+  # Business logic for renegotiation timing
+  def contract_expiring_soon?
+    return false unless contract_end_date
+    contract_end_date <= 6.months.from_now
+  end
+
+  # Check if renegotiation is allowed for this user
+  def renegotiation_allowed?(user)
+    return false unless contract_expiring_soon?
+    return false if has_ongoing_renegotiation?(user)
+    true
   end
 
   # CSS-friendly version of display status (lowercase with underscores)
