@@ -1,97 +1,76 @@
 <div class="insights-cards-grid">
-  <!-- Current Renegotiations -->
+  <!-- Current Renegotiations (bar chart) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Current Renegotiations</div>
-    <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:current_total] %>
-      </div>
-      <div class="insights-card__chart">
-        <%= column_chart @status_data,
-              height: "100%",
-              library: { legend: { position: "bottom" } } %>
-      </div>
+    <div class="insights-card__value">
+      <%= column_chart @status_data,
+            height: "200px",
+            library: { legend: { position: "bottom" } } %>
     </div>
   </div>
 
-  <!-- Renewing in 30 days -->
-  <div class="insights-card card-pro">
-    <div class="insights-card__header">Renewing in 30 days</div>
-    <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:ending_soon] %>
-      </div>
-      <div class="insights-card__chart">
-        <%= column_chart @renewals_calendar,
-              height: "100%",
-              library: {
-                scales: {
-                  x: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { display: false }
-                  },
-                  y: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { stepSize: 1, beginAtZero: true }
-                  }
-                },
-                plugins: {
-                  legend:  { display: false },
-                  tooltip: { enabled: true }
-                }
-              } %>
-      </div>
-    </div>
-  </div>
-
-    <!-- Avg. Discount -->
-  <div class="insights-card card-pro">
-    <div class="insights-card__header">Avg. Discount</div>
-    <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:avg_discount] %>%
-      </div>
-      <div class="insights-card__chart">
-        <%= area_chart @avg_discount_by_week,
-              height: "100%",
-              xtitle: "Week",
-              ytitle: "Avg Discount (%)" %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Completed Renegotiations -->
+  <!-- Completed Renegotiations (bar chart over selected period) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Completed Renegotiations</div>
-    <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:completed] %>
-      </div>
-      <div class="insights-card__chart">
-        <%= column_chart @completed_over_time,
-              height: "100%",
-              library: {
-                scales: {
-                  x: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { display: false }        # hide date labels
-                  },
-                  y: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { stepSize: 1, beginAtZero: true }
-                  }
+    <div class="insights-card__value">
+      <%= column_chart @completed_over_time,
+            height: "200px",
+            library: {
+              scales: {
+                x: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { display: false }           # hide the date labels
                 },
-                plugins: {
-                  legend:  { display: false },
-                  tooltip: { enabled: true }
+                y: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { stepSize: 1, beginAtZero: true }  # one‐per unit
                 }
-              } %>
-      </div>
+              },
+              plugins: {
+                legend:  { display: false },
+                tooltip: { enabled: true }
+              }
+            } %>
     </div>
   </div>
 
+  <!-- Avg. Discount (area chart) -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Avg. Discount</div>
+    <div class="insights-card__value">
+      <%= area_chart @avg_discount_by_week,
+            height: "200px",
+            xtitle: "Week",
+            ytitle: "Avg Discount (%)" %>
+    </div>
+  </div>
+
+  <!-- Renewing in 30 days (column chart) -->
+  <div class="insights-card card-pro">
+    <div class="insights-card__header">Renewing in 30 days</div>
+    <div class="insights-card__value">
+      <%= column_chart @renewals_calendar,
+            height: "200px",
+            library: {
+              scales: {
+                x: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { display: false }
+                },
+                y: {
+                  display: true,
+                  grid:   { display: true, drawBorder: true },
+                  ticks:  { stepSize: 1, beginAtZero: true }
+                }
+              },
+              plugins: {
+                legend:  { display: false },
+                tooltip: { enabled: true }
+              }
+            } %>
+    </div>
+  </div>
 </div>
