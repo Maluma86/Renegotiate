@@ -90,7 +90,6 @@ gem "chartkick"
 # for sending email to supplier -----#
 gem 'sendgrid-ruby', '~> 6.0'
 group :development do
-  # ...existing code...
-  gem 'letter_opener'
+  # gem 'letter_opener'
 end
 #----------------------------------------
