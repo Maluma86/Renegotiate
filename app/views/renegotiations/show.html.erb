@@ -1,7 +1,22 @@
 <!-- app/views/renegotiations/show.html.erb -->
-<div class="renegotiation-show-page container">
-  <h2 class="mt-4 mb-3">Renegotiate: <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %></h2>
-  <div class="row">
+
+<div class="product-page-container renegotiation-show-page">
+
+  <!-- Sticky header: page title + back button -->
+  <div class="wrapper-that-freezes-things">
+    <div class="products-header">
+      <div class="page-title">
+        <span class="page-title__text">
+          Renegotiate: <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %>
+        </span>
+      </div>
+      <%= link_to "← Back to products",
+                  products_path,
+                  class: "import-btn" %>
+    </div>
+  </div>
+
+  <div class="row mt-4">
     <!-- 1) Chatbox skeleton -->
     <div class="col-md-8">
       <div id="ai-chatbox" class="card mb-4">
@@ -9,33 +24,24 @@
           <strong>Conversation</strong>
         </div>
         <div class="card-body">
-            <%# Below is for the chatbox %>
           <div class="container chatbot">
             <h3>Chat with our negotiator below to renew the contract:</h3>
-            <!-- initial message from the system to kick the conversation off -->
             <p class="chat-intro-message">
               Hi <%= @supplier.contact %>,
               I’ll be handling the renegotiation on behalf of <%= @renegotiation.buyer.company_name %>.
               Our current contract for <%= @product.name %> is approaching its renewal date on <%= @product.contract_end_date.strftime("%B %d, %Y") %>.
-              We’ve been very satisfied with the quality of the product and value our collaboration so far. However, considering current market trends and our internal cost optimization efforts, we believe a price adjustment is reasonable.
-              We propose renewing the contract at a revised unit price of <%= number_to_currency(@renegotiation.max_target) %>.
-              Let us know your thoughts or if there’s any additional context we should consider.
+              We propose renewing at <%= number_to_currency(@renegotiation.max_target) %>.
             </p>
-            <!-- And the conversation starts -->
             <div id="questions">
               <%= render partial: "renegotiations/question", collection: @questions, as: :question %>
             </div>
             <%= render "form", question: @question %>
           </div>
-
-
-          <!-- your JS widget will mount here -->
-          <div id="chat-container">
-            <!-- e.g. <chat-widget :renegotiation-id="<%= @renegotiation.id %>"> -->
-          </div>
+          <div id="chat-container"><!-- JS widget mounts here --></div>
         </div>
       </div>
     </div>
+
     <!-- 2) Summary of the Agreement -->
     <div class="col-md-4">
       <div class="card mb-4">
@@ -50,7 +56,7 @@
              <%= @product.last_month_volume %> units
           </p>
           <p><strong>Contract length</strong><br>
-             <%= contract_length_months(Date.today, @product.contract_end_date) %>
+             <%= contract_length_months(Date.today, @product.contract_end_date) %> months
           </p>
           <p><strong>Notes / Thread</strong><br>
              <%= @renegotiation.thread.presence || "No notes recorded yet." %>
@@ -59,11 +65,19 @@
       </div>
     </div>
   </div>
+
   <!-- 3) Action buttons -->
   <div class="d-flex justify-content-between mb-5">
-    <%= link_to "← Back to main page",
+    <%= link_to "← Back to products",
                 products_path,
                 class: "btn btn-outline-secondary" %>
+<<<<<<< HEAD
+    <%= button_to "Accept & Confirm",
+                  set_target_renegotiation_path(@renegotiation),
+                  method: :post,
+                  params: { target_price: @product.current_price, tone: @renegotiation.tone },
+                  class: "btn btn-primary" %>
+=======
 <%# passing the accepted btn %>
     <% is_done = @renegotiation.status == "done" %>
   <button
@@ -79,10 +93,12 @@
     🎉 Great! The new terms have been passed to the buyer and they will come back to you with the draft contract soon.
   <% end %>
 </span>
+>>>>>>> master
     <%= mail_to @supplier.contact_email,
                 "Talk to a human instead!",
                 class: "btn btn-outline-danger" %>
   </div>
+
 </div>
 
 <!-- Accept Confirmation Modal -->
