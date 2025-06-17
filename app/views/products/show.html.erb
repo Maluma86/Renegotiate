@@ -16,7 +16,9 @@
       <% end %>
 
       <!-- Status -->
-      <h1 class="product-title"><%= @product.status.capitalize %></h1>
+      <% latest = @product.renegotiations.order(created_at: :desc).first %>
+      <% status = latest&.status.present? ? latest.status.capitalize : "Pending" %>
+      <h1 class="product-title"><%= status %></h1>
     </div>
   </div>
 
