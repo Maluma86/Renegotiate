@@ -1,0 +1,29 @@
+// app/assets/stylesheets/components/_page_title.scss
+@import "config/bootstrap_variables";
+
+/* ================================================================
+   Reusable page‐title component
+   ================================================================ */
+.page-title {
+  /* Title text styling */
+  display: block;
+  flex: 1;
+  margin: 0;
+  text-align: left;
+
+  &__text {
+    margin: 0;
+    display: inline-block;
+    font-size: 3rem;
+    font-weight: 600;
+    color: $dark;
+    line-height: 1.2;
+  }
+
+  /* ── Inject a full‐width underline on the TITLE’S PARENT flex container ── */
+  @at-root .wrapper-that-freezes-things .products-header {
+    /* ensure the header container spans full width */
+    border-bottom: 2px solid #131B3F;
+    margin-bottom: 1rem;
+  }
+}
