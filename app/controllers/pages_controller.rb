@@ -22,8 +22,8 @@ class PagesController < ApplicationController
     # 4️⃣ Compute summary metrics
     pending        = scope.pending.count
     ongoing        = scope.ongoing.count
-    human_required = scope.human_required.count
-    total_current  = pending + ongoing + human_required
+    escalated = scope.escalated.count
+    total_current  = pending + ongoing + escalated
     completed      = scope.completed.count
     avg_discount   = scope
                        .where.not(current_target_discount_percentage: nil)
@@ -41,7 +41,7 @@ class PagesController < ApplicationController
       breakdown: {
         pending:        pending,
         ongoing:        ongoing,
-        human_required: human_required
+        escalated:      escalated
       },
       completed:    completed,
       avg_discount: avg_discount,
@@ -54,7 +54,7 @@ class PagesController < ApplicationController
     @status_data = {
       "Pending"        => pending,
       "Ongoing"        => ongoing,
-      "Human Required" => human_required
+      "Escalated"     => escalated
     }
 
     # 8️⃣ Bar chart: completed per day over the selected period
