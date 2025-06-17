@@ -1,9 +1,19 @@
-<div id="<%= dom_id(question) %>" class="question">
+<div id="<%= dom_id(question) %>" class="message-group">
   <%= turbo_stream_from dom_id(question) %>
 
-  <p class="user-question"><%= question.user_question %></p>
-  <p class="ai-answer"><%= question.ai_answer || "..." %></p>
+  <!-- “You” / supplier message -->
+  <div class="message message--user">
+    <div class="message__sender">You</div>
+    <div class="message__bubble">
+      <%= question.user_question %>
+    </div>
+  </div>
+
+  <!-- “John” / AI reply -->
+  <div class="message message--ai">
+    <div class="message__sender">John</div>
+    <div class="message__bubble">
+      <%= question.ai_answer || "<em>...</em>" %>
+    </div>
+  </div>
 </div>
-
-
-
