@@ -18,8 +18,11 @@ Rails.application.routes.draw do
       get :confirm_target          # GET /renegotiations/:id/confirm_target
       post :set_target             # POST /renegotiations/:id/set_target
       post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
+<<<<<<< HEAD
       post :unlock_discount_targets # POST /renegotiations/:id/unlock_discount_targets
       post :accept
+=======
+>>>>>>> master
     end
     resources :questions, only: [:index, :create] # LS changed, a question belongs to a renegotiation
   end
