@@ -1,7 +1,8 @@
 class RenegotiationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_product, only: %i[new create]
-  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets]
+  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets unlock_discount_targets]
+
 
   def show
     # we already have @renegotiation from set_renegotiation
@@ -109,6 +110,15 @@ class RenegotiationsController < ApplicationController
         error: e.message
       }, status: :unprocessable_entity
     end
+  end
+
+  def unlock_discount_targets
+    unless @renegotiation.buyer_id == current_user.id
+      return render json: { success: false, error: 'Not authorized' }, status: :forbidden
+    end
+
+    @renegotiation.unlock_targets!
+    render json: { success: true }
   end
 
   private

@@ -1,212 +1,266 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
+# frozen_string_literal: true
+# ---------------------------------------------------------------------
+# Run with: bin/rails db:seed
+# ---------------------------------------------------------------------
+require "faker"
 
-require 'faker'
-
-# Clear existing data in development only
+# ──────────────────────────────────────────────────────────────
+# 0️⃣  Clean dev DB
+# ──────────────────────────────────────────────────────────────
 if Rails.env.development?
   puts "🧹 Clearing existing data..."
-  Renegotiation.destroy_all
-  Product.destroy_all
-  User.destroy_all
+  [Question, DiscountTargetHistory, Renegotiation, Product, User].each(&:destroy_all)
   puts "✅ Data cleared"
 end
 
-# Create Procurement Users (Buyers)
-puts "👥 Creating procurement users..."
-procurement_users = []
-10.times do
-  procurement_users << User.create!(
-    email: Faker::Internet.unique.email,
-    password: "password123",
-    role: "procurement",
-    company_name: Faker::Company.name,
-    contact: Faker::Name.name,
-    contact_email: Faker::Internet.email
-  )
-end
-puts "✅ Created #{procurement_users.count} procurement users"
-
-# Create Supplier Users
-puts "🏭 Creating supplier users..."
-supplier_users = []
-15.times do
-  supplier_users << User.create!(
-    email: Faker::Internet.unique.email,
-    password: "password123",
-    role: "supplier",
-    company_name: Faker::Company.name,
-    contact: Faker::Name.name,
-    contact_email: Faker::Internet.email
-  )
-end
-puts "✅ Created #{supplier_users.count} supplier users"
-
-# Product categories for realistic data
-categories = [
-  "Office Supplies", "Technology", "Manufacturing Equipment",
-  "Raw Materials", "Packaging", "Logistics", "Software Licenses",
-  "Fun tools", "Marketing Materials", "Industrial Tools"
-]
-
-# Create Products
-puts "📦 Creating products..."
-products = []
-80.times do
-  unit_price = Faker::Commerce.price(range: 50.0..5000.0)
-
-  # Generate realistic monthly spending volume
-  # Low-priced items: higher volume spending
-  # High-priced items: lower volume spending
-  if unit_price < 200
-    volume_spending = Faker::Number.between(from: 1000, to: 25_000)  # $1K-$25K
-  elsif unit_price < 1000
-    volume_spending = Faker::Number.between(from: 2000, to: 40_000)  # $2K-$40K
-  else
-    volume_spending = Faker::Number.between(from: 5000, to: 100_000) # $5K-$100K
-  end
-
-  products << Product.create!(
-    name: Faker::Commerce.product_name,
-    category: categories.sample,
-    description: Faker::Quote.famous_last_words,
-    current_price: unit_price,
-    last_month_volume: volume_spending,
-    status: ["Ongoing", "Done", "Human_required", "Pending"].sample,
-    contract_end_date: Faker::Date.between(from: Date.today, to: 2.years.from_now),
-    supplier: supplier_users.sample,
-    procurement: procurement_users.sample
-  )
-end
-puts "✅ Created #{products.count} products"
-
-# Create Renegotiations
-puts "🤝 Creating renegotiations..."
-renegotiations = []
-30.times do
-  product = products.sample
-  buyer = procurement_users.sample
-
-  # Generate realistic price targets
-  current_price = product.current_price
-  min_target = current_price * 0.7  # 30% discount max
-  max_target = current_price * 0.9  # 10% discount min
-
-  renegotiations << Renegotiation.create!(
-    status: ["ongoing", "done", "Human required"].sample,
-    thread: Faker::Quote.matz,
-    tone: ["collaborative", "neutral", "aggressive"].sample,
-    min_target: min_target,
-    max_target: max_target,
-    new_price: rand < 0.7 ? Faker::Commerce.price(range: min_target..max_target) : nil,
-    product: product,
-    buyer: buyer,
-    supplier: product.supplier
-  )
-end
-puts "✅ Created #{renegotiations.count} renegotiations"
-
-# Create some demo users with known credentials
+# ──────────────────────────────────────────────────────────────
+# 1️⃣  Core demo users
+# ──────────────────────────────────────────────────────────────
 puts "🎭 Creating demo users..."
-demo_procurement1 = User.create!(
-  email: "buyer@Walmart.com",
-  password: "demo123",
-  role: "procurement",
-  company_name: "Walmart",
-  contact: "Jane Buyer",
-  contact_email: "buyer@Walmart.com"
-)
-demo_procurement2 = User.create!(
-  email: "buyer@Carrefour.com",
-  password: "demo123",
-  role: "procurement",
-  company_name: "Walmart",
-  contact: "jean Dupont",
-  contact_email: "buyer@Carrefour.com"
-)
+walmart_buyer = User.find_or_create_by!(email: "buyer@walmart.com") do |u|
+  u.password      = "demo123"
+  u.role          = "procurement"
+  u.company_name  = "Walmart"
+  u.contact       = Faker::Name.name
+  u.contact_email = u.email
+end
 
-demo_supplier = User.create!(
-  email: "supplier@demo.com",
-  password: "demo123",
-  role: "supplier",
-  company_name: "Demo Supplies Inc",
-  contact: "John Supplier",
-  contact_email: "john@supplier.com"
-)
+demo_supplier = User.find_or_create_by!(email: "supplier@demo.com") do |u|
+  u.password      = "demo123"
+  u.role          = "supplier"
+  u.company_name  = "Demo Supplies Inc"
+  u.contact       = Faker::Name.name
+  u.contact_email = u.email
+end
+puts "✅ Demo users ready"
 
-# Create demo products
-demo_products = []
-demo_prices = [100, 250, 500, 1000, 1500]
-demo_volumes = [5000, 8000, 15_000, 25_000, 30_000] # Realistic spending volumes
+# ──────────────────────────────────────────────────────────────
+# 2️⃣  Extra suppliers (20 random + demo)
+# ──────────────────────────────────────────────────────────────
+puts "🏭 Creating suppliers..."
+suppliers = Array.new(20) do
+  User.create!(
+    email:         Faker::Internet.unique.email,
+    password:      "password123",
+    role:          "supplier",
+    company_name:  Faker::Company.name,
+    contact:       Faker::Name.name,
+    contact_email: Faker::Internet.email
+  )
+end
+suppliers << demo_supplier
+puts "✅ #{suppliers.size} suppliers created"
 
-5.times do |i|
-  demo_products << Product.create!(
-    name: "Demo Product #{i + 1}",
-    category: categories.sample,
-    description: "This is a demo product for testing the renegotiation platform",
-    current_price: demo_prices[i],
-    last_month_volume: demo_volumes[i], # Total spent last month
-    status: "pending",
-    contract_end_date: 6.months.from_now,
-    supplier: demo_supplier,
-    procurement: demo_procurement1
+# ──────────────────────────────────────────────────────────────
+# Helpers for capped date buckets
+# ──────────────────────────────────────────────────────────────
+def build_future_dates(total, days_ahead:, max_per_day:)
+  counts = Hash.new(0)
+  dates  = []
+  while dates.size < total
+    offset = rand(days_ahead)          # 0…days_ahead-1
+    next if counts[offset] >= max_per_day
+    counts[offset] += 1
+    dates << (Date.today + offset)
+  end
+  dates.shuffle
+end
+
+def build_past_dates(total, range_start, range_end, max_per_day:)
+  offsets = (range_start..range_end).to_a
+  counts  = Hash.new(0)
+  dates   = []
+  while dates.size < total
+    offset = offsets.sample
+    next if counts[offset] >= max_per_day
+    counts[offset] += 1
+    dates << (Date.today - offset)
+  end
+  dates.shuffle
+end
+
+# ──────────────────────────────────────────────────────────────
+# 3️⃣  Products – 120 total (35 renew ≤30 days, ≤3/day)
+# ──────────────────────────────────────────────────────────────
+puts "📦 Creating products..."
+renewal_dates = build_future_dates(35, days_ahead: 30, max_per_day: 3)
+categories    = %w[Office\ Supplies Technology Manufacturing\ Equipment Logistics Raw\ Materials]
+
+products = 120.times.map do |i|
+  price = Faker::Commerce.price(range: 50..5_000)
+
+  end_date =
+    if i < 35
+      renewal_dates[i]                                           # inside 30 days
+    else
+      rand < 0.5 ? Faker::Date.between(from: 3.months.ago, to: Date.yesterday)
+                 : Faker::Date.between(from: 31.days.from_now, to: 4.months.from_now)
+    end
+
+  Product.create!(
+    name:              Faker::Commerce.product_name,
+    category:          categories.sample,
+    description:       Faker::Marketing.buzzwords,
+    current_price:     price,
+    last_month_volume: Faker::Number.between(from: 1_000, to: 60_000),
+    contract_end_date: end_date,
+    supplier:          suppliers.sample,
+    procurement:       walmart_buyer
+  )
+end
+puts "✅ Created #{products.count} products (35 renew ≤30 days)"
+
+# ──────────────────────────────────────────────────────────────
+# 4️⃣  Renegotiations – 70 completed (spread) + 33 current
+# ──────────────────────────────────────────────────────────────
+puts "🤝 Creating renegotiations..."
+
+# Build 20 / 30 / 20 completed slots: days_0-29, 30-59, 60-89
+completed_dates =
+  build_past_dates(20, 0, 29,  max_per_day: 4) +
+  build_past_dates(30, 30, 59, max_per_day: 4) +
+  build_past_dates(20, 60, 89, max_per_day: 4)
+
+def discount_targets(price)
+  tgt_pct = rand(4.5..6.5).round(1)        # keeps mean under 7 %
+  min_pct = rand(2.0..4.0).round(1)
+  [
+    (price * (1 - tgt_pct/100)).round(2),  # min_target
+    (price * (1 - min_pct/100)).round(2),  # max_target
+    tgt_pct, min_pct
+  ]
+end
+
+renegs = []
+
+# Completed renegotiations
+completed_dates.each do |day|
+  product = products.sample
+  min_t, max_t, tgt_pct, min_pct = discount_targets(product.current_price)
+
+  renegs << Renegotiation.create!(
+    status: %w[done done done locked].sample,
+    thread: Faker::Quote.matz,
+    tone:   %w[collaborative neutral aggressive].sample,
+    min_target: min_t,
+    max_target: max_t,
+    new_price:  Faker::Commerce.price(range: min_t..max_t),
+    product:    product,
+    buyer:      walmart_buyer,
+    supplier:   product.supplier,
+    created_at: (day - 2.days).to_time.change(hour: 10),
+    updated_at: day.to_time.change(hour: 12),
+    current_target_discount_percentage: tgt_pct,
+    current_min_discount_percentage:    min_pct,
+    discount_targets_locked:            true
   )
 end
 
-# Create a demo renegotiation linked to the first product of walmart that is ongoing
-Renegotiation.create!(
-  status: "ongoing",
-  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
-  tone: "collaborative",
-  min_target: 800,
-  max_target: 900,
-  new_price: nil,
-  product: demo_products.first,
-  buyer: demo_procurement1,
-  supplier: demo_supplier
-)
+# Current renegotiations
+33.times do
+  product = products.sample
+  min_t, max_t, tgt_pct, min_pct = discount_targets(product.current_price)
+  ts = Faker::Time.between(from: 90.days.ago, to: Time.current)
 
-Renegotiation.create!(
-  status: "escalated",
-  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
-  tone: "collaborative",
-  min_target: 800,
-  max_target: 900,
-  new_price: nil,
-  product: demo_products.second,
-  buyer: demo_procurement1,
-  supplier: demo_supplier
-)
+  renegs << Renegotiation.create!(
+    status: %w[ongoing ongoing escalated].sample,
+    thread: Faker::Quote.matz,
+    tone:   %w[collaborative neutral aggressive].sample,
+    min_target: min_t,
+    max_target: max_t,
+    product:    product,
+    buyer:      walmart_buyer,
+    supplier:   product.supplier,
+    created_at: ts,
+    updated_at: ts,
+    current_target_discount_percentage: tgt_pct,
+    current_min_discount_percentage:    min_pct,
+    discount_targets_locked:            false
+  )
+end
+puts "✅ #{Renegotiation.where(status: %w[done locked]).count} completed, #{Renegotiation.where(status: %w[ongoing escalated]).count} current"
 
-Renegotiation.create!(
-  status: "done",
-  thread: "Hi! We'd love to discuss better terms for our contract renewal as loyal customers.",
-  tone: "collaborative",
-  min_target: 800,
-  max_target: 900,
-  new_price: nil,
-  product: demo_products.third,
-  buyer: demo_procurement1,
-  supplier: demo_supplier
-)
+# ──────────────────────────────────────────────────────────────
+# 5️⃣  Discount-target histories – 2-5 per renegotiation
+# ──────────────────────────────────────────────────────────────
+puts "🗂️  Creating discount-target histories..."
+DiscountTargetHistory.destroy_all
 
+renegs.each do |neg|
+  versions = rand(2..5)
+  versions.times do |v|
+    tgt = (neg.current_target_discount_percentage + rand(-0.4..0.4)).round(1)
+    min = (neg.current_min_discount_percentage    + rand(-0.4..0.4)).clamp(0.0, tgt).round(1)
+    ts  = Faker::Time.between(from: neg.created_at, to: neg.created_at + 5.days)
 
-puts "✅ Created demo users and sample data"
+    rec = DiscountTargetHistory.create!(
+      renegotiation:              neg,
+      target_discount_percentage: tgt,
+      min_discount_percentage:    min,
+      set_by_user_id:             walmart_buyer.id,
+      set_at:                     ts,
+      version_number:             v + 1,
+      is_active:                  v + 1 == versions,
+      created_at:                 ts,
+      updated_at:                 ts
+    )
 
+    neg.update!(
+      current_target_discount_percentage: tgt,
+      current_min_discount_percentage:    min,
+      active_discount_target_version_id:  rec.id
+    ) if rec.is_active
+  end
+end
+puts "✅ #{DiscountTargetHistory.count} history rows"
+
+# ──────────────────────────────────────────────────────────────
+# 6️⃣  Questions – 1-3 for each current renegotiation
+# ──────────────────────────────────────────────────────────────
+puts "💬 Creating Q&A pairs..."
+question_bank = [
+  "Can you confirm volume commitment at the proposed price?",
+  "What lead-time improvements can we expect?",
+  "Would you accept a stepped discount if volumes rise by 15 %?"
+]
+answer_bank = [
+  "Based on the last 6 months, that commitment is realistic.",
+  "Lead-time would drop from 8 days to 5 days once the new contract is signed.",
+  "Yes, we can formalise a stepped discount table in the contract appendix."
+]
+q_total = 0
+
+Renegotiation.where(status: %w[ongoing escalated]).find_each do |neg|
+  rand(1..3).times do
+    ts = Faker::Time.between(from: neg.created_at, to: neg.updated_at)
+    Question.create!(
+      user_question: question_bank.sample,
+      ai_answer:     answer_bank.sample,
+      user:          walmart_buyer,
+      renegotiation: neg,
+      created_at:    ts,
+      updated_at:    ts
+    )
+    q_total += 1
+  end
+end
+puts "✅ Created #{q_total} Q&A pairs"
+
+# ──────────────────────────────────────────────────────────────
+# 7️⃣  Final summary
+# ──────────────────────────────────────────────────────────────
 puts "
-🎉 Seed data creation complete!
+🎉 Seed complete!
 
-📊 Summary:
-- #{User.where(role: 'procurement').count} Procurement Users
-- #{User.where(role: 'supplier').count} Supplier Users
-- #{Product.count} Products
-- #{Renegotiation.count} Renegotiations
+📊 Totals
+   • Products:          #{Product.count}   (35 renew ≤30 days)
+   • Renegotiations:    #{Renegotiation.count}
+        ↳ Completed:    #{Renegotiation.where(status: %w[done locked]).count}
+        ↳ Current:      #{Renegotiation.where(status: %w[ongoing escalated]).count}
+   • Histories:         #{DiscountTargetHistory.count}
+   • Questions:         #{Question.count}
 
-🧪 Demo Accounts:
-- Buyer1: buyer@Walmart.com / demo123 -> has already 5 products attached
-- Buyer2: buyer@Carrefour.com / demo123 -> no products attached. Need to import. Should not see the products from Carrefour.
-- Supplier: supplier@demo.com / demo123
-
-🚀 Run 'rails server' and start testing!
+🧪 Demo logins
+   buyer@walmart.com / demo123
+   supplier@demo.com / demo123
 "
