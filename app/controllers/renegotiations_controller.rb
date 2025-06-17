@@ -47,7 +47,9 @@ class RenegotiationsController < ApplicationController
     @ai_suggestion = {
       recommended_target: 0.40,
       confidence_score: 0.85,
-      reasoning: "Test data - AI integration coming in task 7.10"
+      reasoning: "Test data - AI integration coming in task 7.10",
+      target_price: @renegotiation.max_target, # Use the max_target from the renegotiation
+      min_price: @renegotiation.min_target # Use the min_target from the renegotiation
     }
     @market_data = {
       average_price: 0.38,

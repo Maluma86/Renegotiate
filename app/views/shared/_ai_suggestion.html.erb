@@ -50,20 +50,50 @@
   </header>
 
   <!-- AI Recommendation - Moved to top -->
-  <div class="ai-recommendation" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518; margin-bottom: 2rem;">
+  <div class="ai-recommendation" id="ai-recommendation-section" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518; margin-bottom: 2rem;">
     <h4 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">💡 AI Recommendation</h4>
-    <p style="color: #E5E4E2; margin: 0; line-height: 1.6;">
-      Target €850 offers optimal balance between cost savings and supplier relationship maintenance. 
-      Current market conditions favor negotiation, with 85% confidence in achieving 7.2% savings while 
-      maintaining supplier partnership quality.
-    </p>
+    
+    <!-- Loading State -->
+    <div id="ai-loading" style="display: block;">
+      <div class="d-flex align-items-center" style="color: #E5E4E2;">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mb-0">Analyzing product composition and market conditions...</p>
+      </div>
+    </div>
+    
+    <!-- Content will be loaded here via AJAX -->
+    <div id="ai-content" style="display: none;">
+      <p id="ai-recommendation-text" style="color: #E5E4E2; margin: 0; line-height: 1.6;">
+        <!-- Dynamic content will be inserted here -->
+      </p>
+    </div>
+    
+    <!-- Fallback for demo purposes - Remove when implementing real AJAX -->
+    <script>
+      // Temporary demo: Show static content after 3 seconds
+      setTimeout(function() {
+        document.getElementById('ai-loading').style.display = 'none';
+        document.getElementById('ai-content').style.display = 'block';
+        document.getElementById('ai-recommendation-text').innerText = 
+          'Target €850 offers optimal balance between cost savings and supplier relationship maintenance. ' +
+          'Current market conditions favor negotiation, with 85% confidence in achieving 7.2% savings while ' +
+          'maintaining supplier partnership quality.';
+      }, 3000);
+    </script>
   </div>
 
   <!-- Key Metrics Row -->
   <div class="metrics-row" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
-    
+
     <div class="metric-card" style="text-align: center; background: #0A0F2E; padding: 1rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
-      <div style="font-size: 1.75rem; font-weight: 700; color: #FF7518; margin-bottom: 0.5rem;">€850</div>
+      <div style="font-size: 1.75rem; font-weight: 700; color: #FF7518; margin-bottom: 0.5rem;">€<%= suggestion[:min_price] || 780 %></div>
+      <div style="font-size: 0.875rem; color: #9CA3AF;">Min Price</div>
+    </div>
+
+    <div class="metric-card" style="text-align: center; background: #0A0F2E; padding: 1rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="font-size: 1.75rem; font-weight: 700; color: #FF7518; margin-bottom: 0.5rem;">€<%= suggestion[:target_price] || 850 %></div>
       <div style="font-size: 0.875rem; color: #9CA3AF;">Target Price</div>
     </div>
 
@@ -83,11 +113,6 @@
     </div>
 
     <div class="metric-card" style="text-align: center; background: #0A0F2E; padding: 1rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
-      <div style="font-size: 1.75rem; font-weight: 700; color: #FF7518; margin-bottom: 0.5rem;">€780</div>
-      <div style="font-size: 0.875rem; color: #9CA3AF;">Min Price</div>
-    </div>
-
-    <div class="metric-card" style="text-align: center; background: #0A0F2E; padding: 1rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <div style="font-size: 1.75rem; font-weight: 700; color: #FBBF24; margin-bottom: 0.5rem;">4.5★</div>
       <div style="font-size: 0.875rem; color: #9CA3AF;">Rating</div>
     </div>
@@ -96,7 +121,7 @@
 
   <!-- Charts and Analysis Row -->
   <div class="analysis-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-    
+
     <!-- Price Trend Chart -->
     <div class="chart-section" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">📊 Price Trend (6 months)</h4>
@@ -132,7 +157,7 @@
 
   <!-- Supplier & Risk Analysis -->
   <div class="details-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-    
+
     <!-- Supplier Analysis -->
     <div class="analysis-section" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">🏭 Supplier Analysis</h4>
