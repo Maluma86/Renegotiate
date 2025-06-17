@@ -96,7 +96,7 @@ class ProductsController < ApplicationController
           end
 
           # Find or create supplier
-          supplier = User.find_or_initialize_by(company_name: company_name, role: "supplier")
+          supplier = User.find_or_initialize_by(email: email, role: "supplier")
           if supplier.new_record?
             supplier.assign_attributes(
               email: email,

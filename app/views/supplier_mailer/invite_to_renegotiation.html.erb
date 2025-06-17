@@ -1,0 +1,29 @@
+<h1>Time to renew the contract for <%= @renegotiation.product.name %> with <%= @buyer.company_name %></h1>
+<p>
+  Hi <%= @supplier.contact %>,
+</p>
+<p>
+  I’m John, your procurement partner at Renegotiate (on behalf of Walmart).
+  We’re kicking off our annual review of the contract for <em><%= @renegotiation.product.name %></em> and
+  would like to discuss updated terms that reflect current market conditions.
+</p>
+
+<p>
+  To review the proposed target price and share your feedback, please
+  <%= link_to "click here to view the renewal proposal", renegotiation_url(@renegotiation), target: "_blank" %>.
+  You’ll find all the details and can leave comments right on the page.
+</p>
+
+<p>
+  If you have any questions or need assistance, feel free to reach out to your Walmart contact.
+</p>
+
+<p>
+  Thank you for your partnership. We look forward to working together to find the best terms for both sides.
+</p>
+
+<p>
+  Best regards,<br>
+  <strong><%= @buyer.company_name %></strong><br>
+  Procurement Team, Renegotiate
+</p>
