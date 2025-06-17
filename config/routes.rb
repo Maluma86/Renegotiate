@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       post :set_target             # POST /renegotiations/:id/set_target
       post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
       post :unlock_discount_targets # POST /renegotiations/:id/unlock_discount_targets
+      post :accept
     end
     resources :questions, only: [:index, :create] # LS changed, a question belongs to a renegotiation
   end

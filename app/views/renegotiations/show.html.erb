@@ -64,13 +64,87 @@
     <%= link_to "← Back to main page",
                 products_path,
                 class: "btn btn-outline-secondary" %>
-    <%= button_to "Accept the renegotiation / confirm",
-                  set_target_renegotiation_path(@renegotiation),
-                  method: :post,
-                  params: { target_price: @product.current_price, tone: @renegotiation.tone },
-                  class: "btn btn-primary" %>
+<%# passing the accepted btn %>
+    <% is_done = @renegotiation.status == "done" %>
+  <button
+    id="accept-renegotiation-btn"
+    class="btn btn-success"
+    style="min-width: 260px; font-size: 1rem;"
+    data-accept-url="<%= accept_renegotiation_path(@renegotiation) %>"
+    <%= "disabled" if is_done %>>
+    <%= is_done ? "Renegotiation Accepted" : "Accept the renegotiation / confirm" %>
+</button>
+<span id="accept-message" style="margin-left: 2rem; color: #22C55E; font-weight: 600; display: <%= is_done ? 'inline-block' : 'none' %>;">
+  <% if is_done %>
+    🎉 Great! The new terms have been passed to the buyer and they will come back to you with the draft contract soon.
+  <% end %>
+</span>
     <%= mail_to @supplier.contact_email,
                 "Talk to a human instead!",
                 class: "btn btn-outline-danger" %>
   </div>
 </div>
+
+<!-- Accept Confirmation Modal -->
+<div class="modal" id="accept-modal" tabindex="-1" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(30,30,30,0.6); z-index: 1050; align-items: center; justify-content: center;">
+  <div style="background: #fff; padding: 2rem 2.5rem; border-radius: 1rem; box-shadow: 0 2px 16px rgba(0,0,0,0.3); max-width: 420px; margin: auto; text-align: center;">
+    <div style="font-size: 2.5rem; color: #22C55E; margin-bottom: 1rem;">🎉</div>
+    <h4 style="margin-bottom: 1rem;">Renegotiation Accepted!</h4>
+    <p style="color: #333;">
+      Great! The new terms have been passed to the Supplier and they will come back to you with the draft contract soon.
+    </p>
+    <button id="close-modal-btn" class="btn btn-primary mt-3" style="margin-top: 1rem;">Close</button>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const acceptBtn = document.getElementById('accept-renegotiation-btn');
+  const modal = document.getElementById('accept-modal');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+
+  if (!acceptBtn || acceptBtn.disabled) return;
+
+  const acceptUrl = acceptBtn.dataset.acceptUrl;
+
+  acceptBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    acceptBtn.disabled = true;
+
+    fetch(acceptUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+        'Accept': 'application/json'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        acceptBtn.textContent = "Renegotiation Accepted";
+        if (modal) {
+          modal.style.display = 'flex';
+        }
+      } else {
+        acceptBtn.disabled = false;
+        alert(data.error || "There was a problem confirming.");
+      }
+    })
+    .catch(() => {
+      acceptBtn.disabled = false;
+      alert("There was a problem confirming.");
+    });
+  });
+
+  if (closeModalBtn && modal) {
+    closeModalBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+    // Optional: close modal when clicking outside the popup
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+});
+</script>
