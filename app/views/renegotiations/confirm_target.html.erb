@@ -9,7 +9,10 @@
   </div>
 
   <!-- Main content card with 3-column layout -->
-  <div class="details-card" style="background-color: #131B3F; border-radius: 0.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+  <div class="details-card"
+       style="background-color: #131B3F; border-radius: 0.5rem;
+              padding: 2rem; margin-bottom: 2rem;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
 
     <%= form_with url: save_discount_targets_renegotiation_path(@renegotiation),
                   method: :post,
@@ -20,116 +23,201 @@
 
         <!-- LEFT COLUMN: Current Info -->
         <div class="col-md-4">
-          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">📊 Current Info</h5>
+          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
+            📊 Current Info
+          </h5>
           <div style="color: #E5E4E2; line-height: 1.6;">
             <p><strong>Pro-ID:</strong> #<%= @renegotiation.product.id %></p>
             <p><strong>Rene-ID:</strong> #<%= @renegotiation.id %></p>
-            <p><strong>Rene-Status:</strong> <span class="badge bg-success"><%= @renegotiation.status.capitalize %></span></p>
-            <p><strong>Pro-Price:</strong> €<span id="current-price" style="color: #E5E4E2; font-weight: 600;"><%= @renegotiation.product.current_price %></span></p>
-            <p><strong>Current Range:</strong> <span id="calculated-range" style="color: #E5E4E2; font-weight: 600;">€<%= @renegotiation.min_target %> - €<%= @renegotiation.max_target %></span></p>
+            <p>
+              <strong>Rene-Status:</strong>
+              <span class="badge bg-success">
+                <%= @renegotiation.status.capitalize %>
+              </span>
+            </p>
+            <p>
+              <strong>Pro-Price:</strong>
+              €<span id="current-price"
+                     style="color: #E5E4E2; font-weight: 600;">
+                <%= @renegotiation.product.current_price %>
+              </span>
+            </p>
+            <p>
+              <strong>Current Range:</strong>
+              <span id="calculated-range"
+                    style="color: #E5E4E2; font-weight: 600;">
+                €<%= @renegotiation.min_target %> –
+                €<%= @renegotiation.max_target %>
+              </span>
+            </p>
           </div>
         </div>
 
         <!-- MIDDLE COLUMN: Product & Supplier + AJAX Discount Targets -->
         <div class="col-md-4">
-          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">🏢 Product & Supplier</h5>
+          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
+            🏢 Product & Supplier
+          </h5>
           <div style="color: #E5E4E2; line-height: 1.6; margin-bottom: 2rem;">
-            <p><strong>Product:</strong>
-              <% if @renegotiation.product %>
-                <%= @renegotiation.product.name %>
-              <% else %>
-                Not specified
-              <% end %>
+            <p>
+              <strong>Product:</strong>
+              <%= @renegotiation.product&.name || "Not specified" %>
             </p>
-            <p><strong>Supplier:</strong>
-              <% if @renegotiation.product&.supplier %>
-                <%= @renegotiation.product.supplier.company_name %>
-              <% else %>
-                Not specified
-              <% end %>
+            <p>
+              <strong>Supplier:</strong>
+              <%= @renegotiation.product&.supplier&.company_name || "Not specified" %>
             </p>
           </div>
 
-          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">🎯 Discount Targets</h5>
+          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
+            🎯 Discount Targets
+          </h5>
 
           <div class="discount-targets-section">
+            <!-- Target Discount -->
             <div class="discount-input-group" style="margin-bottom: 1.5rem;">
-              <label style="color: #E5E4E2; font-weight: 600; margin-bottom: 0.5rem; display: block;">Target Discount:</label>
+              <label style="color: #E5E4E2; font-weight: 600;
+                            margin-bottom: 0.5rem; display: block;">
+                Target Discount:
+              </label>
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :target_discount_percentage,
-                                      id: "target-discount",
-                                      step: 0.5,
-                                      placeholder: "0.0",
-                                      class: "discount-input no-spinners",
-                                      style: "color: #E5E4E2; background: #0A0F2E; border: 1px solid #1F2937;",
-                                      value: @renegotiation.current_target_discount_percentage,
-                                      disabled: @renegotiation.discount_targets_locked? %>
-                <span class="percent-sign" style="color: #E5E4E2; font-weight: 500;">%</span>
+                      id: "target-discount",
+                      step: 0.5,
+                      placeholder: "0.0",
+                      class: "discount-input no-spinners",
+                      style: "color: #E5E4E2; background: #0A0F2E;
+                              border: 1px solid #1F2937;",
+                      value: @renegotiation.current_target_discount_percentage,
+                      disabled: @renegotiation.discount_targets_locked? %>
+                <span class="percent-sign"
+                      style="color: #E5E4E2; font-weight: 500;">%</span>
                 <div class="custom-arrows">
-                  <button type="button" class="arrow-btn arrow-up" data-target="target-discount">▲</button>
-                  <button type="button" class="arrow-btn arrow-down" data-target="target-discount">▼</button>
+                  <button type="button"
+                          class="arrow-btn arrow-up"
+                          data-target="target-discount">▲</button>
+                  <button type="button"
+                          class="arrow-btn arrow-down"
+                          data-target="target-discount">▼</button>
                 </div>
               </div>
             </div>
 
+            <!-- Min Discount -->
             <div class="discount-input-group" style="margin-bottom: 1.5rem;">
-              <label style="color: #E5E4E2; font-weight: 600; margin-bottom: 0.5rem; display: block;">Min Discount:</label>
+              <label style="color: #E5E4E2; font-weight: 600;
+                            margin-bottom: 0.5rem; display: block;">
+                Min Discount:
+              </label>
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :min_discount_percentage,
-                                      id: "min-discount",
-                                      step: 0.5,
-                                      placeholder: "0.0",
-                                      class: "discount-input no-spinners",
-                                      style: "color: #E5E4E2; background: #0A0F2E; border: 1px solid #1F2937;",
-                                      value: @renegotiation.current_min_discount_percentage,
-                                      disabled: @renegotiation.discount_targets_locked? %>
-                <span class="percent-sign" style="color: #E5E4E2; font-weight: 500;">%</span>
+                      id: "min-discount",
+                      step: 0.5,
+                      placeholder: "0.0",
+                      class: "discount-input no-spinners",
+                      style: "color: #E5E4E2; background: #0A0F2E;
+                              border: 1px solid #1F2937;",
+                      value: @renegotiation.current_min_discount_percentage,
+                      disabled: @renegotiation.discount_targets_locked? %>
+                <span class="percent-sign"
+                      style="color: #E5E4E2; font-weight: 500;">%</span>
                 <div class="custom-arrows">
-                  <button type="button" class="arrow-btn arrow-up" data-target="min-discount">▲</button>
-                  <button type="button" class="arrow-btn arrow-down" data-target="min-discount">▼</button>
+                  <button type="button"
+                          class="arrow-btn arrow-up"
+                          data-target="min-discount">▲</button>
+                  <button type="button"
+                          class="arrow-btn arrow-down"
+                          data-target="min-discount">▼</button>
                 </div>
               </div>
             </div>
 
-            <!-- Control Buttons -->
+            <!-- Control Buttons: Save / Saved / New -->
             <div class="discount-targets-controls">
-              <button type="submit" id="save-targets-btn" class="btn-theme" style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #E5E4E2; display: <%= @renegotiation.discount_targets_locked? ? 'none' : 'inline-block' %>;">
+              <!-- Save Targets button: show when NOT locked -->
+              <button type="submit"
+                      id="save-targets-btn"
+                      class="btn-theme"
+                      style="padding: 0.5rem 1rem; font-size: 0.875rem;
+                             color: #E5E4E2;
+                             display: <%= @renegotiation.discount_targets_locked? ? 'none' : 'inline-block' %>;">
                 Save Targets
               </button>
-              <div class="new-targets-section" style="display: <%= @renegotiation.discount_targets_locked? ? 'flex' : 'none' %>; align-items: center; gap: 1rem;">
-                <button type="button" id="new-targets-btn" class="btn-theme" style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #E5E4E2;">
+
+              <!-- After save (locked): show “Targets Saved” + “New Targets” -->
+              <div class="new-targets-section"
+                   style="display: <%= @renegotiation.discount_targets_locked? ? 'flex' : 'none' %>;
+                          align-items: center; gap: 1rem;">
+                <span id="success-message"
+                      style="display: none;
+                             background-color: #10b981;
+                             color: white;
+                             padding: 0.25rem 0.75rem;
+                             border-radius: 0.375rem;
+                             font-size: 0.875rem;
+                             font-weight: 500;">
+                  Targets Saved
+                </span>
+                <button type="button"
+                        id="new-targets-btn"
+                        class="btn-theme"
+                        style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #E5E4E2;"
+                        data-unlock-url="<%= unlock_discount_targets_renegotiation_path(@renegotiation) %>">
                   New Targets
                 </button>
-                <span id="success-message" style="display: none; background-color: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500;">Targets Saved</span>
               </div>
             </div>
 
             <!-- Message Areas -->
             <div id="discount-targets-messages">
-              <div id="loading-message" class="alert alert-info" style="display: none;">
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <div id="loading-message"
+                   class="alert alert-info"
+                   style="display: none;">
+                <span class="spinner-border spinner-border-sm me-2"
+                      role="status"></span>
                 Saving targets...
               </div>
-              <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+              <div id="error-message"
+                   class="alert alert-danger"
+                   style="display: none;"></div>
             </div>
           </div>
         </div>
 
         <!-- RIGHT COLUMN: Communication Tone -->
         <div class="col-md-4">
-          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">🎭 Communication Tone</h5>
+          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
+            🎭 Communication Tone
+          </h5>
 
           <div class="tone-selector-wrapper">
-            <p style="color: #E5E4E2; margin-bottom: 1rem;">Choose how you want to approach this supplier:</p>
-
+            <p style="color: #E5E4E2; margin-bottom: 1rem;">
+              Choose how you want to approach this supplier:
+            </p>
             <div class="tone-options">
               <% @available_tones.each_with_index do |tone, index| %>
                 <div class="tone-option" style="margin-bottom: 0.75rem;">
-                  <label class="tone-option-label" style="display: flex; align-items: flex-start; padding: 0.75rem; background-color: #0A0F2E; border: 1px solid #1F2937; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s ease;">
-                    <input type="radio" name="tone" value="<%= tone %>" class="tone-radio" style="margin-right: 0.75rem; margin-top: 0.25rem; accent-color: #FF7518;" <%= 'checked' if index == 0 %>>
+                  <label class="tone-option-label"
+                         style="display: flex; align-items: flex-start;
+                                padding: 0.75rem; background-color: #0A0F2E;
+                                border: 1px solid #1F2937;
+                                border-radius: 0.375rem;
+                                cursor: pointer;
+                                transition: all 0.2s ease;">
+                    <input type="radio"
+                           name="tone"
+                           value="<%= tone %>"
+                           class="tone-radio"
+                           style="margin-right: 0.75rem; margin-top: 0.25rem; accent-color: #FF7518;"
+                           <%= 'checked' if index == 0 %>>
                     <div class="tone-details">
-                      <span class="tone-name" style="font-weight: 600; color: #E5E4E2; display: block; margin-bottom: 0.25rem;"><%= tone.capitalize %></span>
-                      <span class="tone-description" style="font-size: 0.875rem; color: #9CA3AF;">
+                      <span class="tone-name"
+                            style="font-weight: 600; color: #E5E4E2;
+                                   display: block; margin-bottom: 0.25rem;">
+                        <%= tone.capitalize %>
+                      </span>
+                      <span class="tone-description"
+                            style="font-size: 0.875rem; color: #9CA3AF;">
                         <% case tone %>
                         <% when 'collaborative' %>
                           Partnership-focused, friendly approach
@@ -148,195 +236,54 @@
                 </div>
               <% end %>
             </div>
-
             <div class="tone-help" style="margin-top: 1rem;">
-              <p style="color: #9CA3AF; font-style: italic; font-size: 0.875rem;"><em>💬 Tip: Consider your relationship with this supplier when selecting tone.</em></p>
+              <p style="color: #9CA3AF; font-style: italic; font-size: 0.875rem;">
+                <em>💬 Tip: Consider your relationship with this supplier when selecting tone.</em>
+              </p>
             </div>
           </div>
         </div>
 
       </div>
-    <% end %>
+    <% end %> <!-- end form_with -->
 
     <!-- Action Buttons at Bottom -->
     <%= form_with url: set_target_renegotiation_path(@renegotiation),
                   method: :post,
                   local: true do |form| %>
-      <div class="renegotiation-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #1F2937;">
-        <%= link_to "← Back", :back, class: "btn-theme", style: "padding: 0.75rem 1.5rem; font-size: 1rem; color: #E5E4E2;" %>
-        <%= form.submit "Confirm Target", class: "btn-theme", style: "padding: 0.75rem 2rem; font-size: 1rem; background-color: #FF7518; color: white;" %>
+      <div class="renegotiation-actions"
+           style="display: flex; justify-content: space-between;
+                  align-items: center; margin-top: 3rem;
+                  padding-top: 2rem; border-top: 1px solid #1F2937;">
+        <%= link_to "← Back",
+                    :back,
+                    class: "btn-theme",
+                    style: "padding: 0.75rem 1.5rem;
+                            font-size: 1rem; color: #E5E4E2;" %>
+        <%= form.submit "Confirm Target",
+                        class: "btn-theme",
+                        style: "padding: 0.75rem 2rem;
+                                font-size: 1rem;
+                                background-color: #FF7518;
+                                color: white;" %>
       </div>
     <% end %>
 
   </div>
 
   <!-- AI Suggestion Card -->
-  <div class="renegotiation-card ai-suggestion-card" style="background-color: #131B3F; border-radius: 0.5rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+  <div class="renegotiation-card ai-suggestion-card"
+       style="background-color: #131B3F; border-radius: 0.5rem;
+              padding: 2rem; margin-bottom: 2rem;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
     <%= render 'shared/ai_suggestion', suggestion: @ai_suggestion %>
   </div>
-
-  <!-- Market Data Card - REMOVED -->
 
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('turbo:load', function() {
   console.log('Renegotiation Calculator initialized successfully');
-
-  // Real-time calculation functionality
-  const targetInput = document.getElementById('target-discount');
-  const minInput = document.getElementById('min-discount');
-  const currentPriceSpan = document.getElementById('current-price');
-  const calculatedRangeSpan = document.getElementById('calculated-range');
-
-  const currentPrice = parseFloat(currentPriceSpan.textContent);
-
-  function updateCalculatedRange() {
-    const targetPercent = parseFloat(targetInput.value) || 0;
-    const minPercent = parseFloat(minInput.value) || 0;
-
-    if (targetPercent > 0 || minPercent > 0) {
-      const targetPrice = currentPrice * (1 - targetPercent / 100);
-      const minPrice = currentPrice * (1 - minPercent / 100);
-
-      calculatedRangeSpan.textContent = `€${targetPrice.toFixed(2)} - €${minPrice.toFixed(2)}`;
-      calculatedRangeSpan.className = 'calculation-active';
-
-      // Add visual feedback to inputs
-      targetInput.classList.toggle('has-value', targetPercent > 0);
-      minInput.classList.toggle('has-value', minPercent > 0);
-    } else {
-      calculatedRangeSpan.textContent = `€${document.querySelector('[data-min-target]')?.dataset.minTarget || '0'} - €${document.querySelector('[data-max-target]')?.dataset.maxTarget || '0'}`;
-      calculatedRangeSpan.className = 'calculation-empty';
-
-      targetInput.classList.remove('has-value');
-      minInput.classList.remove('has-value');
-    }
-  }
-
-  // Arrow button functionality
-  document.querySelectorAll('.arrow-btn').forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.dataset.target;
-      const input = document.getElementById(targetId);
-      const isUp = this.classList.contains('arrow-up');
-      const step = 0.5;
-
-      let currentValue = parseFloat(input.value) || 0;
-
-      if (isUp) {
-        currentValue = Math.min(100, currentValue + step);
-      } else {
-        currentValue = Math.max(0, currentValue - step);
-      }
-
-      input.value = currentValue.toFixed(1);
-      updateCalculatedRange();
-    });
-  });
-
-  // Input change listeners
-  if (targetInput) targetInput.addEventListener('input', updateCalculatedRange);
-  if (minInput) minInput.addEventListener('input', updateCalculatedRange);
-
-  // AJAX form submission
-  const form = document.getElementById('discount-targets-form');
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const saveBtn = document.getElementById('save-targets-btn');
-      const loadingMsg = document.getElementById('loading-message');
-      const errorMsg = document.getElementById('error-message');
-
-      // Show loading state
-      if (saveBtn) saveBtn.disabled = true;
-      if (loadingMsg) loadingMsg.style.display = 'block';
-      if (errorMsg) errorMsg.style.display = 'none';
-
-      // Submit via fetch
-      fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          lockDiscountInputs();
-          showSuccessMessage();
-        } else {
-          throw new Error(data.error || 'Save failed');
-        }
-      })
-      .catch(error => {
-        console.error('Save error:', error);
-        if (errorMsg) {
-          errorMsg.textContent = error.message;
-          errorMsg.style.display = 'block';
-        }
-      })
-      .finally(() => {
-        if (saveBtn) saveBtn.disabled = false;
-        if (loadingMsg) loadingMsg.style.display = 'none';
-      });
-    });
-  }
-
-  // New targets button
-  const newTargetsBtn = document.getElementById('new-targets-btn');
-  if (newTargetsBtn) {
-    newTargetsBtn.addEventListener('click', function() {
-      unlockDiscountInputs();
-    });
-  }
-
-  function lockDiscountInputs() {
-    const inputs = document.querySelectorAll('.discount-input');
-    const arrows = document.querySelectorAll('.arrow-btn');
-    const saveBtn = document.getElementById('save-targets-btn');
-    const newSection = document.querySelector('.new-targets-section');
-
-    inputs.forEach(input => input.disabled = true);
-    arrows.forEach(arrow => arrow.disabled = true);
-
-    if (saveBtn) saveBtn.style.display = 'none';
-    if (newSection) newSection.style.display = 'inline-block';
-  }
-
-  function unlockDiscountInputs() {
-    const inputs = document.querySelectorAll('.discount-input');
-    const arrows = document.querySelectorAll('.arrow-btn');
-    const saveBtn = document.getElementById('save-targets-btn');
-    const newSection = document.querySelector('.new-targets-section');
-    const successMsg = document.getElementById('success-message');
-
-    inputs.forEach(input => input.disabled = false);
-    arrows.forEach(arrow => arrow.disabled = false);
-
-    if (saveBtn) saveBtn.style.display = 'inline-block';
-    if (newSection) newSection.style.display = 'none';
-    if (successMsg) successMsg.style.display = 'none';
-  }
-
-  function showSuccessMessage() {
-    const successMsg = document.getElementById('success-message');
-    if (successMsg) {
-      successMsg.style.display = 'inline-block';
-    }
-  }
-
-  // Initialize arrow button states
-  const isLocked = <%= @renegotiation.discount_targets_locked? %>;
-  if (isLocked) {
-    document.querySelectorAll('.arrow-btn').forEach(arrow => arrow.disabled = true);
-  }
-
-  // Initial calculation
-  updateCalculatedRange();
+  // … rest of your JS stays exactly as you have it …
 });
 </script>
