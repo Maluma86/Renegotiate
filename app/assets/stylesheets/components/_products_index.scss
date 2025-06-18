@@ -16,30 +16,23 @@
 
 /* ---------- sticky header (title + import button) ---------- */
 .wrapper-that-freezes-things {
-  position: sticky;
-  top: 0;
-  background: $light;       // white bar
-  z-index: 10;
-  padding-bottom: 0.5rem;
+  position: sticky;           // stick to top of viewport
+  top: 0;                     // zero offset
+  background: $light;         // white background
+  z-index: 10;                // above other content
+  padding-bottom: 0.5rem;     // space underneath
 
   .products-header {
-    display: flex;
+    display: flex;            // flex container for title + button
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-
-    .product-title {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: $dark;        // dark text on white
-    }
+    margin-bottom: 1rem;      // gap before the rest of the content
 
     .import-btn {
-      @extend .btn-theme;   // gray bg, orange on hover
+      @extend .btn-theme;     // shared button style
       padding: 0.5rem 1rem;
       font-size: 0.875rem;
-      color: $light !important;  // white text
+      color: $light !important;
     }
   }
 }

@@ -2,29 +2,30 @@
 
 <div class="product-page-container">
 
-  <!-- Sticky header: product name | supplier name | status -->
+  <!-- Sticky header: static page title -->
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
-      <!-- Product name -->
-      <h1 class="product-title"><%= @product.name %></h1>
-
-      <!-- Supplier name (same styling as product-title) -->
-      <% if (s = @product.supplier) %>
-        <h1 class="product-title"><%= s.company_name %></h1>
-      <% else %>
-        <h1 class="product-title text-gray-500">Unknown Supplier</h1>
-      <% end %>
-
-      <!-- Status -->
-      <% latest = @product.renegotiations.order(created_at: :desc).first %>
-      <% status = latest&.status.present? ? latest.status.capitalize : "Pending" %>
-      <h1 class="product-title"><%= status %></h1>
+      <div class="page-title">
+        <span class="page-title__text">Renegotiate Product</span>
+      </div>
     </div>
   </div>
 
   <!-- Detail card -->
   <div class="card-wrapper">
     <div class="card-pro">
+      <!-- Product & supplier inside the card -->
+      <div class="card-pro__title">
+        <h2 style="margin:0; font-size:1.5rem; font-weight:600;">
+          <%= @product.name %>
+        </h2>
+        <% if (s = @product.supplier) %>
+          <p style="margin:0.25rem 0 1rem; color:#555;">
+            <strong>Supplier:</strong> <%= s.company_name %>
+          </p>
+        <% end %>
+      </div>
+
       <hr>
 
       <!-- Supplier email -->
@@ -51,6 +52,14 @@
       <p class="card-pro__content">
         <strong>Last 30 days:</strong>   <%= @product.last_month_volume %> units<br>
         <strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units
+      </p>
+
+      <!-- Status -->
+      <% latest = @product.renegotiations.order(created_at: :desc).first
+         status = latest&.status.present? ? latest.status.downcase.tr(' ', '_') : "pending" %>
+      <p class="card-pro__content">
+        <strong>Status:</strong>
+        <span class="status <%= status %>"><%= status.titleize %></span>
       </p>
 
       <!-- Renegotiate button -->

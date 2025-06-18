@@ -20,6 +20,8 @@ Rails.application.routes.draw do
       post :save_discount_targets  # POST /renegotiations/:id/save_discount_targets
       post :start_product_intelligence    # POST /renegotiations/:id/start_product_intelligence
       get :product_intelligence_status    # GET /renegotiations/:id/product_intelligence_status
+      post :unlock_discount_targets # POST /renegotiations/:id/unlock_discount_targets
+      post :accept
     end
     resources :questions, only: [:index, :create] # LS changed, a question belongs to a renegotiation
   end
