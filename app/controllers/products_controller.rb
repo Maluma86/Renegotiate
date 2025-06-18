@@ -51,7 +51,6 @@ class ProductsController < ApplicationController
     # Just renders the form view
   end
 
-
   def upload
     if params[:file].present?
       begin
@@ -161,6 +160,7 @@ class ProductsController < ApplicationController
       redirect_to import_products_path, alert: "Please upload a CSV file."
     end
   end
+
 
   private
 
