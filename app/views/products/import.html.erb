@@ -1,35 +1,51 @@
-<div class="import-form">
-  <h1>Import Products via CSV</h1>
+<!-- app/views/products/import.html.erb -->
 
-  <%= form_with url: upload_products_path,
-                method: :post,
-                local: true,
-                html: { multipart: true, data: { turbo: false } } do %>
+<div class="product-page-container">
 
-    <div class="form-group">
-      <label for="file">Choose your CSV file:</label>
-      <%= file_field_tag :file,
-                         accept: ".csv",
-                         id: "file",
-                         class: "form-control-file",
-                         onchange: "updateFilename()" %>
-      <p id="selected-filename"></p>
+  <!-- Sticky header: page title + back button -->
+  <div class="wrapper-that-freezes-things">
+    <div class="products-header">
+      <div class="page-title">
+        <span class="page-title__text">Import Products via CSV</span>
+      </div>
+      <%= link_to "← Back to products",
+                  products_path,
+                  class: "import-btn" %>
     </div>
+  </div>
 
-    <div class="form-group">
-      <%= submit_tag "Upload", class: "import-btn" %>
-    </div>
-  <% end %>
+  <!-- CSV upload form -->
+  <div class="import-form">
+    <%= form_with url: upload_products_path,
+                  method: :post,
+                  local: true,
+                  html: { multipart: true, data: { turbo: false } } do %>
 
-  <hr>
+      <div class="form-group">
+        <label for="file">Choose your CSV file:</label>
+        <%= file_field_tag :file,
+                           accept: ".csv",
+                           id: "file",
+                           class: "form-control-file",
+                           onchange: "updateFilename()" %>
+        <p id="selected-filename"></p>
+      </div>
 
-  <div class="download-template">
-    <p>
+      <div class="form-group">
+        <%= submit_tag "Upload", class: "import-btn" %>
+      </div>
+    <% end %>
+
+    <hr>
+
+    <div class="download-template">
+      <p>
         <%= link_to "Download CSV template",
                     "/template_upload.csv",
                     download: "template_upload.csv",
                     class: "btn btn-outline-secondary" %>
-    </p>
+      </p>
+    </div>
   </div>
 </div>
 
