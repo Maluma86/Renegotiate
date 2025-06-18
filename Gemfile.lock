@@ -285,6 +285,7 @@ GEM
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
+    ruby_http_client (3.5.5)
     rubyzip (2.4.1)
     sassc (2.4.0)
       ffi (~> 1.9)
@@ -301,6 +302,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    sendgrid-ruby (6.7.0)
+      ruby_http_client (~> 3.4)
     solid_queue (1.1.5)
       activejob (>= 7.1)
       activerecord (>= 7.1)
@@ -375,6 +378,7 @@ DEPENDENCIES
   ruby-openai
   sassc-rails
   selenium-webdriver
+  sendgrid-ruby (~> 6.0)
   simple_form!
   solid_queue
   sprockets-rails

@@ -51,7 +51,6 @@ class ProductsController < ApplicationController
     # Just renders the form view
   end
 
-
   def upload
     if params[:file].present?
       begin
@@ -96,9 +95,10 @@ class ProductsController < ApplicationController
           end
 
           # Find or create supplier
-          supplier = User.find_or_initialize_by(company_name: company_name, role: "supplier")
+          supplier = User.find_or_initialize_by(email: email, role: "supplier")
           if supplier.new_record?
             supplier.assign_attributes(
+              company_name: company_name,
               email: email,
               contact: contact_name,
               contact_email: contact_email,
@@ -160,6 +160,7 @@ class ProductsController < ApplicationController
       redirect_to import_products_path, alert: "Please upload a CSV file."
     end
   end
+
 
   private
 

@@ -62,6 +62,18 @@ class RenegotiationsController < ApplicationController
     target_price = params[:target_price]
     selected_tone = params[:tone]
 
+    # sending the email to the supplier-----
+    Rails.logger.info "attempting to send email to supplier"
+    begin
+        # deliver_now so we can catch errors immediately
+        SupplierMailer.invite_to_renegotiation(@renegotiation.id).deliver_now
+        Rails.logger.info "[RenegotiationsController] Mailer invited #{@renegotiation.supplier.email} at #{Time.current}"
+      rescue => e
+        Rails.logger.error "[RenegotiationsController] Failed to send mail: #{e.class} #{e.message}"
+        Rails.logger.error e.backtrace.first(5).join("\n")
+      end
+    #---------------------------------------
+
     redirect_to renegotiation_path(@renegotiation),
                 notice: "Target set to #{target_price} with #{selected_tone} tone"
   end

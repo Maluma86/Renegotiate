@@ -1,0 +1,17 @@
+Contract Renewal Invitation for <%= @renegotiation.product.name %>
+
+Hello <%= @supplier.contact %>,
+
+I’m <%= @buyer.company_name %>, your procurement partner at Renegotiate (on behalf of Walmart).
+We’re kicking off our annual review of the contract for "<%= @renegotiation.product.name %>" and would like to discuss updated terms that reflect current market conditions.
+
+Please review the proposal and leave your comments by visiting:
+<%= renegotiation_url(@renegotiation) %>
+
+If you have any questions, simply reply to this email or reach out to your Walmart sourcing contact.
+
+Thank you for your partnership.
+
+Best regards,
+<%= @buyer.company_name %>
+Procurement Team, Renegotiate
