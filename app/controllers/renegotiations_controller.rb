@@ -1,7 +1,7 @@
 class RenegotiationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_product, only: %i[new create]
-  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets]
+  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets start_product_intelligence product_intelligence_status]
 
   def show
     # we already have @renegotiation from set_renegotiation
@@ -48,8 +48,8 @@ class RenegotiationsController < ApplicationController
       recommended_target: 0.40,
       confidence_score: 0.85,
       reasoning: "Test data - AI integration coming in task 7.10",
-      target_price: @renegotiation.max_target, # Use the max_target from the renegotiation
-      min_price: @renegotiation.min_target # Use the min_target from the renegotiation
+      target_price: @renegotiation.max_target, # Use the max_target from the renegotiation for Max AI page 2506171630
+      min_price: @renegotiation.min_target # Use the min_target from the renegotiation for Max AI page 2506171630
     }
     @market_data = {
       average_price: 0.38,
@@ -98,6 +98,32 @@ class RenegotiationsController < ApplicationController
         success: false,
         error: e.message
       }, status: :unprocessable_entity
+    end
+  end
+
+  def start_product_intelligence
+    # Check if job is already running
+    job_status_key = "product_intel_job_#{@renegotiation.id}"
+
+    unless Rails.cache.exist?(job_status_key)
+      # Mark job as running
+      Rails.cache.write(job_status_key, true, expires_in: 5.minutes)
+
+      # Queue the background job
+      ProductIntelligenceJob.perform_later(@renegotiation.id)
+    end
+
+    render json: { status: 'processing' }
+  end
+
+  def product_intelligence_status
+    result_key = "product_intel_result_#{@renegotiation.id}"
+    result = Rails.cache.read(result_key)
+
+    if result
+      render json: { status: 'completed', data: result }
+    else
+      render json: { status: 'processing' }
     end
   end
 

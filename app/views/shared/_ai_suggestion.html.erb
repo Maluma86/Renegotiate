@@ -70,17 +70,142 @@
       </p>
     </div>
     
-    <!-- Fallback for demo purposes - Remove when implementing real AJAX -->
+    <!-- Real AJAX Implementation -->
     <script>
-      // Temporary demo: Show static content after 3 seconds
-      setTimeout(function() {
+      document.addEventListener('DOMContentLoaded', function() {
+        const renegotiationId = <%= @renegotiation.id %>;
+        
+        // Start the background job
+        startProductIntelligence(renegotiationId);
+        
+        // Poll for results
+        const pollInterval = setInterval(() => {
+          checkProductIntelligenceStatus(renegotiationId, pollInterval);
+        }, 2000); // Check every 2 seconds
+        
+        // Timeout after 30 seconds
+        setTimeout(() => {
+          clearInterval(pollInterval);
+          showFallbackContent();
+        }, 30000);
+      });
+
+      function startProductIntelligence(renegotiationId) {
+        fetch(`/renegotiations/${renegotiationId}/start_product_intelligence`, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+          }
+        })
+        .catch(error => {
+          console.error('Error starting product intelligence:', error);
+          showFallbackContent();
+        });
+      }
+
+      function checkProductIntelligenceStatus(renegotiationId, pollInterval) {
+        fetch(`/renegotiations/${renegotiationId}/product_intelligence_status`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'completed') {
+              clearInterval(pollInterval);
+              updateUIWithIntelligence(data.data);
+            }
+          })
+          .catch(error => {
+            console.error('Error checking status:', error);
+            clearInterval(pollInterval);
+            showFallbackContent();
+          });
+      }
+
+      function updateUIWithIntelligence(intelligence) {
+        // Hide loading
+        document.getElementById('ai-loading').style.display = 'none';
+        document.getElementById('ai-content').style.display = 'block';
+        
+        // Update recommendation text
+        const recommendationElement = document.getElementById('ai-recommendation-text');
+        if (intelligence.recommendation) {
+          recommendationElement.innerText = intelligence.recommendation;
+        } else {
+          recommendationElement.innerText = 'AI analysis completed successfully.';
+        }
+        
+        // Update forecast chart if data available
+        if (intelligence.forecast) {
+          updateForecastChart(intelligence.forecast);
+        }
+        
+        // Future: Update other dashboard sections when implemented
+        // if (intelligence.ingredients) updateIngredientAnalysis(intelligence.ingredients);
+        // if (intelligence.risks) updateRiskAssessment(intelligence.risks);
+        // if (intelligence.strategies) updateStrategies(intelligence.strategies);
+      }
+
+      function showFallbackContent() {
         document.getElementById('ai-loading').style.display = 'none';
         document.getElementById('ai-content').style.display = 'block';
         document.getElementById('ai-recommendation-text').innerText = 
-          'Target €850 offers optimal balance between cost savings and supplier relationship maintenance. ' +
-          'Current market conditions favor negotiation, with 85% confidence in achieving 7.2% savings while ' +
-          'maintaining supplier partnership quality.';
-      }, 3000);
+          'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
+      }
+
+      // Function to update forecast chart with AI data
+      function updateForecastChart(forecastData) {
+        if (!forecastData || !forecastData.periods) return;
+        
+        const labelsContainer = document.getElementById('forecast-labels');
+        const barsContainer = document.getElementById('forecast-bars');
+        const titleElement = document.getElementById('forecast-title');
+        const trendElement = document.getElementById('forecast-trend');
+        
+        // Update title if provided
+        if (forecastData.title) {
+          titleElement.textContent = forecastData.title;
+        }
+        
+        // Clear existing content
+        labelsContainer.innerHTML = '';
+        barsContainer.innerHTML = '';
+        
+        // Add new labels and bars
+        forecastData.periods.forEach((period, index) => {
+          // Add label
+          const label = document.createElement('span');
+          label.style.cssText = 'color: #9CA3AF; font-size: 0.75rem;';
+          label.textContent = period.label;
+          labelsContainer.appendChild(label);
+          
+          // Determine color based on trend
+          let color = '#6B7280'; // neutral
+          if (period.trend > 0) color = period.trend > 10 ? '#EF4444' : '#FF7518'; // red or orange for increases
+          if (period.trend < 0) color = '#10B981'; // green for decreases
+          
+          // Add bar
+          const bar = document.createElement('div');
+          bar.className = 'forecast-bar';
+          bar.style.cssText = `
+            flex: 1; 
+            background: ${color}; 
+            height: ${Math.max(10, Math.min(90, period.value))}%; 
+            opacity: 0.8; 
+            border-radius: 0.25rem 0.25rem 0 0;
+            transition: all 0.3s ease;
+          `;
+          bar.setAttribute('data-value', period.value);
+          bar.setAttribute('data-period', period.label);
+          bar.setAttribute('title', `${period.label}: ${period.trend > 0 ? '+' : ''}${period.trend}%`);
+          barsContainer.appendChild(bar);
+        });
+        
+        // Update overall trend
+        if (forecastData.overallTrend) {
+          const trendColor = forecastData.overallTrend.value > 0 ? '#EF4444' : '#10B981';
+          trendElement.style.color = trendColor;
+          trendElement.textContent = `${forecastData.overallTrend.value > 0 ? '+' : ''}${forecastData.overallTrend.value}% ${forecastData.overallTrend.description}`;
+        }
+      }
     </script>
   </div>
 
@@ -206,4 +331,286 @@
 
   </div>
 
+</section>
+
+<!-- NEW PRODUCT INTELLIGENCE SECTIONS -->
+
+<!-- Product Overview Section -->
+<section class="product-overview" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
+  <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
+    <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
+      📦 Product Analysis
+    </h2>
+  </header>
+  
+  <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+    <h3 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 600;">
+      <%= @renegotiation.product.name %>
+    </h3>
+    <p style="color: #E5E4E2; margin: 0 0 1rem 0; line-height: 1.6;">
+      <strong>Description:</strong> <%= @renegotiation.product.description || "No description available" %>
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+      <div>
+        <span style="color: #9CA3AF; font-size: 0.875rem;">Category</span>
+        <p style="color: #E5E4E2; margin: 0.25rem 0 0 0; font-weight: 600;"><%= @renegotiation.product.category %></p>
+      </div>
+      <div>
+        <span style="color: #9CA3AF; font-size: 0.875rem;">Current Price</span>
+        <p style="color: #FF7518; margin: 0.25rem 0 0 0; font-weight: 600;">€<%= @renegotiation.product.current_price %></p>
+      </div>
+      <div>
+        <span style="color: #9CA3AF; font-size: 0.875rem;">Supplier</span>
+        <p style="color: #E5E4E2; margin: 0.25rem 0 0 0; font-weight: 600;"><%= @renegotiation.product.supplier.company_name %></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ingredient Composition Analysis -->
+<section class="ingredient-analysis" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
+  <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
+    <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
+      🧪 Top 5 Ingredient Analysis
+    </h2>
+  </header>
+  
+  <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #1F2937;">
+          <th style="text-align: left; padding: 0.75rem; color: #9CA3AF; font-weight: 600;">Ingredient</th>
+          <th style="text-align: center; padding: 0.75rem; color: #9CA3AF; font-weight: 600;">%</th>
+          <th style="text-align: left; padding: 0.75rem; color: #9CA3AF; font-weight: 600;">Origin</th>
+          <th style="text-align: center; padding: 0.75rem; color: #9CA3AF; font-weight: 600;">Price Trend</th>
+          <th style="text-align: right; padding: 0.75rem; color: #9CA3AF; font-weight: 600;">Risk Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Hardcoded ingredient data - will be dynamic later -->
+        <tr style="border-bottom: 1px solid #1F2937;">
+          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Cocoa</td>
+          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">35%</td>
+          <td style="padding: 1rem; color: #E5E4E2;">Ghana, Ivory Coast</td>
+          <td style="text-align: center; padding: 1rem;">
+            <span style="color: #EF4444; font-weight: 600;">↑ +12%</span>
+          </td>
+          <td style="text-align: right; padding: 1rem;">
+            <span style="background: #EF4444; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">HIGH</span>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1F2937;">
+          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Sugar</td>
+          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">25%</td>
+          <td style="padding: 1rem; color: #E5E4E2;">Brazil, India</td>
+          <td style="text-align: center; padding: 1rem;">
+            <span style="color: #10B981; font-weight: 600;">↓ -3%</span>
+          </td>
+          <td style="text-align: right; padding: 1rem;">
+            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1F2937;">
+          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Milk Powder</td>
+          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">20%</td>
+          <td style="padding: 1rem; color: #E5E4E2;">EU, New Zealand</td>
+          <td style="text-align: center; padding: 1rem;">
+            <span style="color: #FBBF24; font-weight: 600;">↑ +5%</span>
+          </td>
+          <td style="text-align: right; padding: 1rem;">
+            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1F2937;">
+          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Palm Oil</td>
+          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">10%</td>
+          <td style="padding: 1rem; color: #E5E4E2;">Indonesia, Malaysia</td>
+          <td style="text-align: center; padding: 1rem;">
+            <span style="color: #FBBF24; font-weight: 600;">↑ +7%</span>
+          </td>
+          <td style="text-align: right; padding: 1rem;">
+            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Vanilla Extract</td>
+          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">5%</td>
+          <td style="padding: 1rem; color: #E5E4E2;">Madagascar</td>
+          <td style="text-align: center; padding: 1rem;">
+            <span style="color: #6B7280; font-weight: 600;">→ 0%</span>
+          </td>
+          <td style="text-align: right; padding: 1rem;">
+            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 6-Month Price Forecast -->
+<section class="price-forecast" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
+  <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
+    <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
+      📈 6-Month Ingredient Price Forecast
+    </h2>
+  </header>
+  
+  <div class="forecast-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Forecast Chart - Now Dynamic -->
+    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;" id="forecast-title">Price Projection Timeline</h4>
+      <!-- Dynamic chart container -->
+      <div id="forecast-chart-container" style="position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
+        <!-- Month labels - dynamically populated -->
+        <div id="forecast-labels" style="position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding-top: 0.5rem;">
+          <!-- Default 6-month labels - will be overridden by AI -->
+          <span style="color: #9CA3AF; font-size: 0.75rem;">Jan</span>
+          <span style="color: #9CA3AF; font-size: 0.75rem;">Feb</span>
+          <span style="color: #9CA3AF; font-size: 0.75rem;">Mar</span>
+          <span style="color: #9CA3AF; font-size: 0.75rem;">Apr</span>
+          <span style="color: #9CA3AF; font-size: 0.75rem;">May</span>
+          <span style="color: #9CA3AF; font-size: 0.75rem;">Jun</span>
+        </div>
+        <!-- Forecast bars - dynamically generated -->
+        <div id="forecast-bars" style="position: absolute; bottom: 2rem; left: 0; right: 0; height: 150px; display: flex; align-items: flex-end; gap: 0.5rem;">
+          <!-- Default bars - will be replaced by AI data -->
+          <div class="forecast-bar" style="flex: 1; background: #FF7518; height: 60%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="60" data-period="Jan"></div>
+          <div class="forecast-bar" style="flex: 1; background: #FF7518; height: 65%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="65" data-period="Feb"></div>
+          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 75%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="75" data-period="Mar"></div>
+          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 80%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="80" data-period="Apr"></div>
+          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 85%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="85" data-period="May"></div>
+          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 88%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="88" data-period="Jun"></div>
+        </div>
+      </div>
+      <p id="forecast-summary" style="color: #9CA3AF; font-size: 0.875rem; margin-top: 1rem;">
+        Overall trend: <span id="forecast-trend" style="color: #EF4444; font-weight: 600;">+15% expected increase</span>
+      </p>
+    </div>
+    
+    <!-- Forecast Summary -->
+    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;">Key Price Drivers</h4>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
+          <span style="color: #EF4444;">🔴</span>
+          <span style="color: #E5E4E2; margin-left: 0.5rem;">Cocoa: Drought in West Africa affecting harvest</span>
+        </li>
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
+          <span style="color: #10B981;">🟢</span>
+          <span style="color: #E5E4E2; margin-left: 0.5rem;">Sugar: Brazil surplus creating downward pressure</span>
+        </li>
+        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
+          <span style="color: #FBBF24;">🟡</span>
+          <span style="color: #E5E4E2; margin-left: 0.5rem;">Dairy: EU regulations impacting supply</span>
+        </li>
+        <li style="padding: 0.5rem 0;">
+          <span style="color: #FBBF24;">🟡</span>
+          <span style="color: #E5E4E2; margin-left: 0.5rem;">Palm Oil: Sustainability concerns affecting production</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Risk Intelligence Dashboard -->
+<section class="risk-intelligence" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
+  <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
+    <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
+      ⚠️ Risk Intelligence Dashboard
+    </h2>
+  </header>
+  
+  <div class="risk-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+    <!-- Geopolitical Risks -->
+    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
+        <span style="background: #EF4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">HIGH</span>
+        Geopolitical
+      </h4>
+      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <li style="padding: 0.375rem 0;">• Ghana election uncertainty (Q2)</li>
+        <li style="padding: 0.375rem 0;">• EU-Africa trade negotiations</li>
+        <li style="padding: 0.375rem 0;">• Indonesia export restrictions</li>
+      </ul>
+    </div>
+    
+    <!-- Product-Specific Risks (Agricultural/Technical/Material based on product type) -->
+    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #FBBF24;">
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
+        <span style="background: #FBBF24; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">MEDIUM</span>
+        Product-Specific
+      </h4>
+      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <!-- These will be dynamically generated based on product type -->
+        <% if @renegotiation.product.category&.downcase&.include?('food') || @renegotiation.product.category&.downcase&.include?('agricultural') %>
+          <li style="padding: 0.375rem 0;">• Cocoa crop disease outbreak</li>
+          <li style="padding: 0.375rem 0;">• Unusual weather patterns</li>
+          <li style="padding: 0.375rem 0;">• Dairy feed cost increases</li>
+        <% elsif @renegotiation.product.category&.downcase&.include?('electronic') || @renegotiation.product.category&.downcase&.include?('tech') %>
+          <li style="padding: 0.375rem 0;">• Semiconductor shortage risk</li>
+          <li style="padding: 0.375rem 0;">• Rare earth mineral dependencies</li>
+          <li style="padding: 0.375rem 0;">• Manufacturing capacity constraints</li>
+        <% elsif @renegotiation.product.category&.downcase&.include?('industrial') || @renegotiation.product.category&.downcase&.include?('machinery') %>
+          <li style="padding: 0.375rem 0;">• Steel price volatility</li>
+          <li style="padding: 0.375rem 0;">• Energy cost fluctuations</li>
+          <li style="padding: 0.375rem 0;">• Manufacturing delays</li>
+        <% else %>
+          <!-- Default/Generic risks -->
+          <li style="padding: 0.375rem 0;">• Raw material availability</li>
+          <li style="padding: 0.375rem 0;">• Quality control variations</li>
+          <li style="padding: 0.375rem 0;">• Production capacity limits</li>
+        <% end %>
+      </ul>
+    </div>
+    
+    <!-- Supply Chain Risks -->
+    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #10B981;">
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
+        <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">LOW</span>
+        Supply Chain
+      </h4>
+      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <li style="padding: 0.375rem 0;">• Shipping routes stable</li>
+        <li style="padding: 0.375rem 0;">• Port congestion clearing</li>
+        <li style="padding: 0.375rem 0;">• Container availability improving</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Market Intelligence Summary -->
+<section class="market-intelligence-summary" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem; margin-bottom: 2rem;">
+  <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
+    <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
+      🎯 Negotiation Strategy Recommendations
+    </h2>
+  </header>
+  
+  <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
+    <h4 style="color: #FF7518; margin: 0 0 1rem 0;">Based on Product Intelligence Analysis:</h4>
+    <ol style="color: #E5E4E2; line-height: 1.8; padding-left: 1.5rem;">
+      <li style="margin-bottom: 0.75rem;">
+        <strong>Lock in Q1 prices immediately</strong> - Cocoa prices expected to rise 15% by June due to West African drought
+      </li>
+      <li style="margin-bottom: 0.75rem;">
+        <strong>Negotiate volume discounts</strong> - Supplier has excess sugar inventory, leverage for 5-7% additional discount
+      </li>
+      <li style="margin-bottom: 0.75rem;">
+        <strong>Request price protection clause</strong> - Include 90-day price freeze given high geopolitical risks
+      </li>
+      <li style="margin-bottom: 0.75rem;">
+        <strong>Consider alternative origins</strong> - Explore South American cocoa sources to reduce Ghana dependency
+      </li>
+      <li style="margin-bottom: 0;">
+        <strong>Timing advantage</strong> - Current market conditions favor buyers, but window closing in 30-45 days
+      </li>
+    </ol>
+    
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1F2937;">
+      <p style="color: #9CA3AF; font-size: 0.875rem; margin: 0;">
+        <em>💡 Pro tip: Use the sugar surplus as your primary negotiation leverage. Your supplier needs to move inventory before new Brazilian harvest arrives in April.</em>
+      </p>
+    </div>
+  </div>
 </section>
