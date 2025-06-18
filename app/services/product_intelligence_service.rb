@@ -25,7 +25,7 @@ class ProductIntelligenceService
         model: "gpt-4o-mini",
         messages: build_messages(prompt),
         temperature: 0.7,
-        max_tokens: 200
+        max_tokens: 10_000
       }
     )
 
