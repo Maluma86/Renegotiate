@@ -474,3 +474,120 @@
     </div>
   </div>
 </section>
+
+<!-- BUYER'S COMPACT AI DASHBOARD - CONCEPT VERSION -->
+<section class="buyer-compact-dashboard" style="background: #131B3F; border-radius: 0.5rem; padding: 1.5rem; color: #E5E4E2; margin-top: 2rem; border: 2px solid #FF7518;">
+  
+  <!-- Compact Header -->
+  <header style="margin-bottom: 1.5rem; border-bottom: 2px solid #FF7518; padding-bottom: 0.75rem;">
+    <h3 style="color: #E5E4E2; margin: 0; font-size: 1.25rem; font-weight: 700;">
+      🛒 Buyer's Decision Summary <span style="color: #9CA3AF; font-size: 0.875rem; font-weight: 400;">(CONCEPT)</span>
+    </h3>
+  </header>
+
+  <!-- Quick Metrics (4 cards instead of 6) -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+    <div style="text-align: center; background: #0A0F2E; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="font-size: 1.25rem; font-weight: 700; color: #FF7518; margin-bottom: 0.25rem;">€850</div>
+      <div style="font-size: 0.75rem; color: #9CA3AF;">Target</div>
+    </div>
+    <div style="text-align: center; background: #0A0F2E; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="font-size: 1.25rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">85%</div>
+      <div style="font-size: 0.75rem; color: #9CA3AF;">Confidence</div>
+    </div>
+    <div style="text-align: center; background: #0A0F2E; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="font-size: 1.25rem; font-weight: 700; color: #10B981; margin-bottom: 0.25rem;">7.2%</div>
+      <div style="font-size: 0.75rem; color: #9CA3AF;">Savings</div>
+    </div>
+    <div style="text-align: center; background: #0A0F2E; padding: 0.75rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="font-size: 1.25rem; font-weight: 700; color: #EF4444; margin-bottom: 0.25rem;">HIGH</div>
+      <div style="font-size: 0.75rem; color: #9CA3AF;">Risk</div>
+    </div>
+  </div>
+
+  <!-- Collapsible Sections -->
+  <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+    
+    <!-- AI Recommendation (Collapsible) -->
+    <div style="background: #0A0F2E; border-radius: 0.375rem; border: 1px solid #FF7518;">
+      <div style="padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('ai-rec-content')">
+        <span style="color: #FF7518; font-weight: 600; font-size: 0.875rem;">💡 Lock prices now - market rising 15%</span>
+        <span style="color: #FF7518; font-size: 0.875rem;">▼</span>
+      </div>
+      <div id="ai-rec-content" style="display: none; padding: 0 1rem 1rem 1rem; border-top: 1px solid #1F2937;">
+        <p style="color: #E5E4E2; margin: 0; font-size: 0.875rem; line-height: 1.5;">
+          Based on current market analysis, recommend locking in Q1 prices immediately. Cocoa prices are expected to rise 15% by June due to West African drought conditions. Supply chain disruptions and geopolitical tensions are creating additional upward pressure.
+        </p>
+      </div>
+    </div>
+
+    <!-- Top Ingredients (Collapsible) -->
+    <div style="background: #0A0F2E; border-radius: 0.375rem; border: 1px solid #1F2937;">
+      <div style="padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('ingredients-content')">
+        <span style="color: #E5E4E2; font-size: 0.875rem;">🧪 Top 5: Cocoa (35%), Sugar (25%), Milk (20%)...</span>
+        <span style="color: #9CA3AF; font-size: 0.875rem;">▼</span>
+      </div>
+      <div id="ingredients-content" style="display: none; padding: 0 1rem 1rem 1rem; border-top: 1px solid #1F2937;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem;">
+          <div style="color: #E5E4E2;">Cocoa: <span style="color: #FF7518; font-weight: 600;">35%</span> <span style="color: #EF4444;">↑ +12%</span></div>
+          <div style="color: #E5E4E2;">Sugar: <span style="color: #FF7518; font-weight: 600;">25%</span> <span style="color: #10B981;">↓ -3%</span></div>
+          <div style="color: #E5E4E2;">Milk: <span style="color: #FF7518; font-weight: 600;">20%</span> <span style="color: #FBBF24;">↑ +5%</span></div>
+          <div style="color: #E5E4E2;">Vanilla: <span style="color: #FF7518; font-weight: 600;">15%</span> <span style="color: #EF4444;">↑ +18%</span></div>
+          <div style="color: #E5E4E2;">Lecithin: <span style="color: #FF7518; font-weight: 600;">5%</span> <span style="color: #10B981;">→ 0%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk Alert (Collapsible) -->
+    <div style="background: #0A0F2E; border-radius: 0.375rem; border: 1px solid #EF4444;">
+      <div style="padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('risk-content')">
+        <span style="color: #EF4444; font-size: 0.875rem;">⚠️ HIGH Risk: Political tensions, crop disease, trade wars</span>
+        <span style="color: #EF4444; font-size: 0.875rem;">▼</span>
+      </div>
+      <div id="risk-content" style="display: none; padding: 0 1rem 1rem 1rem; border-top: 1px solid #1F2937;">
+        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.75rem;">
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• Ghana election uncertainty affecting cocoa supply</li>
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• Crop disease outbreaks in West Africa</li>
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• EU-Africa trade negotiations creating volatility</li>
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• Climate change affecting harvest schedules</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Key Strategies (Collapsible) -->
+    <div style="background: #0A0F2E; border-radius: 0.375rem; border: 1px solid #10B981;">
+      <div style="padding: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSection('strategy-content')">
+        <span style="color: #10B981; font-size: 0.875rem;">🎯 3 Key Tactics: Price lock, volume discount, timing advantage</span>
+        <span style="color: #10B981; font-size: 0.875rem;">▼</span>
+      </div>
+      <div id="strategy-content" style="display: none; padding: 0 1rem 1rem 1rem; border-top: 1px solid #1F2937;">
+        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.75rem;">
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• <strong>Price Lock:</strong> Secure Q1 prices before 15% increase</li>
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• <strong>Volume Discount:</strong> Leverage sugar surplus for 5-7% discount</li>
+          <li style="color: #E5E4E2; padding: 0.25rem 0;">• <strong>Timing:</strong> Current buyer's market closes in 30-45 days</li>
+        </ul>
+        <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid #1F2937;">
+          <p style="color: #9CA3AF; font-size: 0.75rem; margin: 0;">
+            <em>💡 Pro tip: Use sugar surplus as primary leverage - supplier needs to move inventory before Brazilian harvest.</em>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function toggleSection(contentId) {
+  const content = document.getElementById(contentId);
+  const arrow = content.previousElementSibling.querySelector('span:last-child');
+  
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    arrow.textContent = '▲';
+  } else {
+    content.style.display = 'none';
+    arrow.textContent = '▼';
+  }
+}
+</script>
