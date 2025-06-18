@@ -1,6 +1,7 @@
 // app/assets/stylesheets/components/_products_index.scss
 
-@import "config/bootstrap_variables";
+@import "config/bootstrap_variables";  // bring in your color variables
+@import "components/buttons";         // import your .btn-main styles
 
 /* ================================================================
    Products index – theme-aligned
@@ -29,7 +30,7 @@
     margin-bottom: 1rem;      // gap before the rest of the content
 
     .import-btn {
-      @extend .btn-theme;     // shared button style
+      @extend .btn-main;      // use your new main button style
       padding: 0.5rem 1rem;
       font-size: 0.875rem;
       color: $light !important;
@@ -65,10 +66,10 @@
 }
 
 .product-search-button {
-  @extend .btn-theme;        // gray bg, orange on hover
+  @extend .btn-main;         // grey bg, orange border, white text, hover orange
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  color: $light !important;  // white text
+  color: $light !important;
 }
 
 /* ---------- products table ---------- */
@@ -131,19 +132,21 @@
         font-size: 0.75rem;
         font-weight: 500;
         border-radius: 0.25rem;
+        color: $light;
+        border: 1px solid $light;
 
-        &.pending         { background: #fef9c3; color: #92400e; }
-        &.ongoing         { background: #a0adf3; color: #1e40af; }
-        &.done            { background: #91bba0; color: #166534; }
-        &.human_required  { background: #eda1a1; color: #991b1b; }
+        &.pending         { background: #986F00; color: $light; }
+        &.ongoing         { background: #334155; color: $light; }
+        &.done            { background: $secondary; color: $light; }
+        &.human_required  { background: #eda1a1; color: $light; }
       }
     }
 
     .renegotiate-btn {
-      @extend .btn-theme;      // gray bg, orange on hover
+      @extend .btn-main;      // grey bg, orange border, white text, hover orange
       padding: 0.25rem 0.5rem;
       font-size: 0.75rem;
-      color: $light !important; // white text
+      color: $light !important;
     }
   }
 }

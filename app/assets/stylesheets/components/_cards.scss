@@ -10,14 +10,13 @@
 
 /* ── Two‐Tone Card (now plain white with black text & grey border) ──────────────────────────────────── */
 .card-pro {
-  max-width:     600px;
+  max-width:     650px;
   width:         100%;
   background:    $light;                     // white background
   color:         $dark;                      // black text throughout
   border-radius: 0.5rem;
   border:        1px solid (#0A0F2E);  // subtle grey border
   box-shadow:    0 2px 6px rgba(0,0,0,0.2);
-  padding:       1rem;                       // adjust padding as needed
   display:       flex;
   flex-direction: column;
 
