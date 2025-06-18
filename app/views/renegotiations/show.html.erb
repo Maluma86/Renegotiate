@@ -1,5 +1,3 @@
-<!-- app/views/renegotiations/show.html.erb -->
-
 <div class="product-page-container renegotiation-show-page">
 
   <!-- Sticky header: page title + back button -->
@@ -71,29 +69,27 @@
     <%= link_to "← Back to products",
                 products_path,
                 class: "btn btn-outline-secondary" %>
-<<<<<<< HEAD
-    <%= button_to "Accept & Confirm",
-                  set_target_renegotiation_path(@renegotiation),
-                  method: :post,
-                  params: { target_price: @product.current_price, tone: @renegotiation.tone },
-                  class: "btn btn-primary" %>
-=======
-<%# passing the accepted btn %>
+    <%# unified Accept button %>
     <% is_done = @renegotiation.status == "done" %>
-  <button
-    id="accept-renegotiation-btn"
-    class="btn btn-success"
-    style="min-width: 260px; font-size: 1rem;"
-    data-accept-url="<%= accept_renegotiation_path(@renegotiation) %>"
-    <%= "disabled" if is_done %>>
-    <%= is_done ? "Renegotiation Accepted" : "Accept the renegotiation / confirm" %>
-</button>
-<span id="accept-message" style="margin-left: 2rem; color: #22C55E; font-weight: 600; display: <%= is_done ? 'inline-block' : 'none' %>;">
-  <% if is_done %>
-    🎉 Great! The new terms have been passed to the buyer and they will come back to you with the draft contract soon.
-  <% end %>
-</span>
->>>>>>> master
+    <button
+      id="accept-renegotiation-btn"
+      class="btn btn-success"
+      style="min-width: 260px; font-size: 1rem;"
+      data-accept-url="<%= accept_renegotiation_path(@renegotiation) %>"
+      <%= "disabled" if is_done %>>
+      <%= is_done ? "Renegotiation Accepted" : "Accept & Confirm" %>
+    </button>
+    <span
+      id="accept-message"
+      style="margin-left: 2rem;
+             color: #22C55E;
+             font-weight: 600;
+             display: <%= is_done ? 'inline-block' : 'none' %>;
+      ">
+      <% if is_done %>
+        🎉 Great! The new terms have been passed to the Supplier and they will come back to you with the draft contract soon.
+      <% end %>
+    </span>
     <%= mail_to @supplier.contact_email,
                 "Talk to a human instead!",
                 class: "btn btn-outline-danger" %>
@@ -113,14 +109,13 @@
   </div>
 </div>
 
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('turbo:load', function() {
   const acceptBtn = document.getElementById('accept-renegotiation-btn');
   const modal = document.getElementById('accept-modal');
   const closeModalBtn = document.getElementById('close-modal-btn');
 
-  if (!acceptBtn || acceptBtn.disabled) return;
+  if (!acceptBtn) return;
 
   const acceptUrl = acceptBtn.dataset.acceptUrl;
 
@@ -137,11 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(res => res.json())
     .then(data => {
-      if (data.success) {
+      // Treat "Already confirmed" as a successful accept
+      if (data.success || data.error === 'Already confirmed') {
         acceptBtn.textContent = "Renegotiation Accepted";
-        if (modal) {
-          modal.style.display = 'flex';
-        }
+        if (modal) modal.style.display = 'flex';
       } else {
         acceptBtn.disabled = false;
         alert(data.error || "There was a problem confirming.");
@@ -157,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
     closeModalBtn.addEventListener('click', function() {
       modal.style.display = 'none';
     });
-    // Optional: close modal when clicking outside the popup
     modal.addEventListener('click', function(e) {
       if (e.target === modal) modal.style.display = 'none';
     });
