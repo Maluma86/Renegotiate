@@ -6,7 +6,7 @@
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
       <div class="page-title">
-        <span class="page-title__text">Renegotiate Product</span>
+        <span class="page-title__text">Renegotiate</span>
       </div>
     </div>
   </div>
@@ -17,14 +17,22 @@
       <!-- Product & supplier inside the card -->
       <div class="card-pro__title">
         <h2 style="margin:0; font-size:1.5rem; font-weight:600;">
-          <%= @product.name %>
+          Product: <%= @product.name %>
         </h2>
         <% if (s = @product.supplier) %>
-          <p style="margin:0.25rem 0 1rem; color:#555;">
-            <strong>Supplier:</strong> <%= s.company_name %>
-          </p>
+
+          <h2 style="margin:0; font-size:1.5rem; font-weight:600;"> Supplier:
+            <%= s.company_name %>
+          </h2>
         <% end %>
       </div>
+
+            <!-- Status -->
+      <% latest = @product.renegotiations.order(created_at: :desc).first
+         status = latest&.status.present? ? latest.status.downcase.tr(' ', '_') : "pending" %>
+      <p class="card-pro__content">
+        <span class="status <%= status %>"><%= status.titleize %></span>
+      </p>
 
       <hr>
 
@@ -52,14 +60,6 @@
       <p class="card-pro__content">
         <strong>Last 30 days:</strong>   <%= @product.last_month_volume %> units<br>
         <strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units
-      </p>
-
-      <!-- Status -->
-      <% latest = @product.renegotiations.order(created_at: :desc).first
-         status = latest&.status.present? ? latest.status.downcase.tr(' ', '_') : "pending" %>
-      <p class="card-pro__content">
-        <strong>Status:</strong>
-        <span class="status <%= status %>"><%= status.titleize %></span>
       </p>
 
       <!-- Renegotiate button -->

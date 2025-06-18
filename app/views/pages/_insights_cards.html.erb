@@ -1,97 +1,79 @@
+<!-- app/views/pages/_insights_cards.html.erb -->
 <div class="insights-cards-grid">
-  <!-- Current Renegotiations -->
+
+  <!-- 1) Current Renegotiations: hide Y-axis numbers, keep X (statuses) -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Current Renegotiations</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:current_total] %>
-      </div>
+      <div class="insights-card__metric"><%= @stats[:current_total] %></div>
       <div class="insights-card__chart">
         <%= column_chart @status_data,
               height: "100%",
-              library: { legend: { position: "bottom" } } %>
+              library: {
+                scales: {
+                  y: { display: false },    # no numbers on Y
+                  x: { display: true }      # keep status labels on X
+                },
+                plugins: { legend: { position: "bottom" } }
+              } %>
       </div>
     </div>
   </div>
 
-  <!-- Renewing in 30 days -->
+  <!-- 4) Renewing in 30 days: hide Y-axis numbers -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Renewing in 30 days</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:ending_soon] %>
-      </div>
+      <div class="insights-card__metric"><%= @stats[:ending_soon] %></div>
       <div class="insights-card__chart">
         <%= column_chart @renewals_calendar,
               height: "100%",
               library: {
                 scales: {
-                  x: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { display: false }
-                  },
-                  y: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { stepSize: 1, beginAtZero: true }
-                  }
+                  y: { display: false },
+                  x: { display: true, grid: { display: true }, ticks: { display: false } }
                 },
-                plugins: {
-                  legend:  { display: false },
-                  tooltip: { enabled: true }
-                }
+                plugins: { legend: { display: false }, tooltip: { enabled: true } }
               } %>
       </div>
     </div>
   </div>
 
-    <!-- Avg. Discount -->
+  <!-- 3) Avg. Discount: only show Y-axis numbers, hide X-axis -->
   <div class="insights-card card-pro">
-    <div class="insights-card__header">Avg. Discount</div>
+    <div class="insights-card__header">Average Discount (%)</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:avg_discount] %>%
-      </div>
+      <div class="insights-card__metric"><%= @stats[:avg_discount] %></div>
       <div class="insights-card__chart">
         <%= area_chart @avg_discount_by_week,
               height: "100%",
-              xtitle: "Week",
-              ytitle: "Avg Discount (%)" %>
+              library: {
+                scales: {
+                  x: { display: false },  # remove X labels/lines
+                  y: { display: true }    # keep Y numbers
+                },
+                plugins: { legend: { display: false } }
+              } %>
       </div>
     </div>
   </div>
 
-  <!-- Completed Renegotiations -->
+  <!-- 2) Completed Renegotiations: hide Y-axis numbers entirely -->
   <div class="insights-card card-pro">
     <div class="insights-card__header">Completed Renegotiations</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric">
-        <%= @stats[:completed] %>
-      </div>
+      <div class="insights-card__metric"><%= @stats[:completed] %></div>
       <div class="insights-card__chart">
         <%= column_chart @completed_over_time,
               height: "100%",
               library: {
                 scales: {
-                  x: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { display: false }        # hide date labels
-                  },
-                  y: {
-                    display: true,
-                    grid:   { display: true, drawBorder: true },
-                    ticks:  { stepSize: 1, beginAtZero: true }
-                  }
+                  y: { display: false },
+                  x: { display: true, grid: { display: true }, ticks: { display: false } }
                 },
-                plugins: {
-                  legend:  { display: false },
-                  tooltip: { enabled: true }
-                }
+                plugins: { legend: { display: false }, tooltip: { enabled: true } }
               } %>
       </div>
     </div>
   </div>
-
 </div>

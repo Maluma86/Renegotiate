@@ -1,60 +1,66 @@
-@import "config/bootstrap_variables"; // Import shared Bootstrap variable overrides
+@import "config/bootstrap_variables";
 
-/* ================================================================
-   Insights cards – 2×2 layout with split metric/chart body
-   ================================================================ */
-
-.insights-cards-grid {
-  display: grid;                             // Enable CSS Grid layout
-  grid-template-columns: repeat(2, 1fr);     // Two equal-width columns
-  grid-auto-rows: auto;       // Rows at least 250px tall
-  gap: 1.5rem;                               // Space between grid items
-  margin: 2rem 0;                            // Vertical margin around the grid
+/* 1) The wrapper only needs to center its child */
+.insights-cards-wrapper {
+  display: flex;
+  justify-content: center;  // center the grid horizontally
 }
 
-.insights-card {
-  display: flex;                             // Use Flexbox within each card
-  flex-direction: column;                    // Stack header and body vertically
-  overflow: hidden;                          // Clip overflow to maintain rounded corners
+/* 2) The grid: two columns, equal gaps, auto-sized to content */
+.insights-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 2rem;                                           // 2rem both row & column gaps
+  margin: 2rem 0;                                      // vertical space above/below the grid
+  width: fit-content;                                  // shrink-wrap to its cards
+}
 
+/* 3) Card internals remain exactly as before */
+.insights-card {
+  display: flex;
+  width: 800px;
+  flex-direction: column;
+  overflow: hidden;
 
   &__header {
-    padding: 0.75rem 1rem;                   // Inner spacing for the header
-    font-size: 1rem;                         // Base font size for headers
-    font-weight: 600;                        // Semi-bold header text
-    text-align: center;                      // Center-align header text
-    background: lighten($secondary, 45%);    // Lightened secondary color for header bg
-    border-bottom: 1px solid lighten($secondary, 30%); // Subtle bottom border
-    color: $dark;                            // Dark text for contrast
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    background: lighten($secondary, 45%);
+    border-bottom: 1px solid lighten($secondary, 30%);
+    color: $dark;
   }
 
   &__body {
-    flex: 1;                                 // Fill remaining vertical space
-    display: flex;                           // Arrange metric and chart side by side
-    background: $light;                      // White background for the body
+    flex: 1;
+    display: flex;
+    background: $light;
+    padding-top: 1rem;
   }
 
   &__metric {
-    flex: 1 1 40%;                           // Occupy ~40% width of the body
-    display: flex;                           // Flex container for centering
-    align-items: center;                     // Vertically center content
-    justify-content: center;                 // Horizontally center content
-    font-size: 3rem;                         // Large font size for emphasis
-    font-weight: 700;                        // Bold metric text
-    color: $primary;                         // Accent color for the number
-    padding: 1rem;                           // Inner spacing around the metric
+    flex: 1 1 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: $primary;
+    padding: 1rem;
   }
 
   &__chart {
-    flex: 1 1 60%;                           // Occupy ~60% width of the body
-    display: flex;                           // Flex container for centering
-    align-items: center;                     // Vertically center chart
-    justify-content: center;                 // Horizontally center chart
-    padding: 1rem;                           // Inner spacing around the chart
+    flex: 1 1 65%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
 
-    .chartkick, .chart-container {
-      width: 100% !important;                // Ensure chart fills container width
-      height: 100% !important;               // Ensure chart fills container height
+    .chartkick,
+    .chart-container {
+      width: 100% !important;
+      height: 100% !important;
     }
   }
 }
