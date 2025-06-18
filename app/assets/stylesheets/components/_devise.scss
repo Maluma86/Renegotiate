@@ -1,48 +1,47 @@
 // app/assets/stylesheets/components/_devise.scss
 
-@import "config/bootstrap_variables";              // bring in your color variables
+@import "config/bootstrap_variables";  // bring in your color variables
+@import "components/buttons";         // import your new .btn-main styles
 
 .devise-form {
-  max-width: 400px;                               // limit form width to 400px
-  margin: 4rem auto;                              // center form and add vertical space
-  background: $secondary;                         // dark indigo background for contrast
-  padding: 2rem;                                  // inner padding around the form
-  border-radius: 0.5rem;                          // slightly round the form corners
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);           // subtle drop shadow for depth
-  color: $light;                                  // make all text white on dark bg
+  max-width: 400px;                   // limit form width to 400px
+  margin: 4rem auto;                  // center form and add vertical space
+  background: $secondary;             // dark indigo background for contrast
+  padding: 2rem;                      // inner padding around the form
+  border-radius: 0.5rem;              // slightly round the form corners
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); // subtle drop shadow for depth
+  color: $light;                      // make all text white on dark bg
 
   h2 {
-    text-align: center;                           // center the “Log in” / “Sign up” heading
-    margin-bottom: 1.5rem;                        // space below the heading
-    color: $light;                                // white heading text
+    text-align: center;               // center the “Log in” / “Sign up” heading
+    margin-bottom: 1.5rem;            // space below the heading
+    color: $light;                    // white heading text
   }
 
   .form-inputs {
-    label { color: $light; }                      // white labels for inputs
+    label { color: $light; }          // white labels for inputs
     input {
       color: $light;                              // white input text
       background: lighten($secondary, 10%);       // slightly lighter input bg
       border: 1px solid darken($secondary, 10%);  // border for input contrast
     }
     input::placeholder {
-      color: rgba($light, 0.7);                   // semi‐transparent white placeholder
+      color: rgba($light, 0.7);        // semi‐transparent white placeholder
     }
   }
 
   .form-actions {
-    margin-top: 1rem;                             // space above the submit button
+    margin-top: 1rem;                 // space above the submit button
   }
 
+  /* Use the shared .btn-main for buttons */
   .btn {
-    @extend .btn-theme;                           // reuse shared button styles
-    background: #282828;                         // orange primary button bg
-    color: $light !important;                     // force white button text
-    width: 100%;                                  // full-width button
-    &:hover { background: darken($primary, 10%); }// darker orange on hover
+    @extend .btn-main;                // apply grey bg, orange border, white text, hover orange
+    width: 100%;                      // full-width button
   }
 
   a {
-    color: $light;                                // white links
-    text-decoration: underline;                   // underline for clarity
+    color: $light;                    // white links
+    text-decoration: underline;       // underline for clarity
   }
 }

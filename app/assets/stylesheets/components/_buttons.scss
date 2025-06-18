@@ -1,0 +1,25 @@
+@import "config/bootstrap_variables"; // bring in your color vars
+
+/* ================================================================
+   Main site button – grey bg, orange border, white text
+   ================================================================ */
+.btn-main {
+  background-color: #4d494c;    // grey background
+  border:           1px solid #FF7518; // orange border
+  color:            $light !important; // white text
+
+  padding:          0.5rem 1rem;  // adjust as needed
+  font-weight:      600;
+  border-radius:    0.375rem;
+  display:          inline-block;
+  text-align:       center;
+  text-decoration:  none;
+
+  &:hover,
+  &:focus {
+    background-color: #FF7518;    // orange on hover
+    border-color:     #FF7518;
+    color:            $light !important;
+    text-decoration:  none;
+  }
+}

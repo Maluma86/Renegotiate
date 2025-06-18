@@ -1,7 +1,17 @@
 Rails.application.routes.draw do
   devise_for :users
+
   # when you log in it leads to the list products page
-  root to: "products#index"
+  authenticated :user do
+    root to: "products#index", as: :authenticated_root
+  end
+
+  # send unauthenticated users to the Devise login form
+  devise_scope :user do
+    unauthenticated do
+      root to: "devise/sessions#new", as: :unauthenticated_root
+    end
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

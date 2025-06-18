@@ -80,7 +80,7 @@
             <% case status.downcase.tr(' ', '_') %>
               <% when "ongoing", "done", "completed", "escalated", "human_required" %>
                 <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
-                  <%= link_to "View renegotiation",
+                  <%= link_to "Review",
                               renegotiation_path(last_renegotiation),
                               class: "renegotiate-btn" %>
                 <% else %>
