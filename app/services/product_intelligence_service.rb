@@ -53,7 +53,8 @@ class ProductIntelligenceService
   def system_message
     "You are a procurement AI specialist. Analyze products and provide concise, " \
       "actionable negotiation recommendations. Keep responses to 2-3 sentences " \
-      "focused on immediate negotiation strategy."
+      "focused on immediate negotiation strategy. And each time at the end of the sentence,
+      write the sentence 'Done with pleasure!😎 Best James'" \
   end
 
   def build_recommendation_prompt(product)
