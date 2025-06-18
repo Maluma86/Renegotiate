@@ -52,7 +52,7 @@
   <!-- AI Recommendation - Moved to top -->
   <div class="ai-recommendation" id="ai-recommendation-section" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518; margin-bottom: 2rem;">
     <h4 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">💡 AI Recommendation</h4>
-    
+
     <!-- Loading State -->
     <div id="ai-loading" style="display: block;">
       <div class="d-flex align-items-center" style="color: #E5E4E2;">
@@ -62,31 +62,34 @@
         <p class="mb-0">Analyzing product composition and market conditions...</p>
       </div>
     </div>
-    
+
     <!-- Content will be loaded here via AJAX -->
     <div id="ai-content" style="display: none;">
       <p id="ai-recommendation-text" style="color: #E5E4E2; margin: 0; line-height: 1.6;">
         <!-- Dynamic content will be inserted here -->
       </p>
     </div>
-    
+
     <!-- Real AJAX Implementation -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const renegotiationId = <%= @renegotiation.id %>;
-        
+
         // Start the background job
         startProductIntelligence(renegotiationId);
-        
+
         // Poll for results
         const pollInterval = setInterval(() => {
           checkProductIntelligenceStatus(renegotiationId, pollInterval);
         }, 2000); // Check every 2 seconds
-        
-        // Timeout after 30 seconds
+
+        // Timeout after 30 seconds - only if content hasn't loaded
         setTimeout(() => {
           clearInterval(pollInterval);
-          showFallbackContent();
+          // Only show fallback if AI content is still hidden (meaning it never loaded)
+          if (document.getElementById('ai-content').style.display === 'none') {
+            showFallbackContent();
+          }
         }, 30000);
       });
 
@@ -124,7 +127,7 @@
         // Hide loading
         document.getElementById('ai-loading').style.display = 'none';
         document.getElementById('ai-content').style.display = 'block';
-        
+
         // Update recommendation text
         const recommendationElement = document.getElementById('ai-recommendation-text');
         if (intelligence.recommendation) {
@@ -132,15 +135,18 @@
         } else {
           recommendationElement.innerText = 'AI analysis completed successfully.';
         }
-        
+
         // Update forecast chart if data available
         if (intelligence.forecast) {
           updateForecastChart(intelligence.forecast);
         }
-        
+
         // Update other dashboard sections when data is available
         if (intelligence.ingredients) {
           updateIngredientAnalysis(intelligence.ingredients);
+        }
+        if (intelligence.price_drivers) {
+          updatePriceDrivers(intelligence.price_drivers);
         }
         // if (intelligence.risks) updateRiskAssessment(intelligence.risks);
         // if (intelligence.strategies) updateStrategies(intelligence.strategies);
@@ -149,7 +155,7 @@
       function showFallbackContent() {
         document.getElementById('ai-loading').style.display = 'none';
         document.getElementById('ai-content').style.display = 'block';
-        document.getElementById('ai-recommendation-text').innerText = 
+        document.getElementById('ai-recommendation-text').innerText =
           'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
       }
 
@@ -157,15 +163,15 @@
       function updateIngredientAnalysis(ingredients) {
         const tbody = document.querySelector('.ingredient-analysis tbody');
         if (!tbody || !ingredients || !Array.isArray(ingredients)) return;
-        
+
         // Clear existing rows
         tbody.innerHTML = '';
-        
+
         // Add new rows for each ingredient
         ingredients.forEach((ingredient, index) => {
           const row = document.createElement('tr');
           row.style.borderBottom = index === ingredients.length - 1 ? 'none' : '1px solid #1F2937';
-          
+
           // Determine trend color and arrow
           let trendColor, trendArrow, trendSign;
           if (ingredient.price_trend > 0) {
@@ -181,7 +187,7 @@
             trendArrow = '→';
             trendSign = '';
           }
-          
+
           // Determine risk level color
           let riskColor;
           switch (ingredient.risk_level) {
@@ -190,7 +196,7 @@
             case 'LOW': riskColor = '#10B981'; break;
             default: riskColor = '#6B7280';
           }
-          
+
           row.innerHTML = `
             <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">${ingredient.name}</td>
             <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">${ingredient.percentage}%</td>
@@ -202,7 +208,7 @@
               <span style="background: ${riskColor}; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">${ingredient.risk_level}</span>
             </td>
           `;
-          
+
           tbody.appendChild(row);
         });
       }
@@ -210,21 +216,21 @@
       // Function to update forecast chart with AI data
       function updateForecastChart(forecastData) {
         if (!forecastData || !forecastData.periods) return;
-        
+
         const labelsContainer = document.getElementById('forecast-labels');
         const barsContainer = document.getElementById('forecast-bars');
         const titleElement = document.getElementById('forecast-title');
         const trendElement = document.getElementById('forecast-trend');
-        
+
         // Update title if provided
         if (forecastData.title) {
           titleElement.textContent = forecastData.title;
         }
-        
+
         // Clear existing content
         labelsContainer.innerHTML = '';
         barsContainer.innerHTML = '';
-        
+
         // Add new labels and bars
         forecastData.periods.forEach((period, index) => {
           // Add label
@@ -232,20 +238,20 @@
           label.style.cssText = 'color: #9CA3AF; font-size: 0.75rem;';
           label.textContent = period.label;
           labelsContainer.appendChild(label);
-          
+
           // Determine color based on trend
           let color = '#6B7280'; // neutral
           if (period.trend > 0) color = period.trend > 10 ? '#EF4444' : '#FF7518'; // red or orange for increases
           if (period.trend < 0) color = '#10B981'; // green for decreases
-          
+
           // Add bar
           const bar = document.createElement('div');
           bar.className = 'forecast-bar';
           bar.style.cssText = `
-            flex: 1; 
-            background: ${color}; 
-            height: ${Math.max(10, Math.min(90, period.value))}%; 
-            opacity: 0.8; 
+            flex: 1;
+            background: ${color};
+            height: ${Math.max(10, Math.min(90, period.value))}%;
+            opacity: 0.8;
             border-radius: 0.25rem 0.25rem 0 0;
             transition: all 0.3s ease;
           `;
@@ -254,13 +260,43 @@
           bar.setAttribute('title', `${period.label}: ${period.trend > 0 ? '+' : ''}${period.trend}%`);
           barsContainer.appendChild(bar);
         });
-        
+
         // Update overall trend
         if (forecastData.overallTrend) {
           const trendColor = forecastData.overallTrend.value > 0 ? '#EF4444' : '#10B981';
           trendElement.style.color = trendColor;
           trendElement.textContent = `${forecastData.overallTrend.value > 0 ? '+' : ''}${forecastData.overallTrend.value}% ${forecastData.overallTrend.description}`;
         }
+      }
+
+      // Function to update price drivers with AI data
+      function updatePriceDrivers(priceDrivers) {
+        const priceDriversList = document.querySelector('.price-drivers-list');
+        if (!priceDriversList || !priceDrivers || !Array.isArray(priceDrivers)) return;
+
+        // Clear existing items
+        priceDriversList.innerHTML = '';
+
+        // Add new price drivers
+        priceDrivers.forEach((driver, index) => {
+          const listItem = document.createElement('li');
+          listItem.style.cssText = `padding: 0.5rem 0; ${index === priceDrivers.length - 1 ? '' : 'border-bottom: 1px solid #1F2937;'}`;
+
+          // Determine color based on level
+          let color;
+          switch (driver.level.toLowerCase()) {
+            case 'high': color = '#EF4444'; break;
+            case 'low': color = '#10B981'; break;
+            default: color = '#FBBF24';
+          }
+
+          listItem.innerHTML = `
+            <span style="color: ${color};">${driver.icon}</span>
+            <span style="color: #E5E4E2; margin-left: 0.5rem;">${driver.description}</span>
+          `;
+
+          priceDriversList.appendChild(listItem);
+        });
       }
     </script>
   </div>
@@ -300,7 +336,8 @@
 
   </div>
 
-  <!-- Charts and Analysis Row -->
+  <!-- Charts and Analysis Row - COMMENTED OUT -->
+  <%#
   <div class="analysis-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
 
     <!-- Price Trend Chart -->
@@ -386,22 +423,24 @@
     </div>
 
   </div>
+  %>
 
 </section>
 
 <!-- NEW PRODUCT INTELLIGENCE SECTIONS -->
 
-<!-- Product Overview Section -->
+<!-- Product Overview Section - COMMENTED OUT
 <section class="product-overview" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
       📦 Product Analysis
     </h2>
   </header>
-  
+
   <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
     <h3 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 600;">
       <%= @renegotiation.product.name %>
+
     </h3>
     <p style="color: #E5E4E2; margin: 0 0 1rem 0; line-height: 1.6;">
       <strong>Description:</strong> <%= @renegotiation.product.description || "No description available" %>
@@ -422,6 +461,8 @@
     </div>
   </div>
 </section>
+-->
+
 
 <!-- Ingredient Composition Analysis -->
 <section class="ingredient-analysis" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
@@ -430,7 +471,7 @@
       🧪 Top 5 Ingredient Analysis
     </h2>
   </header>
-  
+
   <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
     <table style="width: 100%; border-collapse: collapse;">
       <thead>
@@ -450,7 +491,7 @@
               <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;"><%= ingredient[:percentage] %>%</td>
               <td style="padding: 1rem; color: #E5E4E2;"><%= ingredient[:origin] %></td>
               <td style="text-align: center; padding: 1rem;">
-                <% 
+                <%
                   # Determine trend color and arrow
                   if ingredient[:price_trend] > 0
                     trend_color = ingredient[:price_trend] > 10 ? '#EF4444' : '#FBBF24'
@@ -469,7 +510,7 @@
                 <span style="color: <%= trend_color %>; font-weight: 600;"><%= trend_arrow %> <%= trend_sign %><%= ingredient[:price_trend] %>%</span>
               </td>
               <td style="text-align: right; padding: 1rem;">
-                <% 
+                <%
                   # Determine risk level color
                   risk_color = case ingredient[:risk_level]
                   when 'HIGH' then '#EF4444'
@@ -501,7 +542,7 @@
       📈 6-Month Ingredient Price Forecast
     </h2>
   </header>
-  
+
   <div class="forecast-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
     <!-- Forecast Chart - Now Dynamic -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
@@ -533,27 +574,25 @@
         Overall trend: <span id="forecast-trend" style="color: #EF4444; font-weight: 600;">+15% expected increase</span>
       </p>
     </div>
-    
+
     <!-- Forecast Summary -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;">Key Price Drivers</h4>
-      <ul style="list-style: none; padding: 0; margin: 0;">
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #EF4444;">🔴</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Cocoa: Drought in West Africa affecting harvest</span>
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #10B981;">🟢</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Sugar: Brazil surplus creating downward pressure</span>
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #FBBF24;">🟡</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Dairy: EU regulations impacting supply</span>
-        </li>
-        <li style="padding: 0.5rem 0;">
-          <span style="color: #FBBF24;">🟡</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Palm Oil: Sustainability concerns affecting production</span>
-        </li>
+      <ul style="list-style: none; padding: 0; margin: 0;" class="price-drivers-list">
+        <% if suggestion[:price_drivers].present? %>
+          <% suggestion[:price_drivers].each_with_index do |driver, index| %>
+            <li style="padding: 0.5rem 0; <%= index == suggestion[:price_drivers].size - 1 ? '' : 'border-bottom: 1px solid #1F2937;' %>">
+              <span style="color: <%= driver[:level] == 'high' ? '#EF4444' : (driver[:level] == 'low' ? '#10B981' : '#FBBF24') %>;">
+                <%= driver[:icon] %>
+              </span>
+              <span style="color: #E5E4E2; margin-left: 0.5rem;"><%= driver[:description] %></span>
+            </li>
+          <% end %>
+        <% else %>
+          <li style="padding: 1rem 0; text-align: center; color: #9CA3AF;">
+            Price driver analysis not available at this time.
+          </li>
+        <% end %>
       </ul>
     </div>
   </div>
@@ -566,7 +605,7 @@
       ⚠️ Risk Intelligence Dashboard
     </h2>
   </header>
-  
+
   <div class="risk-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
     <!-- Geopolitical Risks -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
@@ -580,7 +619,7 @@
         <li style="padding: 0.375rem 0;">• Indonesia export restrictions</li>
       </ul>
     </div>
-    
+
     <!-- Product-Specific Risks (Agricultural/Technical/Material based on product type) -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #FBBF24;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
@@ -609,7 +648,7 @@
         <% end %>
       </ul>
     </div>
-    
+
     <!-- Supply Chain Risks -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #10B981;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
@@ -632,7 +671,7 @@
       🎯 Negotiation Strategy Recommendations
     </h2>
   </header>
-  
+
   <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
     <h4 style="color: #FF7518; margin: 0 0 1rem 0;">Based on Product Intelligence Analysis:</h4>
     <ol style="color: #E5E4E2; line-height: 1.8; padding-left: 1.5rem;">
@@ -652,7 +691,7 @@
         <strong>Timing advantage</strong> - Current market conditions favor buyers, but window closing in 30-45 days
       </li>
     </ol>
-    
+
     <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1F2937;">
       <p style="color: #9CA3AF; font-size: 0.875rem; margin: 0;">
         <em>💡 Pro tip: Use the sugar surplus as your primary negotiation leverage. Your supplier needs to move inventory before new Brazilian harvest arrives in April.</em>
