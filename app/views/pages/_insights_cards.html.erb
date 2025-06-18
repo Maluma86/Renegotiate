@@ -8,6 +8,7 @@
       <div class="insights-card__metric"><%= @stats[:current_total] %></div>
       <div class="insights-card__chart">
         <%= column_chart @status_data,
+              colors: ["#131B3F"],
               height: "100%",
               library: {
                 scales: {
@@ -20,13 +21,14 @@
     </div>
   </div>
 
-  <!-- 4) Renewing in 30 days: hide Y-axis numbers -->
+  <!-- 2) Completed Renegotiations: hide Y-axis numbers entirely -->
   <div class="insights-card card-pro">
-    <div class="insights-card__header">Renewing in 30 days</div>
+    <div class="insights-card__header">Completed Renegotiations</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric"><%= @stats[:ending_soon] %></div>
+      <div class="insights-card__metric"><%= @stats[:completed] %></div>
       <div class="insights-card__chart">
-        <%= column_chart @renewals_calendar,
+        <%= column_chart @completed_over_time,
+              colors: ["#131B3F"],
               height: "100%",
               library: {
                 scales: {
@@ -46,6 +48,7 @@
       <div class="insights-card__metric"><%= @stats[:avg_discount] %></div>
       <div class="insights-card__chart">
         <%= area_chart @avg_discount_by_week,
+              colors: ["#131B3F"],
               height: "100%",
               library: {
                 scales: {
@@ -58,13 +61,14 @@
     </div>
   </div>
 
-  <!-- 2) Completed Renegotiations: hide Y-axis numbers entirely -->
+  <!-- 4) Renewing in 30 days: hide Y-axis numbers -->
   <div class="insights-card card-pro">
-    <div class="insights-card__header">Completed Renegotiations</div>
+    <div class="insights-card__header">Renewing in 30 days</div>
     <div class="insights-card__body">
-      <div class="insights-card__metric"><%= @stats[:completed] %></div>
+      <div class="insights-card__metric"><%= @stats[:ending_soon] %></div>
       <div class="insights-card__chart">
-        <%= column_chart @completed_over_time,
+        <%= column_chart @renewals_calendar,
+              colors: ["#131B3F"],
               height: "100%",
               library: {
                 scales: {
@@ -76,4 +80,5 @@
       </div>
     </div>
   </div>
+
 </div>
