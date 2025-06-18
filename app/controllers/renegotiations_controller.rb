@@ -130,11 +130,15 @@ class RenegotiationsController < ApplicationController
 
   def product_intelligence_status
     result_key = "product_intel_result_#{@renegotiation.id}"
+    Rails.logger.info "🔍 AJAX Status Check - Looking for cache key: #{result_key}"
     result = Rails.cache.read(result_key)
+    Rails.logger.info "🔍 AJAX Status Check - Cache result found: #{result.present?}"
 
     if result
+      Rails.logger.info "🔍 AJAX Status Check - Returning completed with data keys: #{result.keys}" if result.is_a?(Hash)
       render json: { status: 'completed', data: result }
     else
+      Rails.logger.info "🔍 AJAX Status Check - Returning processing status"
       render json: { status: 'processing' }
     end
   end

@@ -42,7 +42,9 @@ class ProductIntelligenceJob < ApplicationJob
 
   def store_result_for_ajax(renegotiation_id, intelligence_data)
     result_key = "product_intel_result_#{renegotiation_id}"
+    Rails.logger.info "💾 Job Storage - Storing data at cache key: #{result_key}"
     Rails.cache.write(result_key, intelligence_data, expires_in: 1.hour)
+    Rails.logger.info "💾 Job Storage - Data stored successfully with keys: #{intelligence_data.keys}" if intelligence_data.is_a?(Hash)
   end
 
   def cleanup_job_status(renegotiation_id)
