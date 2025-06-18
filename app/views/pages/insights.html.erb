@@ -1,19 +1,26 @@
-<div class="insights-page-container container">
-  <header class="insights-header">
-    <%= render "shared/product_title", title_text: "Insights" %>
+<!-- app/views/insights.html.erb -->
 
-    <div class="timeframe-select">
-      <%= form_with url: insights_path, method: :get, local: true do %>
-        <%= select_tag :period,
-              options_for_select(
-                [['Last 7 days','7'], ['Last 30 days','30'], ['Last 90 days','90'], ['All time','all']],
-                params[:period] || '7'
-              ),
-              onchange: 'this.form.submit()'
-        %>
-      <% end %>
+<div class="product-page-container">
+  <!-- Sticky header (title + period selector) -->
+  <div class="wrapper-that-freezes-things">
+    <div class="products-header">
+      <div class="page-title">
+        <span class="page-title__text">Insights</span>
+      </div>
+
+      <div class="timeframe-select">
+        <%= form_with url: insights_path, method: :get, local: true do %>
+          <%= select_tag :period,
+                options_for_select(
+                  [['Last 7 days','7'], ['Last 30 days','30'], ['Last 90 days','90'], ['All time','all']],
+                  params[:period] || '7'
+                ),
+                class: "import-btn",         # use the same styling as the import button
+                onchange: 'this.form.submit()' %>
+        <% end %>
+      </div>
     </div>
-  </header>
+  </div>
 
   <div class="insights-cards-wrapper">
     <%= render "insights_cards", stats: @stats %>
