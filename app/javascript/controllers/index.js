@@ -1,4 +1,6 @@
-// Import and register all your controllers from the importmap via controllers/**/*_controller
-import { application } from "controllers/application"
-import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
-eagerLoadControllersFrom("controllers", application)
+import { application } from "./application"
+import RenegotiationsController from "./renegotiations_controller"
+import RenegotiationShowController from "./renegotiation_show_controller"
+
+application.register("renegotiations", RenegotiationsController)
+application.register("renegotiation-show", RenegotiationShowController)

@@ -1,9 +1,12 @@
-import { Application } from "@hotwired/stimulus"
+// app/javascript/controllers/application.js
+    // import { Application } from "@hotwired/stimulus"
+    // import { definitionsFromContext } from "@hotwired/stimulus-loading"
 
-const application = Application.start()
+    // // 1) start Stimulus
+    // const application = Application.start()
 
-// Configure Stimulus development experience
-application.debug = false
-window.Stimulus   = application
+    // // 2) load every controller in controllers/
+    // const context = require.context(".", true, /\.js$/)
+    // application.load(definitionsFromContext(context))
 
-export { application }
+    // export { application }
