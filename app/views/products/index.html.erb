@@ -56,9 +56,15 @@
           </td>
           <td class="products-line-text"><%= product.supplier.company_name %></td>
           <td class="products-line-text"><%= product.category %></td>
-          <td class="products-line-text"><%= number_to_currency(product.current_price) %></td>
+          <td class="products-line-text"><%= number_to_currency(product.current_price, precision: 0) %></td>
           <td class="products-line-text"><%= product.contract_end_date.strftime("%b %d, %Y") %></td>
-          <td class="products-line-text"><%= product.last_month_volume %></td>
+          <td class="products-line-text">
+              <%= number_with_precision(
+              product.last_month_volume,
+              precision: 0,
+              delimiter: ','
+            ) %>
+          </td>
 
           <!-- Determine the status of the product for the current user -->
           <% status = product.renegotiation_status(current_user) %>
@@ -74,7 +80,7 @@
             <% case status.downcase.tr(' ', '_') %>
               <% when "ongoing", "done", "completed", "escalated", "human_required" %>
                 <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
-                  <%= link_to "View renegotiation",
+                  <%= link_to "Review",
                               renegotiation_path(last_renegotiation),
                               class: "renegotiate-btn" %>
                 <% else %>

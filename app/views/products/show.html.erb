@@ -1,12 +1,10 @@
-<!-- app/views/products/show.html.erb -->
-
 <div class="product-page-container">
 
   <!-- Sticky header: static page title -->
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
       <div class="page-title">
-        <span class="page-title__text">Renegotiate Product</span>
+        <span class="page-title__text">Renegotiate</span>
       </div>
     </div>
   </div>
@@ -14,55 +12,56 @@
   <!-- Detail card -->
   <div class="card-wrapper">
     <div class="card-pro">
-      <!-- Product & supplier inside the card -->
-      <div class="card-pro__title">
-        <h2 style="margin:0; font-size:1.5rem; font-weight:600;">
-          <%= @product.name %>
-        </h2>
+
+      <!-- ───────────────────────────────────────────────────────────
+           ① Card header now includes product, supplier, and status
+           ─────────────────────────────────────────────────────────── -->
+      <div class="card-pro__header">
+        <h2>Product: <%= @product.name %></h2>
         <% if (s = @product.supplier) %>
-          <p style="margin:0.25rem 0 1rem; color:#555;">
-            <strong>Supplier:</strong> <%= s.company_name %>
-          </p>
+          <h2>Supplier: <%= s.company_name %></h2>
         <% end %>
+        <% latest = @product.renegotiations.order(created_at: :desc).first
+           status = latest&.status.present? ? latest.status.downcase.tr(' ', '_') : "pending" %>
+        <span class="status <%= status %>">
+          <%= status.titleize %>
+        </span>
       </div>
 
       <hr>
 
-      <!-- Supplier email -->
-      <% if s && s.contact_email.present? %>
-        <p class="card-pro__content">
-          <strong>Email:</strong>
-          <%= mail_to s.contact_email, s.contact_email, class: "product-email-link" %>
-        </p>
-      <% end %>
+      <!-- ───────────────────────────────────────────────────────────
+           ② Two-column body (unchanged)
+           ─────────────────────────────────────────────────────────── -->
+      <div class="card-pro__body">
+        <!-- Left column -->
+        <div class="card-pro__section">
+          <% if s&.contact_email.present? %>
+            <p>
+              <strong>Email:</strong>
+              <%= mail_to s.contact_email,
+                        s.contact_email,
+                        class: "product-email-link" %>
+            </p>
+          <% end %>
+          <p>
+            <strong>Description:</strong><br>
+            <%= @product.description.presence || "No description available." %>
+          </p>
+        </div>
 
-      <!-- Description -->
-      <p class="card-pro__content">
-        <strong>Description:</strong><br>
-        <%= @product.description.presence || "No description available." %>
-      </p>
+        <!-- Right column -->
+        <div class="card-pro__section">
+          <p><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></p>
+          <p><strong>Ends:</strong>          <%= l(@product.contract_end_date) %></p>
+          <p><strong>Last 30 days:</strong>   <%= @product.last_month_volume %> units</p>
+          <p><strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units</p>
+        </div>
+      </div>
 
-      <!-- Contract details -->
-      <p class="card-pro__content">
-        <strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %><br>
-        <strong>Ends:</strong>          <%= l(@product.contract_end_date) %>
-      </p>
-
-      <!-- Purchase volumes -->
-      <p class="card-pro__content">
-        <strong>Last 30 days:</strong>   <%= @product.last_month_volume %> units<br>
-        <strong>Last 12 months:</strong> <%= @product.last_year_volume  %> units
-      </p>
-
-      <!-- Status -->
-      <% latest = @product.renegotiations.order(created_at: :desc).first
-         status = latest&.status.present? ? latest.status.downcase.tr(' ', '_') : "pending" %>
-      <p class="card-pro__content">
-        <strong>Status:</strong>
-        <span class="status <%= status %>"><%= status.titleize %></span>
-      </p>
-
-      <!-- Renegotiate button -->
+      <!-- ───────────────────────────────────────────────────────────
+           ③ Actions row (unchanged)
+           ─────────────────────────────────────────────────────────── -->
       <div class="card-pro__actions">
         <%= link_to "Renegotiate",
                     new_product_renegotiation_path(@product),
@@ -71,11 +70,10 @@
     </div>
   </div>
 
-  <!-- Back to results -->
+  <!-- Back to results (unchanged) -->
   <div class="text-center" style="margin-top: 1.5rem;">
     <%= link_to "← Back to results",
                 products_path,
                 class: "import-btn" %>
   </div>
-
 </div>

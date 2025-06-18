@@ -1,62 +1,79 @@
-@import "config/bootstrap_variables";
+// app/assets/stylesheets/application.scss
 
-// 1. Bootstrap + extras
-@import "bootstrap";
-@import "font-awesome";
+// ── 0. Custom Web Fonts ────────────────────────────────────────
+// Import Space Grotesk (400 & 700) and any other Google fonts here
+@import "components/fonts";
 
-// 2. Components
+
+// ── 1. Bootstrap Core + Overrides ──────────────────────────────
+@import "config/bootstrap_variables"; // your custom color, spacing overrides
+@import "bootstrap";                  // Bootstrap itself
+
+
+// ── 2. Icon Library ────────────────────────────────────────────
+@import "font-awesome";               // if you’re using Font Awesome icons
+
+
+// ── 3. Reusable Components ─────────────────────────────────────
 @import "components/navbar";
 @import "components/page_title";
 @import "components/products_index";
+@import "components/buttons";
 @import "components/devise";
 @import "components/index";
 @import "components/cards";
 @import "components/renegotiation_confirmation";
 @import "components/questions";
 
-// 3. Page‐specific
+
+// ── 4. Page‐Specific Styles ─────────────────────────────────────
 @import "pages/index";
-// @import "products";
 @import "pages/insights";
 @import "pages/import";
 
-// 4. Utility: global reset & layout tweaks
 
-// make html/body fill viewport and remove default margin
-html, body {
+// ── 5. Global Typography & Resets ──────────────────────────────
+
+// Apply Space Grotesk to body text
+html,
+body {
+  font-family: $body-font;    // body font stack
+  font-size: 17px;  // raises the root from 16px → 18px
   height: 100%;
   margin: 0;
-  background: $body-bg;    // page background behind content
+  background: $body-bg;       // page background behind content
 }
 
-// wrap entire app in a column flexbox
+// Use Space Grotesk (or another headers font) for all headings
+h1, h2, h3, h4, h5, h6 {
+  font-family: $headers-font;
+}
+
+
+// ── 6. Layout Helpers ──────────────────────────────────────────
+
+// Wrap the entire app in a column flexbox so footer can stick to bottom
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-// shift only the main content (not navbar) for the sidebar
+// Push the main content over to make room for the fixed sidebar
 .content {
-  margin-left: 240px;      // match .navbar width
-  padding: 1rem;
-
-  // turn the content area into a column that fills available height
+  margin-left: 240px;       // match sidebar width
   display: flex;
   flex-direction: column;
-  flex: 1;                 // take up all remaining vertical space
-
-  // kill any extra bottom gap
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
+  flex: 1;                  // take up all remaining vertical space
+  padding: 1rem 0;          // top/bottom padding only
 }
 
-// ensure your show/index container within .content grows to push footer down
+// Ensure the inner page containers grow to push footer down
 .content > .product-page-container {
   flex: 1;
 }
 
-// remove default link underlines everywhere
+// Remove underlines from all links by default
 a {
   text-decoration: none !important;
 }
