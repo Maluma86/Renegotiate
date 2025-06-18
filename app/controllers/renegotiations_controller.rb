@@ -1,11 +1,7 @@
 class RenegotiationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_product, only: %i[new create]
-<<<<<<< HEAD
-  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets start_product_intelligence product_intelligence_status]
-=======
-  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets unlock_discount_targets accept]
->>>>>>> master
+  before_action :set_renegotiation, only: %i[show confirm_target set_target save_discount_targets unlock_discount_targets accept start_product_intelligence product_intelligence_status]
 
   def show
     # we already have @renegotiation from set_renegotiation
