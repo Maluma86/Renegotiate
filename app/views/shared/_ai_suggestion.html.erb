@@ -138,8 +138,10 @@
           updateForecastChart(intelligence.forecast);
         }
         
-        // Future: Update other dashboard sections when implemented
-        // if (intelligence.ingredients) updateIngredientAnalysis(intelligence.ingredients);
+        // Update other dashboard sections when data is available
+        if (intelligence.ingredients) {
+          updateIngredientAnalysis(intelligence.ingredients);
+        }
         // if (intelligence.risks) updateRiskAssessment(intelligence.risks);
         // if (intelligence.strategies) updateStrategies(intelligence.strategies);
       }
@@ -149,6 +151,60 @@
         document.getElementById('ai-content').style.display = 'block';
         document.getElementById('ai-recommendation-text').innerText = 
           'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
+      }
+
+      // Function to update ingredient analysis table with AI data
+      function updateIngredientAnalysis(ingredients) {
+        const tbody = document.querySelector('.ingredient-analysis tbody');
+        if (!tbody || !ingredients || !Array.isArray(ingredients)) return;
+        
+        // Clear existing rows
+        tbody.innerHTML = '';
+        
+        // Add new rows for each ingredient
+        ingredients.forEach((ingredient, index) => {
+          const row = document.createElement('tr');
+          row.style.borderBottom = index === ingredients.length - 1 ? 'none' : '1px solid #1F2937';
+          
+          // Determine trend color and arrow
+          let trendColor, trendArrow, trendSign;
+          if (ingredient.price_trend > 0) {
+            trendColor = ingredient.price_trend > 10 ? '#EF4444' : '#FBBF24';
+            trendArrow = '↑';
+            trendSign = '+';
+          } else if (ingredient.price_trend < 0) {
+            trendColor = '#10B981';
+            trendArrow = '↓';
+            trendSign = '';
+          } else {
+            trendColor = '#6B7280';
+            trendArrow = '→';
+            trendSign = '';
+          }
+          
+          // Determine risk level color
+          let riskColor;
+          switch (ingredient.risk_level) {
+            case 'HIGH': riskColor = '#EF4444'; break;
+            case 'MEDIUM': riskColor = '#FBBF24'; break;
+            case 'LOW': riskColor = '#10B981'; break;
+            default: riskColor = '#6B7280';
+          }
+          
+          row.innerHTML = `
+            <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">${ingredient.name}</td>
+            <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">${ingredient.percentage}%</td>
+            <td style="padding: 1rem; color: #E5E4E2;">${ingredient.origin}</td>
+            <td style="text-align: center; padding: 1rem;">
+              <span style="color: ${trendColor}; font-weight: 600;">${trendArrow} ${trendSign}${ingredient.price_trend}%</span>
+            </td>
+            <td style="text-align: right; padding: 1rem;">
+              <span style="background: ${riskColor}; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">${ingredient.risk_level}</span>
+            </td>
+          `;
+          
+          tbody.appendChild(row);
+        });
       }
 
       // Function to update forecast chart with AI data
@@ -387,62 +443,52 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Hardcoded ingredient data - will be dynamic later -->
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Cocoa</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">35%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">Ghana, Ivory Coast</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #EF4444; font-weight: 600;">↑ +12%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #EF4444; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">HIGH</span>
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Sugar</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">25%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">Brazil, India</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #10B981; font-weight: 600;">↓ -3%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Milk Powder</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">20%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">EU, New Zealand</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #FBBF24; font-weight: 600;">↑ +5%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
-          </td>
-        </tr>
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Palm Oil</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">10%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">Indonesia, Malaysia</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #FBBF24; font-weight: 600;">↑ +7%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Vanilla Extract</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">5%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">Madagascar</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #6B7280; font-weight: 600;">→ 0%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
-          </td>
-        </tr>
+        <% if suggestion[:ingredients].present? %>
+          <% suggestion[:ingredients].each_with_index do |ingredient, index| %>
+            <tr style="border-bottom: <%= index == suggestion[:ingredients].size - 1 ? 'none' : '1px solid #1F2937' %>;">
+              <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;"><%= ingredient[:name] %></td>
+              <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;"><%= ingredient[:percentage] %>%</td>
+              <td style="padding: 1rem; color: #E5E4E2;"><%= ingredient[:origin] %></td>
+              <td style="text-align: center; padding: 1rem;">
+                <% 
+                  # Determine trend color and arrow
+                  if ingredient[:price_trend] > 0
+                    trend_color = ingredient[:price_trend] > 10 ? '#EF4444' : '#FBBF24'
+                    trend_arrow = '↑'
+                    trend_sign = '+'
+                  elsif ingredient[:price_trend] < 0
+                    trend_color = '#10B981'
+                    trend_arrow = '↓'
+                    trend_sign = ''
+                  else
+                    trend_color = '#6B7280'
+                    trend_arrow = '→'
+                    trend_sign = ''
+                  end
+                %>
+                <span style="color: <%= trend_color %>; font-weight: 600;"><%= trend_arrow %> <%= trend_sign %><%= ingredient[:price_trend] %>%</span>
+              </td>
+              <td style="text-align: right; padding: 1rem;">
+                <% 
+                  # Determine risk level color
+                  risk_color = case ingredient[:risk_level]
+                  when 'HIGH' then '#EF4444'
+                  when 'MEDIUM' then '#FBBF24'
+                  when 'LOW' then '#10B981'
+                  else '#6B7280'
+                  end
+                %>
+                <span style="background: <%= risk_color %>; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;"><%= ingredient[:risk_level] %></span>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 2rem; color: #9CA3AF;">
+              Ingredient analysis not available at this time.
+            </td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>
