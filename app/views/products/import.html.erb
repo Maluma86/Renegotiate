@@ -6,7 +6,7 @@
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
       <div class="page-title">
-        <span class="page-title__text">Import Products via CSV</span>
+        <span class="page-title__text">Import Data</span>
       </div>
       <%= link_to "← Back to products",
                   products_path,
@@ -22,7 +22,7 @@
                   html: { multipart: true, data: { turbo: false } } do %>
 
       <div class="form-group">
-        <label for="file">Choose your CSV file:</label>
+        <label for="file">Import your data via CSV file</label>
         <%= file_field_tag :file,
                            accept: ".csv",
                            id: "file",
