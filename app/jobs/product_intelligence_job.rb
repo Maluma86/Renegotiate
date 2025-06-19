@@ -12,6 +12,18 @@ class ProductIntelligenceJob < ApplicationJob
     # Second: Stream forecast after recommendation
     stream_forecast_if_needed(product, renegotiation_id)
 
+    # Third: Stream ingredients after forecast
+    stream_ingredients_if_needed(product, renegotiation_id)
+
+    # Fourth: Stream price drivers after ingredients
+    stream_price_drivers_if_needed(product, renegotiation_id)
+
+    # Fifth: Stream risks after price drivers
+    stream_risks_if_needed(product, renegotiation_id)
+
+    # Sixth: Stream strategies after risks
+    stream_strategies_if_needed(product, renegotiation_id)
+
     # Then: Continue with full analysis as before
     intelligence_data = get_or_generate_intelligence(product, cache_key)
     store_result_for_ajax(renegotiation_id, intelligence_data)
@@ -47,6 +59,58 @@ class ProductIntelligenceJob < ApplicationJob
     service.stream_forecast(product, renegotiation_id)
   rescue StandardError => e
     Rails.logger.error "Failed to stream forecast for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
+
+  def stream_ingredients_if_needed(product, renegotiation_id)
+    # Check if ingredients is already cached (avoid duplicate work)
+    ingredients_key = "product_intel_#{renegotiation_id}_ingredients"
+    return if Rails.cache.exist?(ingredients_key)
+
+    # Stream the ingredients
+    service = ProductIntelligenceService.new
+    service.stream_ingredients(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream ingredients for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
+
+  def stream_price_drivers_if_needed(product, renegotiation_id)
+    # Check if price drivers is already cached (avoid duplicate work)
+    price_drivers_key = "product_intel_#{renegotiation_id}_price_drivers"
+    return if Rails.cache.exist?(price_drivers_key)
+
+    # Stream the price drivers
+    service = ProductIntelligenceService.new
+    service.stream_price_drivers(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream price drivers for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
+
+  def stream_risks_if_needed(product, renegotiation_id)
+    # Check if risks is already cached (avoid duplicate work)
+    risks_key = "product_intel_#{renegotiation_id}_risks"
+    return if Rails.cache.exist?(risks_key)
+
+    # Stream the risks
+    service = ProductIntelligenceService.new
+    service.stream_risks(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream risks for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
+
+  def stream_strategies_if_needed(product, renegotiation_id)
+    # Check if strategies is already cached (avoid duplicate work)
+    strategies_key = "product_intel_#{renegotiation_id}_strategies"
+    return if Rails.cache.exist?(strategies_key)
+
+    # Stream the strategies
+    service = ProductIntelligenceService.new
+    service.stream_strategies(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream strategies for renegotiation #{renegotiation_id}: #{e.message}"
     # Don't fail the whole job if streaming fails - continue with normal process
   end
 

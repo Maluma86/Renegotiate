@@ -132,24 +132,36 @@ class RenegotiationsController < ApplicationController
     result_key = "product_intel_result_#{@renegotiation.id}"
     recommendation_key = "product_intel_#{@renegotiation.id}_recommendation"
     forecast_key = "product_intel_#{@renegotiation.id}_forecast"
+    ingredients_key = "product_intel_#{@renegotiation.id}_ingredients"
+    price_drivers_key = "product_intel_#{@renegotiation.id}_price_drivers"
+    risks_key = "product_intel_#{@renegotiation.id}_risks"
+    strategies_key = "product_intel_#{@renegotiation.id}_strategies"
     
-    Rails.logger.info "🔍 AJAX Status Check - Looking for cache keys: #{result_key}, #{recommendation_key}, #{forecast_key}"
+    Rails.logger.info "🔍 AJAX Status Check - Looking for cache keys: #{result_key}, #{recommendation_key}, #{forecast_key}, #{ingredients_key}, #{price_drivers_key}, #{risks_key}, #{strategies_key}"
     
     result = Rails.cache.read(result_key)
     recommendation = Rails.cache.read(recommendation_key)
     forecast = Rails.cache.read(forecast_key)
+    ingredients = Rails.cache.read(ingredients_key)
+    price_drivers = Rails.cache.read(price_drivers_key)
+    risks = Rails.cache.read(risks_key)
+    strategies = Rails.cache.read(strategies_key)
     
-    Rails.logger.info "🔍 AJAX Status Check - Full result found: #{result.present?}, Recommendation found: #{recommendation.present?}, Forecast found: #{forecast.present?}"
+    Rails.logger.info "🔍 AJAX Status Check - Full result found: #{result.present?}, Recommendation found: #{recommendation.present?}, Forecast found: #{forecast.present?}, Ingredients found: #{ingredients.present?}, Price drivers found: #{price_drivers.present?}, Risks found: #{risks.present?}, Strategies found: #{strategies.present?}"
 
     if result
       # Full analysis complete
       Rails.logger.info "🔍 AJAX Status Check - Returning completed with data keys: #{result.keys}" if result.is_a?(Hash)
       render json: { status: 'completed', data: result }
-    elsif recommendation || forecast
+    elsif recommendation || forecast || ingredients || price_drivers || risks || strategies
       # Partial result - some sections ready for streaming
       partial_data = {}
       partial_data[:recommendation] = recommendation if recommendation
       partial_data[:forecast] = forecast if forecast
+      partial_data[:ingredients] = ingredients if ingredients
+      partial_data[:price_drivers] = price_drivers if price_drivers
+      partial_data[:risks] = risks if risks
+      partial_data[:strategies] = strategies if strategies
       
       sections_ready = partial_data.keys
       Rails.logger.info "🔍 AJAX Status Check - Returning partial result with sections: #{sections_ready}"

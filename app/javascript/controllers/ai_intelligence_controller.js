@@ -153,10 +153,25 @@ export default class extends Controller {
           console.log("✅ Forecast updated via streaming")
         }
         
-        // Future sections will be added here:
-        // if (sectionName === 'ingredients' && partialData.ingredients) {
-        //   this.updateIngredientAnalysis(partialData.ingredients)
-        // }
+        if (sectionName === 'ingredients' && partialData.ingredients) {
+          this.updateIngredientAnalysis(partialData.ingredients)
+          console.log("✅ Ingredients updated via streaming")
+        }
+        
+        if (sectionName === 'price_drivers' && partialData.price_drivers) {
+          this.updatePriceDrivers(partialData.price_drivers)
+          console.log("✅ Price drivers updated via streaming")
+        }
+        
+        if (sectionName === 'risks' && partialData.risks) {
+          this.updateRiskIntelligence(partialData.risks)
+          console.log("✅ Risks updated via streaming")
+        }
+        
+        if (sectionName === 'strategies' && partialData.strategies) {
+          this.updateStrategies(partialData.strategies)
+          console.log("✅ Strategies updated via streaming")
+        }
       } else {
         console.log(`⏭️ Section already streamed, skipping: ${sectionName}`)
       }

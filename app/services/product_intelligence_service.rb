@@ -43,6 +43,58 @@ class ProductIntelligenceService
     forecast
   end
 
+  def stream_ingredients(product, renegotiation_id)
+    Rails.logger.info "🧪 Streaming ingredients for renegotiation #{renegotiation_id}"
+    
+    ingredients = generate_ingredients_analysis(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_ingredients"
+    Rails.cache.write(cache_key, ingredients, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Ingredients streamed and cached for renegotiation #{renegotiation_id}"
+    ingredients
+  end
+
+  def stream_price_drivers(product, renegotiation_id)
+    Rails.logger.info "📈 Streaming price drivers for renegotiation #{renegotiation_id}"
+    
+    price_drivers = generate_price_drivers(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_price_drivers"
+    Rails.cache.write(cache_key, price_drivers, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Price drivers streamed and cached for renegotiation #{renegotiation_id}"
+    price_drivers
+  end
+
+  def stream_risks(product, renegotiation_id)
+    Rails.logger.info "⚠️ Streaming risks for renegotiation #{renegotiation_id}"
+    
+    risks = generate_risks(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_risks"
+    Rails.cache.write(cache_key, risks, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Risks streamed and cached for renegotiation #{renegotiation_id}"
+    risks
+  end
+
+  def stream_strategies(product, renegotiation_id)
+    Rails.logger.info "🎯 Streaming strategies for renegotiation #{renegotiation_id}"
+    
+    strategies = generate_strategies(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_strategies"
+    Rails.cache.write(cache_key, strategies, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Strategies streamed and cached for renegotiation #{renegotiation_id}"
+    strategies
+  end
+
   def generate_recommendation(product)
     prompt = build_recommendation_prompt(product)
 
