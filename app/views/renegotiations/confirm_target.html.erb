@@ -1,6 +1,6 @@
 <!-- app/views/renegotiations/confirm_target.html.erb -->
 
-<div class="product-page-container">
+<div class="product-page-container" data-controller="renegotiations">
 
   <!-- Sticky header: page title -->
   <div class="wrapper-that-freezes-things">
@@ -18,9 +18,14 @@
               box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
 
     <%= form_with url: save_discount_targets_renegotiation_path(@renegotiation),
-                  method: :post,
-                  id: "discount-targets-form",
-                  local: false do |discount_form| %>
+              method: :post,
+              id: "discount-targets-form",
+              local: true,
+              data: {
+                turbo:     false,
+                "renegotiations-target": "discountTargetsForm",
+                action:    "submit->renegotiations#onSubmit"
+              } do |discount_form| %>
 
       <div class="row">
 
@@ -41,6 +46,7 @@
             <p>
               <strong>Pro-Price:</strong>
               €<span id="current-price"
+                     data-renegotiations-target="currentPrice"
                      style="color: #E5E4E2; font-weight: 600;">
                 <%= @renegotiation.product.current_price %>
               </span>
@@ -48,6 +54,7 @@
             <p>
               <strong>Current Range:</strong>
               <span id="calculated-range"
+                    data-renegotiations-target="calculatedRange"
                     style="color: #E5E4E2; font-weight: 600;">
                 €<%= @renegotiation.min_target %> –
                 €<%= @renegotiation.max_target %>
@@ -86,6 +93,7 @@
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :target_discount_percentage,
                       id: "target-discount",
+                      data: { "renegotiations-target": "targetDiscount", action: "input->renegotiations#onTargetDiscountInput focus->renegotiations#onFocus" },
                       step: 0.5,
                       placeholder: "0.0",
                       class: "discount-input no-spinners",
@@ -98,10 +106,18 @@
                 <div class="custom-arrows">
                   <button type="button"
                           class="arrow-btn arrow-up"
-                          data-target="target-discount">▲</button>
+                          data-renegotiations-target="arrowBtn"
+                          data-action="click->renegotiations#onArrowClick"
+                          data-target="target-discount">
+                    ▲
+                  </button>
                   <button type="button"
                           class="arrow-btn arrow-down"
-                          data-target="target-discount">▼</button>
+                          data-renegotiations-target="arrowBtn"
+                          data-action="click->renegotiations#onArrowClick"
+                          data-target="target-discount">
+                    ▼
+                  </button>
                 </div>
               </div>
             </div>
@@ -115,6 +131,7 @@
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :min_discount_percentage,
                       id: "min-discount",
+                      data: { "renegotiations-target": "minDiscount", action: "input->renegotiations#onMinDiscountInput focus->renegotiations#onFocus" },
                       step: 0.5,
                       placeholder: "0.0",
                       class: "discount-input no-spinners",
@@ -127,10 +144,18 @@
                 <div class="custom-arrows">
                   <button type="button"
                           class="arrow-btn arrow-up"
-                          data-target="min-discount">▲</button>
+                          data-renegotiations-target="arrowBtn"
+                          data-action="click->renegotiations#onArrowClick"
+                          data-target="min-discount">
+                    ▲
+                  </button>
                   <button type="button"
                           class="arrow-btn arrow-down"
-                          data-target="min-discount">▼</button>
+                          data-renegotiations-target="arrowBtn"
+                          data-action="click->renegotiations#onArrowClick"
+                          data-target="min-discount">
+                    ▼
+                  </button>
                 </div>
               </div>
             </div>
@@ -140,6 +165,7 @@
               <!-- Save Targets button: show when NOT locked -->
               <button type="submit"
                       id="save-targets-btn"
+                      data-renegotiations-target="saveTargetsBtn"
                       class="btn-theme"
                       style="padding: 0.5rem 1rem; font-size: 0.875rem;
                              color: #E5E4E2;
@@ -152,6 +178,7 @@
                    style="display: <%= @renegotiation.discount_targets_locked? ? 'flex' : 'none' %>;
                           align-items: center; gap: 1rem;">
                 <span id="success-message"
+                      data-renegotiations-target="successMessage"
                       style="display: none;
                              background-color: #10b981;
                              color: white;
@@ -163,6 +190,8 @@
                 </span>
                 <button type="button"
                         id="new-targets-btn"
+                        data-renegotiations-target="newTargetsBtn"
+                        data-action="click->renegotiations#onNewTargets"
                         class="btn-theme"
                         style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #E5E4E2;"
                         data-unlock-url="<%= unlock_discount_targets_renegotiation_path(@renegotiation) %>">
@@ -174,6 +203,7 @@
             <!-- Message Areas -->
             <div id="discount-targets-messages">
               <div id="loading-message"
+                   data-renegotiations-target="loadingMessage"
                    class="alert alert-info"
                    style="display: none;">
                 <span class="spinner-border spinner-border-sm me-2"
@@ -181,6 +211,7 @@
                 Saving targets...
               </div>
               <div id="error-message"
+                   data-renegotiations-target="errorMessage"
                    class="alert alert-danger"
                    style="display: none;"></div>
             </div>
@@ -248,7 +279,7 @@
         </div>
 
       </div>
-    <% end %> <!-- end form_with -->
+    <% end %> <!-- end discount-targets form -->
 
     <!-- Action Buttons at Bottom -->
     <%= form_with url: set_target_renegotiation_path(@renegotiation),
@@ -283,10 +314,3 @@
   </div>
 
 </div>
-
-<script>
-document.addEventListener('turbo:load', function() {
-  console.log('Renegotiation Calculator initialized successfully');
-  // … rest of your JS stays exactly as you have it …
-});
-</script>
