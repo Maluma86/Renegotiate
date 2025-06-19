@@ -8,8 +8,8 @@
   border:           1px solid #FF7518; // orange border
   color:            $light !important; // white text
 
-  padding:          0.5rem 1rem;  // adjust as needed
-  font-weight:      600;
+  padding:          0.2rem 0.8rem;
+  font-weight:      500;
   border-radius:    0.375rem;
   display:          inline-block;
   text-align:       center;
@@ -29,8 +29,8 @@
   border:           1px solid #131B3F; // orange border
   color:            $light !important; // white text
 
-  padding:          0.5rem 1rem;  // adjust as needed
-  font-weight:      600;
+  padding:          0.2rem 0.8rem;
+  font-weight:      500;
   border-radius:    0.375rem;
   display:          inline-block;
   text-align:       center;
@@ -50,8 +50,8 @@
   border:           1px solid #1f5c0d;
   color:            $light !important; // white text
 
-  padding:          0.5rem 1rem;
-  font-weight:      600;
+  padding:          0.2rem 0.8rem;
+  font-weight:      500;
   border-radius:    0.375rem;
   display:          inline-block;
   text-align:       center;
@@ -62,6 +62,50 @@
     background-color: #195008;
     border-color:     #195008;
     color:            $light !important;
+    text-decoration:  none;
+  }
+}
+
+.btn-review
+{
+  background-color: #131B3F;
+  border:           1px solid $light;
+  color:            $light !important; // white text
+
+  padding:          0.2rem 0.8rem;
+  font-weight:      500;
+  border-radius:    0.375rem;
+  display:          inline-block;
+  text-align:       center;
+  text-decoration:  none;
+
+  &:hover,
+  &:focus {
+    background-color: #0A0F2E;
+    border:           1px solid $light;
+    color:            $light !important;
+    text-decoration:  none;
+  }
+}
+
+.btn-reneg
+{
+  background-color: #FF7518;
+  border:           1px solid $light;
+  color:           $light !important; // white text
+
+  padding:          0.2rem 0.8rem;
+  font-weight:      500;
+  border-radius:    0.375rem;
+  display:          inline-block;
+  text-align:       center;
+  text-decoration:  none;
+
+  &:hover,
+  &:focus {
+    background-color: #FF7518;
+    border-color:     #FF7518;
+    color:           $light !important;
     text-decoration:  none;
   }
 }

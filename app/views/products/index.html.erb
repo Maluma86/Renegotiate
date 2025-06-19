@@ -38,8 +38,8 @@
           <th class="products-table-title"><%= sort_link("name", "Name") %></th>
           <th class="products-table-title"><%= sort_link("supplier", "Supplier") %></th>
           <th class="products-table-title"><%= sort_link("category", "Category") %></th>
-          <th class="products-table-title"><%= sort_link("price", "Current price/unit") %></th>
-          <th class="products-table-title"><%= sort_link("contract_end", "Contract end date") %></th>
+          <th class="products-table-title"><%= sort_link("price", "Price/unit") %></th>
+          <th class="products-table-title"><%= sort_link("contract_end", "End of contract") %></th>
           <th class="products-table-title"><%= sort_link("volume", "Last month volume") %></th>
           <th class="products-table-title"><%= sort_link("status", "Status") %></th>
           <th class="products-table-title">Actions</th> <!-- No sorting here -->
@@ -82,14 +82,14 @@
                 <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
                   <%= link_to "Review",
                               renegotiation_path(last_renegotiation),
-                              class: "renegotiate-btn" %>
+                              class: "btn-review" %>
                 <% else %>
                   No action
                 <% end %>
               <% when "pending" %>
                 <%= link_to "Renegotiate",
                             new_product_renegotiation_path(product),
-                            class: "renegotiate-btn" %>
+                            class: "btn-reneg" %>
             <% end %>
           </td>
         </tr>
