@@ -13,9 +13,20 @@
                   class: "import-btn" %>
     </div>
   </div>
-
   <!-- CSV upload form -->
   <div class="import-form">
+    <!-- Download template link -->
+    <div class="download-template">
+      <p>
+        <%= link_to "Download CSV template",
+                    "/template_upload.csv",
+                    download: "template_upload.csv",
+                    class: "btn btn-outline-secondary" %>
+      </p>
+    </div>
+    <!-- Download template link -->
+
+    <!-- Form for uploading CSV file -->
     <%= form_with url: upload_products_path,
                   method: :post,
                   local: true,
@@ -35,17 +46,10 @@
         <%= submit_tag "Upload", class: "import-btn" %>
       </div>
     <% end %>
-
+      <!-- Form for uploading CSV file -->
     <hr>
 
-    <div class="download-template">
-      <p>
-        <%= link_to "Download CSV template",
-                    "/template_upload.csv",
-                    download: "template_upload.csv",
-                    class: "btn btn-outline-secondary" %>
-      </p>
-    </div>
+
   </div>
 </div>
 
@@ -54,7 +58,7 @@
     const fileInput = document.getElementById('file');
     const filenameEl = document.getElementById('selected-filename');
     if (fileInput.files && fileInput.files.length > 0) {
-      filenameEl.textContent = `Selected file: ${fileInput.files[0].name}`;
+      filenameEl.textContent = `You selected: ${fileInput.files[0].name}`;
     } else {
       filenameEl.textContent = '';
     }
