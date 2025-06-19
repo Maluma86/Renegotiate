@@ -42,14 +42,9 @@
       <div class="card-pro__body">
         <!-- Left column -->
         <div class="card-pro__section">
-          <p><strong>Ends:</strong>            <%= l(@product.contract_end_date) %></p>
+          <p><strong>End of contract:</strong>            <%= l(@product.contract_end_date) %></p>
+          <p><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></p>
           <% if s&.contact_email.present? %>
-            <p>
-              <strong>Email:</strong>
-              <%= mail_to s.contact_email,
-                         s.contact_email,
-                         class: "product-email-link" %>
-            </p>
           <% end %>
           <p>
             <strong>Description:</strong><br>
@@ -59,9 +54,14 @@
 
         <!-- Right column -->
         <div class="card-pro__section">
-          <p><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></p>
           <p><strong>Last 30 days:</strong>    <%= @product.last_month_volume.to_i %> units</p>
           <p><strong>Last 12 months:</strong>  <%= @product.last_year_volume.to_i %> units</p>
+            <p>
+              <strong>Email:</strong>
+              <%= mail_to s.contact_email,
+                         s.contact_email,
+                         class: "product-email-link" %>
+            </p>
         </div>
       </div>
 
