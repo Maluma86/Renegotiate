@@ -41,12 +41,7 @@
                 </div>
               </div>
             </div>
-
-            <!-- 2) Followed by all the questions/answers as before -->
-            <%= render partial: "renegotiations/question", collection: @questions, as: :question %>
-          </div>
-
-            <%= render "form", question: @question %>
+            <%= render "form", question: @question, id: "new_question" %>
           </div>
           <div id="chat-container"><!-- JS widget mounts here --></div>
         </div>

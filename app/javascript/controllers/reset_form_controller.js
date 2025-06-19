@@ -1,10 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  connect() {console.log("connected")}
+  static targets = ["input"]
 
-  reset() {
-    console.log("fired")
-    this.element.reset()
+  reset(event) {
+    // Only clear on successful 2xx response
+    if (!event.detail.success) return
+
+    // Empty & refocus the textarea
+    this.inputTarget.value = ""
+    this.inputTarget.focus()
   }
 }
