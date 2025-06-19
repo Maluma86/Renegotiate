@@ -15,8 +15,7 @@
 
 /* =================================================================
    Sticky header (page title + import button) *and* search bar below
-   The trick: pull the whole sticky wrapper back over the page‑level
-   side‑padding so it can stretch to the same edge as the table.
+   Responsive full-width header that matches table alignment
    ================================================================= */
 .wrapper-that-freezes-things {
   position: sticky;
@@ -24,24 +23,31 @@
   background: $light;
   z-index: 10;
 
-  /* ---- counter the .product-page-container side‑padding --------- */
+  /* Mobile: extend to available width within parent */
   margin-left: -2rem;
   margin-right: -2rem;
   padding-left: 2rem;
   padding-right: 2rem;
 
+  /* Tablet and up: match container padding exactly */
   @media (min-width: 768px) {
     margin-left: -3rem;
     margin-right: -3rem;
     padding-left: 3rem;
     padding-right: 3rem;
   }
+
+  /* Desktop: match container padding exactly */
   @media (min-width: 1024px) {
     margin-left: -6rem;
     margin-right: -6rem;
     padding-left: 6rem;
     padding-right: 6rem;
   }
+
+  /* Ensure it never goes beyond the available content area */
+  max-width: none;
+  box-sizing: border-box;
 
   /* ---------- title row ----------------------------------------- */
   .products-header {
@@ -69,7 +75,7 @@
     .product-search-form {
       display: flex;
       gap: 0.5rem;
-      max-width: 100%;          // don’t overflow parent
+      max-width: 100%;          // don't overflow parent
     }
 
     .product-search-input {

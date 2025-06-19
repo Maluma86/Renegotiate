@@ -4,7 +4,7 @@
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
       <div class="page-title">
-        <span class="page-title__text">Renegotiate</span>
+        <span class="page-title__text"><%= @product.name %></span>
       </div>
     </div>
   </div>
@@ -20,10 +20,6 @@
       <% s      = @product.supplier %>
       <div class="card-pro__header">
         <div class="card-pro__titles">
-          <h2>
-            <strong>Product:</strong>
-            <span class="card-pro__value"><%= @product.name %></span>
-          </h2>
 
           <% if s.present? %>
             <h2>
@@ -46,6 +42,7 @@
       <div class="card-pro__body">
         <!-- Left column -->
         <div class="card-pro__section">
+          <p><strong>Ends:</strong>            <%= l(@product.contract_end_date) %></p>
           <% if s&.contact_email.present? %>
             <p>
               <strong>Email:</strong>
@@ -63,7 +60,6 @@
         <!-- Right column -->
         <div class="card-pro__section">
           <p><strong>Current Price:</strong> <%= number_to_currency(@product.current_price) %></p>
-          <p><strong>Ends:</strong>            <%= l(@product.contract_end_date) %></p>
           <p><strong>Last 30 days:</strong>    <%= @product.last_month_volume.to_i %> units</p>
           <p><strong>Last 12 months:</strong>  <%= @product.last_year_volume.to_i %> units</p>
         </div>
