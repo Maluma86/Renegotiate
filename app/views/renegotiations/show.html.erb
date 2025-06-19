@@ -41,11 +41,17 @@
                 </div>
               </div>
             </div>
-            <%= render "form", question: @question, id: "new_question" %>
+            <!-- end of initial AI message -->
+            <div id="chat-container"><!-- JS widget mounts here -->
+                <%= render partial: "renegotiations/question", collection: @questions, as: :question %>
+            </div>
           </div>
-          <div id="chat-container"><!-- JS widget mounts here --></div>
+            <!-- question input form -->
+            <%= render "form", question: @question, id: "new_question" %>
+            <!-- end of question input form -->
         </div>
       </div>
+    </div>
     </div>
 
     <!-- 2) Summary of the Agreement -->
