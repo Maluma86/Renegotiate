@@ -148,6 +148,10 @@ class RenegotiationsController < ApplicationController
     strategies = Rails.cache.read(strategies_key)
     
     Rails.logger.info "🔍 AJAX Status Check - Full result found: #{result.present?}, Recommendation found: #{recommendation.present?}, Forecast found: #{forecast.present?}, Ingredients found: #{ingredients.present?}, Price drivers found: #{price_drivers.present?}, Risks found: #{risks.present?}, Strategies found: #{strategies.present?}"
+    
+    # Debug: Show strategies cache content
+    Rails.logger.info "🎯 Strategies cache content: #{strategies.inspect}" if strategies.present?
+    Rails.logger.info "❌ Strategies cache empty or nil" if strategies.blank?
 
     if result
       # Full analysis complete
@@ -165,6 +169,11 @@ class RenegotiationsController < ApplicationController
       
       sections_ready = partial_data.keys
       Rails.logger.info "🔍 AJAX Status Check - Returning partial result with sections: #{sections_ready}"
+      
+      # Debug: Show exact partial_data content
+      Rails.logger.info "📦 Partial data being sent to frontend: #{partial_data.keys.inspect}"
+      Rails.logger.info "🎯 Strategies in partial_data: #{partial_data[:strategies].present? ? 'YES' : 'NO'}"
+      
       render json: { 
         status: 'streaming', 
         partial_data: partial_data,
