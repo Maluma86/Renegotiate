@@ -207,7 +207,7 @@ products << Product.create!(
   name:              "Cotton T-Shirts (Pack of 100)",
   category:          "Raw Materials",
   description:       "100% cotton crew-neck tees",
-  current_price:     800.00,
+  current_price:     200.00,
   last_month_volume: 500,
   contract_end_date: Date.today + 28,
   supplier:          suppliers.sample,
@@ -283,129 +283,108 @@ end
 
 renegs = []
 
-# ⏸Picking 10 random walmart products to remain pending (no renegotiations)
-pending_products = products.sample(10)
+#splitting Walmart product to get 10 "pending" products, 2 done, 2 ongoing 1 escalated
+pending_products    = products.sample(7)
 
-# The rest will get renegotiations attached
-negotiable_products = products - pending_productss
+# from the remaining 8, pick exactly 5 at random for “done”
+remaining           = products - pending_products
+done_products       = remaining.sample(5)
+
+# remove those to pick the ongoing and escalated—
+left_after_done     = remaining - done_products
+ongoing_products    = left_after_done.sample(2)
+escalated_products  = (left_after_done - ongoing_products).sample(1)
 
 
-# Completed renegotiations
-completed_dates.each do |day|
-  product = negotiable_products.sample
-  min_t, max_t, tgt_pct, min_pct = discount_targets(product.current_price)
+# ──────────────────────────────────────────────────────────────
+# Helper to pick consistent targets for manual renegotiations
+# ──────────────────────────────────────────────────────────────
+def make_targets(price)
+  tgt_pct = rand(4.5..6.5).round(1)    # average ~5.5%
+  min_pct = rand(2.0..4.0).round(1)    # floor ~3%
+  min_t   = (price * (1 - tgt_pct/100)).round(2)
+  max_t   = (price * (1 - min_pct/100)).round(2)
+  [min_t, max_t, tgt_pct, min_pct]
+end
 
-  renegs << Renegotiation.create!(
-    status: %w[done done done locked].sample,
-    thread: Faker::Quote.matz,
-    tone:   %w[collaborative neutral aggressive].sample,
+# ──────────────────────────────────────────────────────────────
+# 4️⃣  Renegotiations – fixed counts, split across May & June
+# ──────────────────────────────────────────────────────────────
+
+# Two dates in different months
+done_dates = [
+  Date.new(2025, 4, 10),  # Feb 10, 2025
+  Date.new(2025, 5, 10),  # Mar 12, 2025
+  Date.new(2025, 6, 02),  # Apr 15, 2025
+  Date.new(2025, 6, 16),  # May 18, 2025
+  Date.new(2025, 6, 18)   # Jun 20, 2025
+]
+
+# 2x done
+done_products.each_with_index do |product, idx|
+  min_t, max_t, tgt_pct, min_pct = make_targets(product.current_price)
+
+  Renegotiation.create!(
+    status:  "done",
+    thread:  "Buyer: “Looks good—let’s lock at $#{max_t}.”\nSupplier: “Confirmed.”",
+    tone:    "collaborative",
     min_target: min_t,
     max_target: max_t,
-    new_price:  Faker::Commerce.price(range: min_t..max_t),
+    new_price:  max_t,
     product:    product,
     buyer:      walmart_buyer,
     supplier:   product.supplier,
-    created_at: (day - 2.days).to_time.change(hour: 10),
-    updated_at: day.to_time.change(hour: 12),
+
+    # use the two distinct dates
+    created_at: done_dates[idx].to_time.change(hour: 10),
+    updated_at: done_dates[idx].to_time.change(hour: 15),
+
     current_target_discount_percentage: tgt_pct,
     current_min_discount_percentage:    min_pct,
     discount_targets_locked:            true
   )
+
 end
-
-# Current renegotiations
-33.times do
-  product = products.sample
-  min_t, max_t, tgt_pct, min_pct = discount_targets(product.current_price)
-  ts = Faker::Time.between(from: 90.days.ago, to: Time.current)
-
-  renegs << Renegotiation.create!(
-    status: %w[ongoing ongoing escalated].sample,
-    thread: Faker::Quote.matz,
-    tone:   %w[collaborative neutral aggressive].sample,
+# 2× Ongoing
+ongoing_products.each do |product|
+  min_t, max_t, tgt_pct, min_pct = make_targets(product.current_price)
+  Renegotiation.create!(
+    status:  "ongoing",
+    thread:  Faker::Quote.matz,
+    tone:    "neutral",
     min_target: min_t,
     max_target: max_t,
     product:    product,
     buyer:      walmart_buyer,
     supplier:   product.supplier,
-    created_at: ts,
-    updated_at: ts,
+    created_at: 1.day.ago.to_time.change(hour: 9),
+    updated_at: Time.current,
     current_target_discount_percentage: tgt_pct,
     current_min_discount_percentage:    min_pct,
     discount_targets_locked:            false
   )
 end
-puts "✅ #{Renegotiation.where(status: %w[done locked]).count} completed, #{Renegotiation.where(status: %w[ongoing escalated]).count} current"
 
-# ──────────────────────────────────────────────────────────────
-# 5️⃣  Discount-target histories – 2-5 per renegotiation
-# ──────────────────────────────────────────────────────────────
-puts "🗂️  Creating discount-target histories..."
-DiscountTargetHistory.destroy_all
-
-renegs.each do |neg|
-  versions = rand(2..5)
-  versions.times do |v|
-    tgt = (neg.current_target_discount_percentage + rand(-0.4..0.4)).round(1)
-    min = (neg.current_min_discount_percentage    + rand(-0.4..0.4)).clamp(0.0, tgt).round(1)
-    ts  = Faker::Time.between(from: neg.created_at, to: neg.created_at + 5.days)
-
-    rec = DiscountTargetHistory.create!(
-      renegotiation:              neg,
-      target_discount_percentage: tgt,
-      min_discount_percentage:    min,
-      set_by_user_id:             walmart_buyer.id,
-      set_at:                     ts,
-      version_number:             v + 1,
-      is_active:                  v + 1 == versions,
-      created_at:                 ts,
-      updated_at:                 ts
-    )
-
-    neg.update!(
-      current_target_discount_percentage: tgt,
-      current_min_discount_percentage:    min,
-      active_discount_target_version_id:  rec.id
-    ) if rec.is_active
-  end
+# 1× Escalated
+escalated_products.each do |product|
+  min_t, max_t, tgt_pct, min_pct = make_targets(product.current_price)
+  Renegotiation.create!(
+    status:  "escalated",
+    thread:  "Buyer: “We need better terms, escalating to management.”",
+    tone:    "aggressive",
+    min_target: min_t,
+    max_target: max_t,
+    product:    product,
+    buyer:      walmart_buyer,
+    supplier:   product.supplier,
+    created_at: Time.current - 4.hours,
+    updated_at: Time.current - 1.hour,
+    current_target_discount_percentage: tgt_pct,
+    current_min_discount_percentage:    min_pct,
+    discount_targets_locked:            false
+  )
 end
-puts "✅ #{DiscountTargetHistory.count} history rows"
 
-# ──────────────────────────────────────────────────────────────
-# 6️⃣  Questions – 1-3 for each current renegotiation
-# ──────────────────────────────────────────────────────────────
-puts "💬 Creating Q&A pairs..."
-question_bank = [
-  "Can you confirm volume commitment at the proposed price?",
-  "What lead-time improvements can we expect?",
-  "Would you accept a stepped discount if volumes rise by 15 %?"
-]
-answer_bank = [
-  "Based on the last 6 months, that commitment is realistic.",
-  "Lead-time would drop from 8 days to 5 days once the new contract is signed.",
-  "Yes, we can formalise a stepped discount table in the contract appendix."
-]
-q_total = 0
-
-Renegotiation.where(status: %w[ongoing escalated]).find_each do |neg|
-  rand(1..3).times do
-    ts = Faker::Time.between(from: neg.created_at, to: neg.updated_at)
-    Question.create!(
-      user_question: question_bank.sample,
-      ai_answer:     answer_bank.sample,
-      user:          walmart_buyer,
-      renegotiation: neg,
-      created_at:    ts,
-      updated_at:    ts
-    )
-    q_total += 1
-  end
-end
-puts "✅ Created #{q_total} Q&A pairs"
-
-# ──────────────────────────────────────────────────────────────
-# 7️⃣  Final summary
-# ──────────────────────────────────────────────────────────────
 puts "
 🎉 Seed complete!
 
@@ -420,4 +399,5 @@ puts "
 🧪 Demo logins
    buyer@walmart.com / demo123
    supplier@demo.com / demo123
+   buyer@carrefour.com / demo123 -> use this one to make sure walmart and carrefour buyers can see each other's products and renegotiations.
 "
