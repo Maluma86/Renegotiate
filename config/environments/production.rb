@@ -2,7 +2,7 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   config.action_mailer.default_url_options = {
-    host: 'renegotiate-e364becaefa3.herokuapp.com',
+    host: 'www.renegotiate.live',
     protocol: 'https'
   }
    # Settings specified here will take precedence over those in config/application.rb.
@@ -109,7 +109,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              'smtp.gmail.com',
     port:                 587,
-    domain:               'renegotiate-e364becaefa3.herokuapp.com',  # ← your actual app host
+    domain:               'www.renegotiate.live',  # ← your actual app host
     user_name:            ENV['GMAIL_USERNAME'],
     password:             ENV['GMAIL_PASSWORD'],
     authentication:       'plain',
@@ -118,7 +118,7 @@ Rails.application.configure do
 
   # URLs in email templates must point at your live site
   config.action_mailer.default_url_options = {
-    host:     'renegotiate-e364becaefa3.herokuapp.com',
+    host:     'www.renegotiate.live',
     protocol: 'https'
   }
   # --------------------------------------------------------
