@@ -17,6 +17,32 @@ class ProductIntelligenceService
     }
   end
 
+  def stream_recommendation(product, renegotiation_id)
+    Rails.logger.info "🚀 Streaming recommendation for renegotiation #{renegotiation_id}"
+    
+    recommendation = generate_recommendation(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_recommendation"
+    Rails.cache.write(cache_key, recommendation, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Recommendation streamed and cached for renegotiation #{renegotiation_id}"
+    recommendation
+  end
+
+  def stream_forecast(product, renegotiation_id)
+    Rails.logger.info "📊 Streaming forecast for renegotiation #{renegotiation_id}"
+    
+    forecast = generate_forecast(product)
+    
+    # Store immediately for streaming access
+    cache_key = "product_intel_#{renegotiation_id}_forecast"
+    Rails.cache.write(cache_key, forecast, expires_in: 1.hour)
+    
+    Rails.logger.info "✅ Forecast streamed and cached for renegotiation #{renegotiation_id}"
+    forecast
+  end
+
   def generate_recommendation(product)
     prompt = build_recommendation_prompt(product)
 

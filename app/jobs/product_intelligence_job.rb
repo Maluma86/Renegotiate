@@ -6,6 +6,13 @@ class ProductIntelligenceJob < ApplicationJob
     product = renegotiation.product
     cache_key = build_cache_key(product)
 
+    # First: Stream recommendation immediately for faster user feedback
+    stream_recommendation_if_needed(product, renegotiation_id)
+
+    # Second: Stream forecast after recommendation
+    stream_forecast_if_needed(product, renegotiation_id)
+
+    # Then: Continue with full analysis as before
     intelligence_data = get_or_generate_intelligence(product, cache_key)
     store_result_for_ajax(renegotiation_id, intelligence_data)
     cleanup_job_status(renegotiation_id)
@@ -16,6 +23,32 @@ class ProductIntelligenceJob < ApplicationJob
   end
 
   private
+
+  def stream_recommendation_if_needed(product, renegotiation_id)
+    # Check if recommendation is already cached (avoid duplicate work)
+    recommendation_key = "product_intel_#{renegotiation_id}_recommendation"
+    return if Rails.cache.exist?(recommendation_key)
+
+    # Stream the recommendation immediately
+    service = ProductIntelligenceService.new
+    service.stream_recommendation(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream recommendation for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
+
+  def stream_forecast_if_needed(product, renegotiation_id)
+    # Check if forecast is already cached (avoid duplicate work)
+    forecast_key = "product_intel_#{renegotiation_id}_forecast"
+    return if Rails.cache.exist?(forecast_key)
+
+    # Stream the forecast
+    service = ProductIntelligenceService.new
+    service.stream_forecast(product, renegotiation_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to stream forecast for renegotiation #{renegotiation_id}: #{e.message}"
+    # Don't fail the whole job if streaming fails - continue with normal process
+  end
 
   def get_or_generate_intelligence(product, cache_key)
     intelligence_data = Rails.cache.read(cache_key)

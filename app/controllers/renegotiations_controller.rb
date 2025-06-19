@@ -130,13 +130,34 @@ class RenegotiationsController < ApplicationController
 
   def product_intelligence_status
     result_key = "product_intel_result_#{@renegotiation.id}"
-    Rails.logger.info "🔍 AJAX Status Check - Looking for cache key: #{result_key}"
+    recommendation_key = "product_intel_#{@renegotiation.id}_recommendation"
+    forecast_key = "product_intel_#{@renegotiation.id}_forecast"
+    
+    Rails.logger.info "🔍 AJAX Status Check - Looking for cache keys: #{result_key}, #{recommendation_key}, #{forecast_key}"
+    
     result = Rails.cache.read(result_key)
-    Rails.logger.info "🔍 AJAX Status Check - Cache result found: #{result.present?}"
+    recommendation = Rails.cache.read(recommendation_key)
+    forecast = Rails.cache.read(forecast_key)
+    
+    Rails.logger.info "🔍 AJAX Status Check - Full result found: #{result.present?}, Recommendation found: #{recommendation.present?}, Forecast found: #{forecast.present?}"
 
     if result
+      # Full analysis complete
       Rails.logger.info "🔍 AJAX Status Check - Returning completed with data keys: #{result.keys}" if result.is_a?(Hash)
       render json: { status: 'completed', data: result }
+    elsif recommendation || forecast
+      # Partial result - some sections ready for streaming
+      partial_data = {}
+      partial_data[:recommendation] = recommendation if recommendation
+      partial_data[:forecast] = forecast if forecast
+      
+      sections_ready = partial_data.keys
+      Rails.logger.info "🔍 AJAX Status Check - Returning partial result with sections: #{sections_ready}"
+      render json: { 
+        status: 'streaming', 
+        partial_data: partial_data,
+        message: "Sections ready: #{sections_ready.join(', ')}, other sections processing..."
+      }
     else
       Rails.logger.info "🔍 AJAX Status Check - Returning processing status"
       render json: { status: 'processing' }

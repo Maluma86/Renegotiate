@@ -7,6 +7,9 @@ export default class extends Controller {
   connect() {
     console.log("🤖 AI Intelligence Controller connected for renegotiation", this.renegotiationIdValue)
     
+    // Track which sections have been streamed to avoid repeated updates
+    this.streamedSections = new Set()
+    
     // Start the background job immediately when controller connects
     this.startProductIntelligence()
     
@@ -67,6 +70,10 @@ export default class extends Controller {
           console.log("🎉 AI analysis completed! Updating UI...")
           clearInterval(this.pollInterval)
           this.updateUIWithIntelligence(data.data)
+        } else if (data.status === 'streaming' && data.partial_data) {
+          console.log("🚀 Streaming data received! Updating recommendation...")
+          this.updateStreamingContent(data.partial_data)
+          // Continue polling for complete results
         }
       })
       .catch(error => {
@@ -121,6 +128,51 @@ export default class extends Controller {
     }
     
     console.log("✅ UI update completed successfully")
+  }
+
+  updateStreamingContent(partialData) {
+    console.log("🚀 Processing streaming content:", Object.keys(partialData))
+    
+    let hasNewContent = false
+    
+    // Check each section and only update if it's new
+    Object.keys(partialData).forEach(sectionName => {
+      if (!this.streamedSections.has(sectionName)) {
+        hasNewContent = true
+        this.streamedSections.add(sectionName)
+        console.log(`📥 New section streamed: ${sectionName}`)
+        
+        // Update the specific section
+        if (sectionName === 'recommendation' && partialData.recommendation) {
+          this.updateRecommendation(partialData.recommendation)
+          console.log("✅ Recommendation updated via streaming")
+        }
+        
+        if (sectionName === 'forecast' && partialData.forecast) {
+          this.updateForecastChart(partialData.forecast)
+          console.log("✅ Forecast updated via streaming")
+        }
+        
+        // Future sections will be added here:
+        // if (sectionName === 'ingredients' && partialData.ingredients) {
+        //   this.updateIngredientAnalysis(partialData.ingredients)
+        // }
+      } else {
+        console.log(`⏭️ Section already streamed, skipping: ${sectionName}`)
+      }
+    })
+    
+    // Show content section only on first new content
+    if (hasNewContent) {
+      const loadingElement = document.getElementById('ai-loading')
+      const contentElement = document.getElementById('ai-content')
+      
+      if (loadingElement && contentElement && contentElement.style.display === 'none') {
+        loadingElement.style.display = 'none'
+        contentElement.style.display = 'block'
+        console.log("📺 Showed AI content section for streaming")
+      }
+    }
   }
 
   updateRecommendation(recommendation) {
