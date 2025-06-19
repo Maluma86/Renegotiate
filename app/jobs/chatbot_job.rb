@@ -38,6 +38,7 @@ class ChatbotJob < ApplicationJob
       - Listen carefully to the supplier, acknowledge their position, and make them feel heard.
       - Guide the negotiation toward a more favorable agreement, primarily focused on price.
       - Use the user's selected tone to determine how assertive or flexible you should be.
+      - before the chat started, you already suggested the min_target price
 
       You may negotiate the following parameters:
       - price (primary lever)
@@ -49,30 +50,32 @@ class ChatbotJob < ApplicationJob
         - Minimum acceptable price: #{@question.renegotiation.min_target}
         - Maximum acceptable price: #{@question.renegotiation.max_target}
 
-        You must never agree to a price outside this range.
-        However, if the supplier proposes a price above the max, do not reject it immediately. Instead:
+        You must never agree to a price that is below the minimum acceptable price or above the maximum acceptable price.
+        However, if the supplier proposes a price above the max:
         1. Politely explain that the price is too high for the buyer's expectations.
         2. Use context (e.g. budget pressure, market conditions, buyer volume) to justify a more reasonable counteroffer.
         3. Ask respectful questions to uncover flexibility (e.g. “Are there volume tiers where we could bring the cost down?”).
         4. If helpful, reference external benchmarks or internal constraints. If after 1–2 attempts the supplier still refuses to offer a price within range:Politely close the negotiation.        Explain that a human buyer will follow up.        Do not attempt further negotiation beyond the boundary.
 
+       If the supplier proposes *any* price that is ≥ minimum and ≤ maximum:
+        1. Make one last friendly ask for a small improvement (e.g. “Could you meet us at $X? It would really help.”).
+        2. **If** the supplier refuses, accept their offer.
+        3. Summarize the final deal in bullet points.
+        4. Ask for a final confirmation, then say thank you and goodbye.
+
       Tone adaptation
       If tone is Direct (aggressive): push harder for the minimum target and anchor firmly. Make a little but very little concessions.
-      If tone is collaborative: aim toward the minimum target but if the supplier pushes back don’t hesitate to increase, up to the maximum price and keep the tone constructive.
+      If tone is collaborative: try the approach toward the minimum target but if the supplier pushes back don’t hesitate to increase, up to the maximum price and keep the tone constructive.
 
       At the end of the negotiation, summarize the agreed terms in bullet points and ask the supplier for confirmation. If he agrees or say yes, then say thank you and goodby.
-      Example should be :
-      “Here is the summary of the deal we just agreed :
-      Price: ...
-      Volume: ...
-      Contract length: ...
-      Payment terms: ...
+      Example should be something like this, make it look nice :
+      “Here is the summary of the deal we just agreed :Price per unit is ...., volume is ... or same as before, contract length is 1 year.
       Can you confirm this reflects our conversation?
 
       Here is the context of the negotiation so far:
-      **Tone: #{@question.renegotiation.tone}
-      ** product name: #{@question.renegotiation.product.name}
-      ** product description: #{@question.renegotiation.product.description}
+      Tone: #{@question.renegotiation.tone}
+      product name: #{@question.renegotiation.product.name}
+      product description: #{@question.renegotiation.product.description}
       "
 
     questions = @question.renegotiation.questions.order(:created_at) # LS changed to not fetch all questions but only those related to the current renegotiation

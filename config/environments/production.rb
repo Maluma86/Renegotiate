@@ -1,8 +1,11 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  config.action_mailer.default_url_options = { host: "http://TODO_PUT_YOUR_DOMAIN_HERE" }
-  # Settings specified here will take precedence over those in config/application.rb.
+  config.action_mailer.default_url_options = {
+    host: 'www.renegotiate.live',
+    protocol: 'https'
+  }
+   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
@@ -96,4 +99,27 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+
+
+  # Tell Rails to use SMTP and point it at Gmail-------------
+
+  # Use Gmail SMTP on Heroku
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              'smtp.gmail.com',
+    port:                 587,
+    domain:               'www.renegotiate.live',  # ← your actual app host
+    user_name:            ENV['GMAIL_USERNAME'],
+    password:             ENV['GMAIL_PASSWORD'],
+    authentication:       'plain',
+    enable_starttls_auto: true
+  }
+
+  # URLs in email templates must point at your live site
+  config.action_mailer.default_url_options = {
+    host:     'www.renegotiate.live',
+    protocol: 'https'
+  }
+  # --------------------------------------------------------
 end
