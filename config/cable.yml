@@ -3,5 +3,4 @@ development:
 
 production:
   adapter: solid_cable
-  channel_prefix: renegotiate_production
   polling_interval: 1.seconds
