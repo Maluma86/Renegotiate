@@ -1,5 +1,5 @@
 class Product < ApplicationRecord
-  belongs_to :supplier, class_name: 'User' #this means “Treat supplier_id as a foreign key to the users table — and treat the related record as a User.”
+  belongs_to :supplier, class_name: 'User' # this means “Treat supplier_id as a foreign key to the users table — and treat the related record as a User.”
   belongs_to :procurement, class_name: 'User'
 
   has_many :renegotiations
@@ -23,8 +23,8 @@ class Product < ApplicationRecord
     read_attribute(:target_margin) || 35
   end
 
-  def last_year_volume
-    read_attribute(:last_year_volume) || 0
+  def last_month_volume
+    read_attribute(:last_month_volume) || 0
   end
 
   def last_year_volume
@@ -43,15 +43,15 @@ class Product < ApplicationRecord
       .order(created_at: :desc)
       .first
 
-    #If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
+    # If the product has no renegotiations (renegotiations.none?), we immediately return "pending".
     return "pending" if latest.nil?
 
-    case latest.status.to_s.downcase #We now look at the status of that latest renegotiation
+    case latest.status.to_s.downcase  # We now look at the status of that latest renegotiation
     when "escalated"
       "escalated"
-    when "ongoing", "initialized" #If the latest status is either "in_progress" or "initiated", return "ongoing".
+    when "ongoing", "initialized"    # If it’s initialized/in progress, treat as ongoing.
       "ongoing"
-    when "done" #If the renegotiation is marked "completed", the product is "done".
+    when "done"                      # If the renegotiation is marked done, return done.
       "done"
     else
       "pending"

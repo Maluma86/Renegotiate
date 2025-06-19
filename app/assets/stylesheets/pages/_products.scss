@@ -1,4 +1,5 @@
-@import "config/bootstrap_variables";
+@import "config/bootstrap_variables";  // bring in your color variables
+@import "components/buttons";         // import your .btn-main styles
 
 /* ================================================================
    Product Show – page padding & sticky header
@@ -38,44 +39,68 @@
    Card header (dark blue bar with white text + status badge)
    ================================================================ */
 .card-pro__header {
-  background:     $secondary;        // #131B3F
-  color:          $light;            // white
-  padding:        1rem;
-  text-align:     center;
-  display:        flex;
-  flex-direction: column;            // stack lines vertically
-  align-items:    center;
-  gap:            0.5rem;            // space between h2's and badge
+  background:       $secondary;        // #131B3F
+  color:            $light;            // white
+  padding:          1rem;
+
+  display:          flex;
+  flex-direction:   row;                // horizontal layout
+  justify-content:  space-between;     // titles left, badge right
+  align-items:      flex-start;         // align titles top
+  text-align:       left;              // no center text
+
+  .card-pro__titles {
+    display:         flex;
+    flex-direction:  column;           // Product & Supplier stacked
+    gap:             0.25rem;          // small gap between lines
+  }
 
   h2 {
-    margin:       0;
-    font-size:    1.25rem;
-    font-weight:  600;
+    margin:         0;
+    font-size:      1.25rem;
+    display:        flex;              // inline label + value
+    align-items:    baseline;
+
+    strong {
+      font-weight:  700;               // bold the label
+    }
+
+    .card-pro__value {
+      font-weight:  400;               // normal for the name
+      margin-left:  0.25rem;           // small space
+    }
   }
 
   .status {
-    // unchanged: will pick up your existing badge colors
+    margin-top:      0.25rem;          // nudge pill down slightly
   }
+}
+
+/* reset the <hr> so it’s only a thin line, no extra gap */
+.card-divider {
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid lighten($secondary, 10%);
 }
 
 /* ================================================================
    Card body: two columns for details
    ================================================================ */
 .card-pro__body {
-  display:             grid;
+  display:               grid;
   grid-template-columns: 1fr 1fr;
-  gap:                 1.5rem;
-  padding:             1rem;
-  background:          $light;
-  color:               $dark;
+  gap:                   1.5rem;
+  padding:               1rem;
+  background:            $light;
+  color:                 $dark;
 
   p {
-    margin:            0 0 0.75rem;
-    line-height:       1.4;
+    margin:      0 0 0.75rem;
+    line-height: 1.4;
   }
 
   strong {
-    font-weight:      600;
+    font-weight: 600;
   }
 }
 
@@ -87,44 +112,46 @@
    Actions row in the card footer
    ================================================================ */
 .card-pro__actions {
-  display:           flex;
-  justify-content:   center;
-  padding:           1rem;
+  display:         flex;
+  justify-content: center;
+  padding:         1rem;
 }
 
 /* ================================================================
-   Buttons & badges (untouched, same as your originals)
+   Buttons & badges
    ================================================================ */
 .import-btn {
-  @extend .btn-theme;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
+  @extend .btn-main;     // use your new main button style
+  padding:       0.75rem 1.5rem;
+  font-weight:   600;
   border-radius: 0.375rem;
-  color: $light !important;
+  color:         $light !important;
 }
 
 .status {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  text-transform: capitalize;
-  color: white;
+  display:          inline-block;
+  padding:          0.25rem 0.5rem;
+  font-size:        0.85rem;
+  font-weight:      600;
+  border-radius:    0.375rem;
+  text-transform:   capitalize;
+  color:            white;
+  border:           1px solid $light;  // white border
 }
-.status.done, .status.completed { background-color: #28a745; }
-.status.ongoing  { background-color: #ffc107; color: #212529; }
-.status.pending { background-color: #6c757d; }
-.status.escalated { background-color: #dc3545; }
+.status.done, .status.completed { background: $secondary; color: $light; }
+.status.ongoing  { background: #334155; color: $light; }
+.status.pending  { background: #ff7920; color: $light; }
+.status.escalated{ background: #b23a3a; color: $light; }
 
 /* ================================================================
-   Email‐link color (accent orange) – unchanged from before
+   Email-link color (accent) – unchanged
    ================================================================ */
 .product-email-link {
-  color: $dark;
+  color:           $dark;
   text-decoration: none;
+
   &:hover {
-    color: darken($primary, 10%);
+    color:           darken($primary, 10%);
     text-decoration: underline;
   }
 }
