@@ -25,11 +25,13 @@
         <div class="card-body">
           <div class="container chatbot">
             <h3>Chat with our negotiator below to renew the contract:</h3>
-            <p class="chat-intro-message">
+            <p class="message__bubble">
               Hi <%= @supplier.contact %>,
               I’ll be handling the renegotiation on behalf of <%= @renegotiation.buyer.company_name %>.
               Our current contract for <%= @product.name %> is approaching its renewal date on <%= @product.contract_end_date.strftime("%B %d, %Y") %>.
-              We propose renewing at <%= number_to_currency(@renegotiation.max_target) %>.
+              We’ve been very satisfied with the quality of the product and value our collaboration so far. However, considering current market trends and our internal cost optimization efforts, we believe a price adjustment is reasonable.
+              We propose renewing the contract at a revised unit price of <%= number_to_currency(@renegotiation.max_target) %>.
+              Let us know your thoughts or if there’s any additional context we should consider.
             </p>
             <div id="questions">
               <%= render partial: "renegotiations/question", collection: @questions, as: :question %>
