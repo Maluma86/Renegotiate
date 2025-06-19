@@ -14,9 +14,8 @@
 }
 
 /* =================================================================
-   Sticky header (page title + import button) *and* search bar below
-   The trick: pull the whole sticky wrapper back over the page‑level
-   side‑padding so it can stretch to the same edge as the table.
+   Sticky header (page title + import button) and search bar below
+   Responsive full-width header that matches table alignment
    ================================================================= */
 .wrapper-that-freezes-things {
   position: sticky;
@@ -24,24 +23,31 @@
   background: $light;
   z-index: 10;
 
-  /* ---- counter the .product-page-container side‑padding --------- */
+  /* Mobile: extend to available width within parent */
   margin-left: -2rem;
   margin-right: -2rem;
   padding-left: 2rem;
   padding-right: 2rem;
 
+  /* Tablet and up: match container padding exactly */
   @media (min-width: 768px) {
     margin-left: -3rem;
     margin-right: -3rem;
     padding-left: 3rem;
     padding-right: 3rem;
   }
+
+  /* Desktop: match container padding exactly */
   @media (min-width: 1024px) {
     margin-left: -6rem;
     margin-right: -6rem;
     padding-left: 6rem;
     padding-right: 6rem;
   }
+
+  /* Ensure it never goes beyond the available content area */
+  max-width: none;
+  box-sizing: border-box;
 
   /* ---------- title row ----------------------------------------- */
   .products-header {
@@ -63,17 +69,17 @@
   /* ---------- search‑bar row ------------------------------------ */
   .product-search-wrapper {
     display: flex;
-    justify-content: flex-end;  // keep bar right‑aligned
+    justify-content: flex-end;
     margin-bottom: 0.5rem;
 
     .product-search-form {
       display: flex;
       gap: 0.5rem;
-      max-width: 100%;          // don’t overflow parent
+      max-width: 100%;
     }
 
     .product-search-input {
-      width: 300px;             // retain original fixed size
+      width: 300px;
       padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
       color: $dark;
@@ -81,7 +87,9 @@
       border: 1px solid lighten($secondary, 8%);
       border-radius: 0.375rem;
 
-      &::placeholder { color: rgba($dark, 0.6); }
+      &::placeholder {
+        color: rgba($dark, 0.6);
+      }
     }
 
     .product-search-button {
@@ -125,7 +133,9 @@
     color: $light;
 
     .products-line {
-      &:hover { background-color: darken($secondary, 6%); }
+      &:hover {
+        background-color: darken($secondary, 6%);
+      }
 
       .products-line-text {
         padding: 0.75rem 1rem;
@@ -144,7 +154,7 @@
         color: $light;
         border: 1px solid $light;
 
-        &.pending        { background: #ff7920; }
+        &.pending        { background: #334155; }
         &.ongoing        { background: #334155; }
         &.done           { background: $secondary; }
         &.human_required { background: #b23a3a; }

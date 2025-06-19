@@ -2,10 +2,9 @@
 @import "config/bootstrap_variables";
 
 /* ================================================================
-   Reusable page‐title component
+   Reusable page‐title + sticky wrapper + underline
    ================================================================ */
 .page-title {
-  /* Title text styling */
   display: block;
   flex: 1;
   margin: 0;
@@ -19,10 +18,22 @@
     color: $dark;
     line-height: 1.2;
   }
+}
 
-  /* ── Inject a full‐width underline on the TITLE’S PARENT flex container ── */
-  @at-root .wrapper-that-freezes-things .products-header {
-    /* ensure the header container spans full width */
+/* ── Sticky wrapper and header bar ───────────────────────────── */
+.wrapper-that-freezes-things {
+  position: sticky;
+  top: -2rem;            // ← move the entire banner UP by 1rem
+  margin-top: -2rem;     // ← extra pull so it sits above its normal spot
+  background: $light;
+  z-index: 10;
+  padding-bottom: 0.5rem;
+
+  .products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
     border-bottom: 2px solid #131B3F;
     margin-bottom: 1rem;
   }

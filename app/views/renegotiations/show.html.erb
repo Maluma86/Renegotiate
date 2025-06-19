@@ -6,7 +6,7 @@
     <div class="products-header">
       <div class="page-title">
         <span class="page-title__text">
-          Renegotiate: <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %>
+          Renegotiation Thread
         </span>
       </div>
       <%= link_to "← Back to products",
@@ -20,7 +20,7 @@
     <div class="col-md-8">
       <div id="ai-chatbox" class="card mb-4" style="height:70vh; display:flex; flex-direction:column;" >
         <div class="card-header">
-          <strong>Conversation - Chat with our negotiator below to renew the contract:</strong>
+          <strong>Chat with our negotiator to renew the contract for <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %></strong>
         </div>
         <div class="card-body" style="flex:1 1 auto; display:flex; flex-direction:column;">
           <div class="container chatbot">
