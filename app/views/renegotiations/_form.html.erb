@@ -20,7 +20,7 @@
 
 
 <%= simple_form_for [@renegotiation, question],
-      remote: true,
+      data: { turbo: true }
       html: {
         data: {
           turbo:      true,
