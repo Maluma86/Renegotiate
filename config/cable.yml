@@ -2,4 +2,6 @@ development:
   adapter: enhanced_postgresql
 
 production:
-  adapter: enhanced_postgresql
+  adapter: solid_cable
+  channel_prefix: renegotiate_production
+  polling_interval: 1.seconds
