@@ -14,7 +14,7 @@
 }
 
 /* =================================================================
-   Sticky header (page title + import button) *and* search bar below
+   Sticky header (page title + import button) and search bar below
    Responsive full-width header that matches table alignment
    ================================================================= */
 .wrapper-that-freezes-things {
@@ -69,17 +69,17 @@
   /* ---------- search‑bar row ------------------------------------ */
   .product-search-wrapper {
     display: flex;
-    justify-content: flex-end;  // keep bar right‑aligned
+    justify-content: flex-end;
     margin-bottom: 0.5rem;
 
     .product-search-form {
       display: flex;
       gap: 0.5rem;
-      max-width: 100%;          // don't overflow parent
+      max-width: 100%;
     }
 
     .product-search-input {
-      width: 300px;             // retain original fixed size
+      width: 300px;
       padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
       color: $dark;
@@ -87,7 +87,9 @@
       border: 1px solid lighten($secondary, 8%);
       border-radius: 0.375rem;
 
-      &::placeholder { color: rgba($dark, 0.6); }
+      &::placeholder {
+        color: rgba($dark, 0.6);
+      }
     }
 
     .product-search-button {
@@ -131,7 +133,9 @@
     color: $light;
 
     .products-line {
-      &:hover { background-color: darken($secondary, 6%); }
+      &:hover {
+        background-color: darken($secondary, 6%);
+      }
 
       .products-line-text {
         padding: 0.75rem 1rem;
@@ -150,7 +154,7 @@
         color: $light;
         border: 1px solid $light;
 
-        &.pending        { background: #ff7920; }
+        &.pending        { background: #334155; }
         &.ongoing        { background: #334155; }
         &.done           { background: $secondary; }
         &.human_required { background: #b23a3a; }

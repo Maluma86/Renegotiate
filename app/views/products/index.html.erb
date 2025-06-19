@@ -82,14 +82,14 @@
                 <% if (last_renegotiation = product.renegotiations.where(buyer_id: current_user.id).order(created_at: :desc).first) %>
                   <%= link_to "Review",
                               renegotiation_path(last_renegotiation),
-                              class: "renegotiate-btn" %>
+                              class: "btn-review" %>
                 <% else %>
                   No action
                 <% end %>
               <% when "pending" %>
                 <%= link_to "Renegotiate",
                             new_product_renegotiation_path(product),
-                            class: "renegotiate-btn" %>
+                            class: "btn-reneg" %>
             <% end %>
           </td>
         </tr>
