@@ -51,12 +51,18 @@ class Renegotiation < ApplicationRecord
       discount_target_histories.where.not(id: new_version.id)
                                .update_all(is_active: false)
 
+      cp                 = product.current_price
+      floor_price        = (cp * (1 - target_percentage / 100.0)).round(2)
+      ceiling_price      = (cp * (1 - min_percentage    / 100.0)).round(2)
+
       # Update renegotiation with the new active targets
       update!(
         current_target_discount_percentage: target_percentage,
         current_min_discount_percentage:    min_percentage,
         discount_targets_locked:            true,
-        active_discount_target_version:     new_version
+        active_discount_target_version:     new_version,
+        min_target: floor_price,
+        max_target: ceiling_price
       )
 
       new_version
