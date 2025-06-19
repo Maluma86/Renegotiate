@@ -1,46 +1,104 @@
-@import "config/bootstrap_variables";
+@import "config/bootstrap_variables"; // Core Bootstrap variables
+@import "components/buttons";             // App‑specific button helpers
 
-/* ── Card wrapper to center on‐screen ───────────────────────── */
-.card-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0;
-  padding: 0 1rem;
+// ────────────────────────────────────────────────
+//  Card layout helper – centres card on the page
+// ────────────────────────────────────────────────
+.card-wrapper {                         // Wrapper element
+  display: flex;                       // Enable flexbox
+  justify-content: center;             // Horizontally centre the card
+  margin: 2rem 0;                      // Top / bottom spacing
+  padding: 0 1rem;                     // Small side‑gutters (mobile safety)
 }
 
-/* ── Two‐Tone Card (now plain white with black text & grey border) ──────────────────────────────────── */
-.card-pro {
-  max-width:     650px;
-  width:         100%;
-  background:    $light;                     // white background
-  color:         $dark;                      // black text throughout
-  border-radius: 0.5rem;
-  border:        1px solid (#0A0F2E);  // subtle grey border
-  box-shadow:    0 2px 6px rgba(0,0,0,0.2);
-  display:       flex;
-  flex-direction: column;
+// ────────────────────────────────────────────────
+//  MAIN CARD COMPONENT (.card-pro)
+//  ‑ Header background : #0A0F2E  (dark navy)
+//  ‑ Body   background : #131B3F  (slate navy)
+//  ‑ All text & links  : white
+// ────────────────────────────────────────────────
+.card-pro {                             // Card outer shell
+  max-width: 650px;                    // Consistent max width
+  width: 100%;                         // Fill available space
+  background: #131B3F;                 // Body background colour
+  color: #ffffff;                      // Default text colour
+  border: 1px solid lighten(#131B3F, 10%); // Subtle border tint
+  border-radius: 0.5rem;               // Rounded corners
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); // Very light shadow
+  overflow: hidden;                    // Clip child overflow to radius
+  display: flex;                       // Flex column layout
+  flex-direction: column;              // Stack header/body/footer
 
-  &__title {
-    margin-bottom: 1rem;
-    font-size:     1.75rem;
-    font-weight:   600;
-    text-align:    center;
-    color:         $dark;                    // black header text
+  // —— Force all links inside the card to stay white ——
+  a,
+  a:visited,
+  a:hover,
+  a:active {
+    color: #ffffff;                    // Keep anchors white
   }
+}
 
-  &__content {
-    margin-bottom: 1rem;
-    font-size:     1rem;
-    line-height:   1.6;
-    color:         $dark;                    // black body text
+// ── Header strip – product, supplier & status pill ─────────────
+.card-pro__header {                     // Header bar container
+  background: #0A0F2E;                 // Dark navy background
+  padding: 1rem;                       // Uniform padding
+  display: flex;                       // Place titles and status side‑by‑side
+  justify-content: space-between;      // Push status to right
+  align-items: flex-start;             // Align items to top
+  gap: 1rem;                           // Space between blocks
+}
+
+.card-pro__titles {                     // Title stack (left side)
+  h2 {                                  // Each title line
+    margin: 0 0 0.25rem 0;             // Slight bottom spacing
+    font-size: 1rem;                   // Same as table headings
+    font-weight: 600;                  // Semi‑bold emphasise labels
+    color: #ffffff;                    // White text
   }
+}
 
-  &__actions {
-    margin-top:      1.5rem;
-    display:         flex;
-    justify-content: center;
-    gap:             1rem;
+.status {                               // Status pill (re‑uses table styling)
+  color: #ffffff;                       // Ensure pill text stays white
+  border-color: #ffffff;               // White border for all states
+}
 
-    .btn { color: $dark !important; }        // ensure any buttons inside are black text too
+// ── Divider line below header ──────────────────────────────────
+.card-divider {                         // Horizontal rule element
+  margin: 0;                            // Remove default margins
+  border: 0;                            // Reset native borders
+  height: 1px;                          // 1‑pixel line
+  background: lighten(#131B3F, 10%);   // Slightly lighter navy
+}
+
+// ── Body – two‑column information blocks ──────────────────────
+.card-pro__body {                       // Body content wrapper
+  background: #131B3F;                 // Maintain body colour
+  display: flex;                       // Two columns side‑by‑side (wraps on mobile)
+  flex-wrap: wrap;                     // Allow wrapping at small widths
+  padding: 1rem;                       // Inner spacing
+  gap: 1rem;                           // Column gap
+
+  .card-pro__section {                 // Each column
+    flex: 1 1 300px;                   // Grow / shrink, min width 300px
+    font-size: 0.875rem;               // Match table font size
+    line-height: 1.6;                  // Comfortable reading line height
+
+    p {                                // Paragraph spacing tweak
+      margin-bottom: 0.75rem;          // Space after each paragraph
+    }
+  }
+}
+
+// ── Footer actions row ─────────────────────────────────────────
+.card-pro__actions {                    // Button area
+  background: darken(#131B3F, 4%);     // Slightly darker strip for contrast
+  padding: 1rem;                       // Space around button
+  display: flex;                       // Centre the button
+  justify-content: center;             // Horizontal centring
+
+  .import-btn {                        // Re‑use main green button styles
+    @extend .btn-main;                 // Extend standard button class
+    font-size: 0.875rem;               // 14 px font size
+    color: #ffffff !important;         // Force text colour to white
   }
 }
