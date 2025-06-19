@@ -9,11 +9,11 @@ class ProductIntelligenceJob < ApplicationJob
     # First: Stream recommendation immediately for faster user feedback
     stream_recommendation_if_needed(product, renegotiation_id)
 
-    # Second: Stream forecast after recommendation
-    stream_forecast_if_needed(product, renegotiation_id)
-
-    # Third: Stream ingredients after forecast
+    # Second: Stream ingredients after recommendation
     stream_ingredients_if_needed(product, renegotiation_id)
+
+    # Third: Stream forecast after ingredients
+    stream_forecast_if_needed(product, renegotiation_id)
 
     # Fourth: Stream price drivers after ingredients
     stream_price_drivers_if_needed(product, renegotiation_id)
