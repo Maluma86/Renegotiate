@@ -6,3 +6,4 @@ production:
   adapter: solid_cable
   polling_interval: 1.seconds
   channel_prefix: renegotiate_development
+  url: <%= ENV.fetch("SOLID_CABLE_URL") %>
