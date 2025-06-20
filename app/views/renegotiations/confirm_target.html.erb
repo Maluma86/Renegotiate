@@ -35,16 +35,22 @@
             📊 Current Info
           </h5>
           <div style="color: #E5E4E2; line-height: 1.6;">
-            <p><strong>Pro-ID:</strong> #<%= @renegotiation.product.id %></p>
-            <p><strong>Rene-ID:</strong> #<%= @renegotiation.id %></p>
             <p>
-              <strong>Rene-Status:</strong>
+              <strong>Renegotiation Status:</strong>
               <span class="badge bg-success">
                 <%= @renegotiation.status.capitalize %>
               </span>
             </p>
             <p>
-              <strong>Pro-Price:</strong>
+              <strong>Product:</strong>
+              <%= @renegotiation.product&.name || "Not specified" %>
+            </p>
+            <p>
+              <strong>Supplier:</strong>
+              <%= @renegotiation.product&.supplier&.company_name || "Not specified" %>
+            </p>
+            <p>
+              <strong>Current Price:</strong>
               €<span id="current-price"
                      data-renegotiations-target="currentPrice"
                      style="color: #E5E4E2; font-weight: 600;">
@@ -63,32 +69,17 @@
           </div>
         </div>
 
-        <!-- MIDDLE COLUMN: Product & Supplier + AJAX Discount Targets -->
+        <!-- MIDDLE COLUMN: AJAX Discount Targets -->
         <div class="col-md-4">
-          <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
-            🏢 Product & Supplier
-          </h5>
-          <div style="color: #E5E4E2; line-height: 1.6; margin-bottom: 2rem;">
-            <p>
-              <strong>Product:</strong>
-              <%= @renegotiation.product&.name || "Not specified" %>
-            </p>
-            <p>
-              <strong>Supplier:</strong>
-              <%= @renegotiation.product&.supplier&.company_name || "Not specified" %>
-            </p>
-          </div>
-
           <h5 style="color: #E5E4E2; margin-bottom: 1rem; font-weight: 600;">
             🎯 Discount Targets
           </h5>
-
           <div class="discount-targets-section">
             <!-- Target Discount -->
             <div class="discount-input-group" style="margin-bottom: 1.5rem;">
               <label style="color: #E5E4E2; font-weight: 600;
                             margin-bottom: 0.5rem; display: block;">
-                Target Discount:
+                Max Target
               </label>
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :target_discount_percentage,
@@ -126,7 +117,7 @@
             <div class="discount-input-group" style="margin-bottom: 1.5rem;">
               <label style="color: #E5E4E2; font-weight: 600;
                             margin-bottom: 0.5rem; display: block;">
-                Min Discount:
+                Min Target
               </label>
               <div class="discount-input-wrapper">
                 <%= discount_form.number_field :min_discount_percentage,
@@ -166,11 +157,11 @@
               <button type="submit"
                       id="save-targets-btn"
                       data-renegotiations-target="saveTargetsBtn"
-                      class="btn-theme"
+                      class="btn-main"
                       style="padding: 0.5rem 1rem; font-size: 0.875rem;
                              color: #E5E4E2;
                              display: <%= @renegotiation.discount_targets_locked? ? 'none' : 'inline-block' %>;">
-                Save Targets
+                Save Range
               </button>
 
               <!-- After save (locked): show “Targets Saved” + “New Targets” -->
@@ -195,7 +186,7 @@
                         class="btn-theme"
                         style="padding: 0.5rem 1rem; font-size: 0.875rem; color: #E5E4E2;"
                         data-unlock-url="<%= unlock_discount_targets_renegotiation_path(@renegotiation) %>">
-                  New Targets
+                  New Range
                 </button>
               </div>
             </div>
@@ -225,9 +216,6 @@
           </h5>
 
           <div class="tone-selector-wrapper">
-            <p style="color: #E5E4E2; margin-bottom: 1rem;">
-              Choose how you want to approach this supplier:
-            </p>
             <div class="tone-options">
               <% @available_tones.each_with_index do |tone, index| %>
                 <div class="tone-option" style="margin-bottom: 0.75rem;">
@@ -270,10 +258,7 @@
                 </div>
               <% end %>
             </div>
-            <div class="tone-help" style="margin-top: 1rem;">
-              <p style="color: #9CA3AF; font-style: italic; font-size: 0.875rem;">
-                <em>💬 Tip: Consider your relationship with this supplier when selecting tone.</em>
-              </p>
+            <div class="tone-help" style="margin-top: -1.5rem;">
             </div>
           </div>
         </div>
@@ -291,11 +276,9 @@
                   padding-top: 2rem; border-top: 1px solid #1F2937;">
         <%= link_to "← Back",
                     :back,
-                    class: "btn-theme",
-                    style: "padding: 0.75rem 1.5rem;
-                            font-size: 1rem; color: #E5E4E2;" %>
+                    class: "btn-main"%>
         <%= form.submit "Confirm Target",
-                        class: "btn-theme",
+                        class: "btn-reneg",
                         style: "padding: 0.75rem 2rem;
                                 font-size: 1rem;
                                 background-color: #FF7518;
