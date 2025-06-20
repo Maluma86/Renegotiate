@@ -130,31 +130,10 @@ class RenegotiationsController < ApplicationController
 
   def product_intelligence_status
     result_key = "product_intel_result_#{@renegotiation.id}"
-    partial_key = "product_intel_partial_#{@renegotiation.id}"
-    
-    # Check for complete result first
-    complete_result = Rails.cache.read(result_key)
-    if complete_result
-      return render json: { status: 'completed', data: complete_result }
-    end
-    
-    # Check for partial results (streaming)
-    partial_data = Rails.cache.read(partial_key)
-    if partial_data
-      response_data = {}
-      response_data[:recommendation] = partial_data[:recommendation] if partial_data[:recommendation]
-      response_data[:ingredients] = partial_data[:ingredients] if partial_data[:ingredients]
-      response_data[:price_drivers] = partial_data[:price_drivers] if partial_data[:price_drivers]
-      response_data[:forecast] = partial_data[:forecast] if partial_data[:forecast]
-      response_data[:risks] = partial_data[:risks] if partial_data[:risks]
-      response_data[:strategies] = partial_data[:strategies] if partial_data[:strategies]
-      
-      Rails.logger.info "📤 Returning partial data with: #{response_data.keys.join(', ')}"
-      
-      render json: { 
-        status: 'streaming', 
-        partial_data: response_data
-      }
+    result = Rails.cache.read(result_key)
+
+    if result
+      render json: { status: 'completed', data: result }
     else
       render json: { status: 'processing' }
     end
