@@ -55,16 +55,248 @@
     <%#= turbo_stream_from "ai_recommendation_#{@renegotiation.id}" %>
     <h4 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">💡 AI Recommendation</h4>
 
-    <!-- DEMO HARDCODED CONTENT -->
-    <div id="ai-content" style="display: block;">
+    <!-- Loading State -->
+    <div id="ai-loading" style="display: block;">
+      <div class="d-flex align-items-center" style="color: #E5E4E2;">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mb-0">Analyzing product composition and market conditions...</p>
+      </div>
+    </div>
+
+    <!-- Content will be loaded here via AJAX -->
+    <div id="ai-content" style="display: none;">
       <p id="ai-recommendation-text" style="color: #E5E4E2; margin: 0; line-height: 1.6;">
-        Given the current market dynamics, I recommend negotiating for a price between €6.29-€6.49 per 12-pack. The carbonated beverage market is experiencing upward pressure due to increased aluminum costs and sugar price volatility. However, high fructose corn syrup prices have decreased by 10%, providing leverage for negotiation. Consider locking in a 6-month contract before the November holiday season when prices typically surge 10%. Your volume purchasing power and the supplier's need to secure long-term contracts in an uncertain market give you strong negotiating position.
+        <!-- Dynamic content will be inserted here -->
       </p>
     </div>
 
-    <!-- DEMO Static Display - No JavaScript needed -->
+    <!-- Real AJAX Implementation -->
     <script>
-      // Disabled all AI streaming for demo - data is hardcoded in HTML
+      // Use single event listener to avoid conflicts
+      document.addEventListener('turbo:load', initializeAI);
+
+      function initializeAI() {
+        // Prevent double initialization
+        if (window.aiIntelligenceInitialized) {
+          console.log('🔄 AI Intelligence already initialized, skipping...');
+          return;
+        }
+
+        window.aiIntelligenceInitialized = true;
+
+        // Local variables within function scope to prevent redeclaration errors
+        let pollInterval = null;
+        let pollAttempts = 0;
+        let hasReceivedRecommendation = false;
+        let currentPollDelay = 2000; // Start with 2 seconds for faster streaming
+        let renegotiationId = <%= @renegotiation.id %>;
+
+        // Track received sections for Turbo Stream disconnect
+        let receivedSections = new Set();
+        let turboStreamConnection = null;
+        const expectedSections = ['recommendation', 'ingredients', 'price_drivers']; // Only 3 working sections
+
+        console.log('🎯 Initializing AI Intelligence for renegotiation', renegotiationId);
+
+        // Turbo Stream monitoring commented out - using pure AJAX polling
+        // setupTurboStreamMonitoring();
+
+        // Optimized polling with backoff
+        function startPolling() {
+          pollInterval = setInterval(() => {
+            checkProductIntelligenceStatus(renegotiationId);
+          }, currentPollDelay);
+        }
+
+        function startProductIntelligence(renegotiationId) {
+          console.log('🚀 Starting OpenAI product intelligence job...');
+
+          fetch(`/renegotiations/${renegotiationId}/start_product_intelligence`, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              console.log('✅ OpenAI job started successfully');
+              return response.json();
+            } else {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+          })
+          .then(data => {
+            console.log('📊 Job response:', data);
+            if (data.status === 'processing') {
+              console.log('⏳ OpenAI job is now running in background...');
+            }
+          })
+          .catch(error => {
+            console.error('❌ Failed to start OpenAI job:', error);
+            showFallbackContent();
+          });
+        }
+
+        function checkProductIntelligenceStatus(renegotiationId) {
+          pollAttempts++;
+
+          fetch(`/renegotiations/${renegotiationId}/product_intelligence_status`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === 'completed') {
+                // Full analysis complete - stop all polling
+                if (pollInterval) {
+                  clearInterval(pollInterval);
+                  pollInterval = null;
+                }
+                updateUIWithIntelligence(data.data);
+              } else if (data.status === 'streaming' && data.partial_data) {
+                // NEW: Show recommendation immediately when available
+                if (data.partial_data.recommendation && !hasReceivedRecommendation) {
+                  document.getElementById('ai-loading').style.display = 'none';
+                  document.getElementById('ai-content').style.display = 'block';
+                  document.getElementById('ai-recommendation-text').innerText = data.partial_data.recommendation;
+                  hasReceivedRecommendation = true;
+                  console.log('📥 Recommendation received via streaming!');
+                  console.log('💡 Recommendation text:', data.partial_data.recommendation.substring(0, 100) + '...');
+                }
+
+                // NEW: Show ingredients table immediately when available
+                if (data.partial_data.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
+                  updateIngredientAnalysis(data.partial_data.ingredients);
+                  console.log('📥 Ingredients received via streaming!');
+                  console.log('🧪 Ingredients count:', data.partial_data.ingredients.length);
+                }
+
+                // NEW: Show price drivers immediately when available
+                if (data.partial_data.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
+                  updatePriceDrivers(data.partial_data.price_drivers);
+                  console.log('📥 Price drivers received via streaming!');
+                  console.log('📊 Price drivers count:', data.partial_data.price_drivers.length);
+                }
+
+                // NEW: Show forecast timeline immediately when available
+                if (data.partial_data.forecast && document.getElementById('forecast-loading').style.display !== 'none') {
+                  updateForecast(data.partial_data.forecast);
+                  console.log('📥 Forecast received via streaming!');
+                  console.log('📈 Forecast timeline points:', data.partial_data.forecast.length);
+                }
+
+                // NEW: Show risks immediately when available
+                if (data.partial_data.risks && document.getElementById('risks-loading').style.display !== 'none') {
+                  updateRiskAssessment(data.partial_data.risks);
+                  console.log('📥 Risks received via streaming!');
+                  console.log('⚠️ Risk categories:', Object.keys(data.partial_data.risks).length);
+                }
+
+                // NEW: Show strategies immediately when available
+                if (data.partial_data.strategies && document.getElementById('strategies-loading').style.display !== 'none') {
+                  updateNegotiationStrategies(data.partial_data.strategies);
+                  console.log('📥 Strategies received via streaming!');
+                  console.log('🎯 Strategy recommendations:', data.partial_data.strategies.length);
+
+                  // Slow down polling after ALL sections received (including strategies)
+                  if (currentPollDelay < 5000) {
+                    currentPollDelay = 5000;
+                    clearInterval(pollInterval);
+                    startPolling();
+                  }
+                }
+
+                // Update any other sections when they become available
+                updatePartialIntelligence(data.partial_data);
+              } else if (pollAttempts > 3 && !hasReceivedRecommendation) {
+                // Implement exponential backoff if no progress
+                if (currentPollDelay < 15000) {
+                  if (pollInterval) {
+                    clearInterval(pollInterval);
+                  }
+                  currentPollDelay = Math.min(15000, currentPollDelay * 1.5);
+                  startPolling();
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error checking status:', error);
+              // Don't kill polling on network errors, just slow down
+              if (pollAttempts > 5) {
+                if (pollInterval) {
+                  clearInterval(pollInterval);
+                  pollInterval = null;
+                }
+                showFallbackContent();
+              }
+            });
+        }
+
+        function updateUIWithIntelligence(intelligence) {
+          // Hide loading
+          document.getElementById('ai-loading').style.display = 'none';
+          document.getElementById('ai-content').style.display = 'block';
+
+          // Update recommendation text
+          const recommendationElement = document.getElementById('ai-recommendation-text');
+          if (intelligence.recommendation) {
+            recommendationElement.innerText = intelligence.recommendation;
+          } else {
+            recommendationElement.innerText = 'AI analysis completed successfully.';
+          }
+
+          // Update forecast chart if data available
+          if (intelligence.forecast) {
+            updateForecast(intelligence.forecast);
+          }
+
+          // Update other dashboard sections when data is available
+          if (intelligence.ingredients) {
+            updateIngredientAnalysis(intelligence.ingredients);
+          }
+          if (intelligence.price_drivers) {
+            updatePriceDrivers(intelligence.price_drivers);
+          }
+          if (intelligence.risks) {
+            updateRiskAssessment(intelligence.risks);
+          }
+          if (intelligence.strategies) {
+            updateNegotiationStrategies(intelligence.strategies);
+          }
+        }
+
+        // Handle partial data updates from streaming
+        function updatePartialIntelligence(partialData) {
+          // Only update sections that haven't been delivered via Turbo Streams
+          // This serves as a fallback mechanism
+
+          if (partialData.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
+            updateIngredientAnalysis(partialData.ingredients);
+            receivedSections.add('ingredients');
+            console.log('📥 Ingredients received via AJAX polling');
+          }
+
+          if (partialData.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
+            updatePriceDrivers(partialData.price_drivers);
+            receivedSections.add('price_drivers');
+            console.log('📥 Price drivers received via AJAX polling');
+          }
+
+          if (partialData.forecast && !document.getElementById('forecast-bars').children.length) {
+            updateForecast(partialData.forecast);
+            receivedSections.add('forecast');
+            console.log('📥 Forecast received via AJAX polling');
+          }
+
+          // Note: Using AJAX polling instead of Turbo Streams for better performance
+        }
+
+        function showFallbackContent() {
+          document.getElementById('ai-loading').style.display = 'none';
+          document.getElementById('ai-content').style.display = 'block';
+          document.getElementById('ai-recommendation-text').innerText =
+            'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
+        }
 
         // Function to update ingredient analysis table with AI data
         function updateIngredientAnalysis(ingredients) {
@@ -328,6 +560,32 @@
             strategiesTip.textContent = `💡 Priority focus: ${highPriorityStrategies[0].title} - act ${highPriorityStrategies[0].timeframe}ly for best results.`;
           }
         }
+
+        // Start the background job
+        startProductIntelligence(renegotiationId);
+
+        // Start initial polling
+        startPolling();
+
+        // Timeout after 45 seconds - extended for better reliability
+        setTimeout(() => {
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+          }
+          // Only show fallback if AI content is still hidden
+          if (document.getElementById('ai-content').style.display === 'none') {
+            showFallbackContent();
+          }
+        }, 45000);
+
+        // Clean up polling when user leaves page
+        window.addEventListener('beforeunload', function() {
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+          }
+        });
       }
 
       // Turbo Stream monitoring and disconnect functions - COMMENTED OUT
@@ -587,8 +845,15 @@
     </h2>
   </header>
 
-  <!-- DEMO HARDCODED INGREDIENTS -->
-  <div id="ingredients-content" style="display: block; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+  <!-- Loading State for Ingredients -->
+  <div id="ingredients-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Analyzing ingredient composition...
+  </div>
+
+  <div id="ingredients-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
     <table style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr style="border-bottom: 2px solid #1F2937;">
@@ -600,66 +865,52 @@
         </tr>
       </thead>
       <tbody>
-        <!-- DEMO DATA: Carbonated Water -->
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Carbonated Water</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">90%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">USA</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #FBBF24; font-weight: 600;">↑ +5%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
-          </td>
-        </tr>
-        <!-- DEMO DATA: High Fructose Corn Syrup -->
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">High Fructose Corn Syrup</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">8%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">USA</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #10B981; font-weight: 600;">↓ -10%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
-          </td>
-        </tr>
-        <!-- DEMO DATA: Caramel Color -->
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Caramel Color</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">1%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">USA</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #6B7280; font-weight: 600;">→ 0%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
-          </td>
-        </tr>
-        <!-- DEMO DATA: Phosphoric Acid -->
-        <tr style="border-bottom: 1px solid #1F2937;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Phosphoric Acid</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">0.5%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">USA</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #FBBF24; font-weight: 600;">↑ +3%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #10B981; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">LOW</span>
-          </td>
-        </tr>
-        <!-- DEMO DATA: Caffeine -->
-        <tr style="border-bottom: none;">
-          <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;">Caffeine</td>
-          <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;">0.5%</td>
-          <td style="padding: 1rem; color: #E5E4E2;">USA</td>
-          <td style="text-align: center; padding: 1rem;">
-            <span style="color: #FBBF24; font-weight: 600;">↑ +2%</span>
-          </td>
-          <td style="text-align: right; padding: 1rem;">
-            <span style="background: #FBBF24; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;">MEDIUM</span>
-          </td>
-        </tr>
+        <% if suggestion[:ingredients].present? %>
+          <% suggestion[:ingredients].each_with_index do |ingredient, index| %>
+            <tr style="border-bottom: <%= index == suggestion[:ingredients].size - 1 ? 'none' : '1px solid #1F2937' %>;">
+              <td style="padding: 1rem; color: #E5E4E2; font-weight: 500;"><%= ingredient[:name] %></td>
+              <td style="text-align: center; padding: 1rem; color: #FF7518; font-weight: 700;"><%= ingredient[:percentage] %>%</td>
+              <td style="padding: 1rem; color: #E5E4E2;"><%= ingredient[:origin] %></td>
+              <td style="text-align: center; padding: 1rem;">
+                <%
+                  # Determine trend color and arrow
+                  if ingredient[:price_trend] > 0
+                    trend_color = ingredient[:price_trend] > 10 ? '#EF4444' : '#FBBF24'
+                    trend_arrow = '↑'
+                    trend_sign = '+'
+                  elsif ingredient[:price_trend] < 0
+                    trend_color = '#10B981'
+                    trend_arrow = '↓'
+                    trend_sign = ''
+                  else
+                    trend_color = '#6B7280'
+                    trend_arrow = '→'
+                    trend_sign = ''
+                  end
+                %>
+                <span style="color: <%= trend_color %>; font-weight: 600;"><%= trend_arrow %> <%= trend_sign %><%= ingredient[:price_trend] %>%</span>
+              </td>
+              <td style="text-align: right; padding: 1rem;">
+                <%
+                  # Determine risk level color
+                  risk_color = case ingredient[:risk_level]
+                  when 'HIGH' then '#EF4444'
+                  when 'MEDIUM' then '#FBBF24'
+                  when 'LOW' then '#10B981'
+                  else '#6B7280'
+                  end
+                %>
+                <span style="background: <%= risk_color %>; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem;"><%= ingredient[:risk_level] %></span>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 2rem; color: #9CA3AF;">
+              Ingredient analysis not available at this time.
+            </td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>
@@ -678,86 +929,56 @@
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;" id="forecast-title">6-Month Price Forecast</h4>
 
-      <!-- DEMO HARDCODED FORECAST -->
-      <div id="forecast-chart-container" style="display: block; position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
-        <!-- Month labels -->
-        <div id="forecast-labels" style="position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding-top: 0.5rem;">
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Jul</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Aug</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Sep</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Oct</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Nov</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Dec</span>
+      <!-- Loading State for Forecast -->
+      <div id="forecast-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <!-- Forecast bars -->
+        Generating price forecast timeline...
+      </div>
+
+      <!-- Dynamic chart container -->
+      <div id="forecast-chart-container" style="display: none; position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
+        <!-- Month labels - dynamically populated -->
+        <div id="forecast-labels" style="position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding-top: 0.5rem;">
+          <!-- Will be populated by AI data -->
+        </div>
+        <!-- Forecast bars - dynamically generated -->
         <div id="forecast-bars" style="position: absolute; bottom: 2rem; left: 0; right: 0; height: 150px; display: flex; align-items: flex-end; gap: 0.5rem;">
-          <!-- Jul: +5% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #FF7518; font-size: 0.75rem; margin-bottom: 0.25rem;">+5%</span>
-            <div style="width: 100%; height: 60px; background: #FF7518; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
-          <!-- Aug: +3% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #FF7518; font-size: 0.75rem; margin-bottom: 0.25rem;">+3%</span>
-            <div style="width: 100%; height: 36px; background: #FF7518; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
-          <!-- Sep: -2% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #10B981; font-size: 0.75rem; margin-bottom: 0.25rem;">-2%</span>
-            <div style="width: 100%; height: 24px; background: #10B981; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
-          <!-- Oct: +4% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #FF7518; font-size: 0.75rem; margin-bottom: 0.25rem;">+4%</span>
-            <div style="width: 100%; height: 48px; background: #FF7518; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
-          <!-- Nov: +10% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #EF4444; font-size: 0.75rem; margin-bottom: 0.25rem;">+10%</span>
-            <div style="width: 100%; height: 120px; background: #EF4444; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
-          <!-- Dec: +7% -->
-          <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-            <span style="color: #FF7518; font-size: 0.75rem; margin-bottom: 0.25rem;">+7%</span>
-            <div style="width: 100%; height: 84px; background: #FF7518; border-radius: 0.25rem 0.25rem 0 0;"></div>
-          </div>
+          <!-- Will be populated by AI data -->
         </div>
       </div>
-      <p id="forecast-summary" style="display: block; color: #9CA3AF; font-size: 0.875rem; margin-top: 1rem;">
-        AI Confidence: <span id="forecast-confidence" style="color: #10B981; font-weight: 600;">82% Average</span>
+      <p id="forecast-summary" style="display: none; color: #9CA3AF; font-size: 0.875rem; margin-top: 1rem;">
+        AI Confidence: <span id="forecast-confidence" style="color: #10B981; font-weight: 600;">Loading...</span>
       </p>
     </div>
 
     <!-- Forecast Summary -->
-    <!-- DEMO HARDCODED PRICE DRIVERS -->
-    <div id="price-drivers-content" style="display: block; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+    <!-- Loading State for Price Drivers -->
+    <div id="price-drivers-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+      <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      Identifying key price drivers...
+    </div>
+
+    <div id="price-drivers-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;">Key Price Drivers</h4>
       <ul style="list-style: none; padding: 0; margin: 0;" class="price-drivers-list">
-        <!-- DEMO DATA: Sugar -->
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #EF4444;">🔴</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Sugar: Global sugar prices have risen due to supply chain disruptions and adverse weather conditions affecting harvests in key producing countries.</span>
-        </li>
-        <!-- DEMO DATA: Aluminum -->
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #FBBF24;">🟡</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Aluminum: Increased demand and supply chain issues related to transportation and mining have led to higher prices for aluminum cans.</span>
-        </li>
-        <!-- DEMO DATA: Corn Syrup -->
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #FBBF24;">🟡</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Corn Syrup: Fluctuations in corn prices due to changing agricultural policies and weather impact the cost of high fructose corn syrup, a key ingredient.</span>
-        </li>
-        <!-- DEMO DATA: Carbonated Water -->
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #1F2937;">
-          <span style="color: #10B981;">🟢</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Carbonated Water: While generally stable, minor increases in production costs due to energy prices could affect overall pricing slightly.</span>
-        </li>
-        <!-- DEMO DATA: Flavoring Agents -->
-        <li style="padding: 0.5rem 0;">
-          <span style="color: #FBBF24;">🟡</span>
-          <span style="color: #E5E4E2; margin-left: 0.5rem;">Flavoring Agents: Regulatory changes and sourcing challenges for natural flavoring ingredients have introduced variability in prices.</span>
-        </li>
+        <% if suggestion[:price_drivers].present? %>
+          <% suggestion[:price_drivers].each_with_index do |driver, index| %>
+            <li style="padding: 0.5rem 0; <%= index == suggestion[:price_drivers].size - 1 ? '' : 'border-bottom: 1px solid #1F2937;' %>">
+              <span style="color: <%= driver[:level] == 'high' ? '#EF4444' : (driver[:level] == 'low' ? '#10B981' : '#FBBF24') %>;">
+                <%= driver[:icon] %>
+              </span>
+              <span style="color: #E5E4E2; margin-left: 0.5rem;"><%= driver[:description] %></span>
+            </li>
+          <% end %>
+        <% else %>
+          <li style="padding: 1rem 0; text-align: center; color: #9CA3AF;">
+            Price driver analysis not available at this time.
+          </li>
+        <% end %>
       </ul>
     </div>
   </div>
@@ -771,41 +992,45 @@
     </h2>
   </header>
 
-  <!-- DEMO HARDCODED RISKS -->
-  <div class="risk-grid" id="risk-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-    <!-- Geopolitical Risks -->
+  <!-- Loading State for Risks -->
+  <div id="risks-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Analyzing procurement risks...
+  </div>
+
+  <div class="risk-grid" id="risk-grid" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+    <!-- Geopolitical Risks - Dynamic -->
     <div id="geopolitical-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
         <span id="geopolitical-level" style="background: #EF4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">HIGH</span>
         Geopolitical
       </h4>
       <ul id="geopolitical-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <li style="padding: 0.375rem 0;">• Trade tensions between countries could lead to increased tariffs on imported ingredients, raising costs.</li>
-        <li style="padding: 0.375rem 0;">• Political instability in key sourcing regions could disrupt supply and lead to shortages.</li>
+        <!-- Will be populated by AI -->
       </ul>
     </div>
 
-    <!-- Product-Specific Risks -->
+    <!-- Product-Specific Risks - Dynamic -->
     <div id="product-specific-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #FBBF24;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
         <span id="product-specific-level" style="background: #FBBF24; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">MEDIUM</span>
         Product-Specific
       </h4>
       <ul id="product-specific-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <li style="padding: 0.375rem 0;">• Changes in consumer preferences towards healthier beverages could decrease demand for sugary sodas like Pepsi.</li>
-        <li style="padding: 0.375rem 0;">• New regulations on sugar content in beverages may require reformulation, impacting production processes.</li>
+        <!-- Will be populated by AI -->
       </ul>
     </div>
 
-    <!-- Supply Chain Risks -->
-    <div id="supply-chain-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
+    <!-- Supply Chain Risks - Dynamic -->
+    <div id="supply-chain-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #10B981;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
-        <span id="supply-chain-level" style="background: #EF4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">HIGH</span>
+        <span id="supply-chain-level" style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">LOW</span>
         Supply Chain
       </h4>
       <ul id="supply-chain-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <li style="padding: 0.375rem 0;">• Logistical disruptions, such as port strikes or natural disasters, could delay shipments and affect inventory levels.</li>
-        <li style="padding: 0.375rem 0;">• Supplier instability due to financial issues can lead to sudden changes in sourcing and availability of ingredients.</li>
+        <!-- Will be populated by AI -->
       </ul>
     </div>
   </div>
@@ -819,35 +1044,23 @@
     </h2>
   </header>
 
-  <!-- DEMO HARDCODED STRATEGIES -->
-  <div id="strategies-content" style="display: block; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
+  <!-- Loading State for Strategies -->
+  <div id="strategies-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Generating negotiation strategies...
+  </div>
+
+  <div id="strategies-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
     <h4 style="color: #FF7518; margin: 0 0 1rem 0;">AI-Powered Strategy Recommendations:</h4>
     <ol id="strategies-list" style="color: #E5E4E2; line-height: 1.8; padding-left: 1.5rem;">
-      <li style="margin-bottom: 0.75rem;">
-        <strong style="color: #EF4444;">Leverage Bulk Purchasing</strong> <span style="font-size: 0.75rem; color: #9CA3AF;">(short-term)</span>
-        - Negotiate a discount based on a higher volume order. Offer to purchase a larger quantity if the supplier can reduce the price to €6.29 per 12-pack. Highlight the potential for a long-term partnership based on consistent orders.
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong style="color: #FBBF24;">Seasonal Promotions Engagement</strong> <span style="font-size: 0.75rem; color: #9CA3AF;">(short-term)</span>
-        - Discuss timing advantages by aligning orders with seasonal promotions or holidays. Propose to secure a lower price during off-peak seasons when demand is lower, ensuring better stock availability and pricing.
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong style="color: #EF4444;">Explore Alternative Suppliers</strong> <span style="font-size: 0.75rem; color: #9CA3AF;">(immediate)</span>
-        - Research and identify alternative beverage suppliers offering similar products at competitive rates. Present findings to current supplier as leverage to negotiate better pricing or terms, emphasizing the threat of switching suppliers.
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong style="color: #FBBF24;">Contract Terms Reevaluation</strong> <span style="font-size: 0.75rem; color: #9CA3AF;">(long-term)</span>
-        - Initiate discussions to reevaluate existing contract terms. Propose longer-term agreements in exchange for better pricing, ensuring both parties benefit from stability in the supply chain.
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong style="color: #10B981;">Market Trend Analysis Discussion</strong> <span style="font-size: 0.75rem; color: #9CA3AF;">(short-term)</span>
-        - Utilize current market trends, such as rising demand for beverages, to negotiate price stability. Present data on competitor pricing and consumer preferences to justify requests for competitive pricing adjustments.
-      </li>
+      <!-- Will be populated by AI -->
     </ol>
 
     <div id="strategies-summary" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1F2937;">
       <p style="color: #9CA3AF; font-size: 0.875rem; margin: 0;">
-        <em id="strategies-tip">💡 Priority focus: Leverage Bulk Purchasing - act immediately for best results.</em>
+        <em id="strategies-tip">💡 Strategic insights will appear here based on AI analysis...</em>
       </p>
     </div>
   </div>
