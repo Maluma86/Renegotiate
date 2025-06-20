@@ -130,9 +130,8 @@
             <strong>Volume (30d)</strong><br>
             <%= @product.last_month_volume.to_i %> units
           </p>
-          <p>
-            <strong>Contract length</strong><br>
-            <%= contract_length_months(Date.today, @product.contract_end_date) %>
+          <p><strong>Contract length</strong><br>
+             <%= contract_length_months(Date.today, @product.contract_end_date) %>
           </p>
           <p>
             <strong>Notes / Thread</strong><br>
