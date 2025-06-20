@@ -67,7 +67,7 @@
              <%= @product.last_month_volume %> units
           </p>
           <p><strong>Contract length</strong><br>
-             <%= contract_length_months(Date.today, @product.contract_end_date) %> months
+             <%= contract_length_months(Date.today, @product.contract_end_date) %>
           </p>
           <p><strong>Notes / Thread</strong><br>
              <%= @renegotiation.thread.presence || "No notes recorded yet." %>
