@@ -83,16 +83,16 @@
           console.log('🔄 AI Intelligence already initialized, skipping...');
           return;
         }
-        
+
         window.aiIntelligenceInitialized = true;
-        
+
         // Local variables within function scope to prevent redeclaration errors
         let pollInterval = null;
         let pollAttempts = 0;
         let hasReceivedRecommendation = false;
         let currentPollDelay = 2000; // Start with 2 seconds for faster streaming
         let renegotiationId = <%= @renegotiation.id %>;
-        
+
         // Track received sections for Turbo Stream disconnect
         let receivedSections = new Set();
         let turboStreamConnection = null;
@@ -112,7 +112,7 @@
 
         function startProductIntelligence(renegotiationId) {
           console.log('🚀 Starting OpenAI product intelligence job...');
-          
+
           fetch(`/renegotiations/${renegotiationId}/start_product_intelligence`, {
             method: 'POST',
             headers: {
@@ -142,7 +142,7 @@
 
         function checkProductIntelligenceStatus(renegotiationId) {
           pollAttempts++;
-          
+
           fetch(`/renegotiations/${renegotiationId}/product_intelligence_status`)
             .then(response => response.json())
             .then(data => {
@@ -163,41 +163,41 @@
                   console.log('📥 Recommendation received via streaming!');
                   console.log('💡 Recommendation text:', data.partial_data.recommendation.substring(0, 100) + '...');
                 }
-                
+
                 // NEW: Show ingredients table immediately when available
                 if (data.partial_data.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
                   updateIngredientAnalysis(data.partial_data.ingredients);
                   console.log('📥 Ingredients received via streaming!');
                   console.log('🧪 Ingredients count:', data.partial_data.ingredients.length);
                 }
-                
+
                 // NEW: Show price drivers immediately when available
                 if (data.partial_data.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
                   updatePriceDrivers(data.partial_data.price_drivers);
                   console.log('📥 Price drivers received via streaming!');
                   console.log('📊 Price drivers count:', data.partial_data.price_drivers.length);
                 }
-                
+
                 // NEW: Show forecast timeline immediately when available
                 if (data.partial_data.forecast && document.getElementById('forecast-loading').style.display !== 'none') {
                   updateForecast(data.partial_data.forecast);
                   console.log('📥 Forecast received via streaming!');
                   console.log('📈 Forecast timeline points:', data.partial_data.forecast.length);
                 }
-                
+
                 // NEW: Show risks immediately when available
                 if (data.partial_data.risks && document.getElementById('risks-loading').style.display !== 'none') {
                   updateRiskAssessment(data.partial_data.risks);
                   console.log('📥 Risks received via streaming!');
                   console.log('⚠️ Risk categories:', Object.keys(data.partial_data.risks).length);
                 }
-                
+
                 // NEW: Show strategies immediately when available
                 if (data.partial_data.strategies && document.getElementById('strategies-loading').style.display !== 'none') {
                   updateNegotiationStrategies(data.partial_data.strategies);
                   console.log('📥 Strategies received via streaming!');
                   console.log('🎯 Strategy recommendations:', data.partial_data.strategies.length);
-                  
+
                   // Slow down polling after ALL sections received (including strategies)
                   if (currentPollDelay < 5000) {
                     currentPollDelay = 5000;
@@ -205,7 +205,7 @@
                     startPolling();
                   }
                 }
-                
+
                 // Update any other sections when they become available
                 updatePartialIntelligence(data.partial_data);
               } else if (pollAttempts > 3 && !hasReceivedRecommendation) {
@@ -269,25 +269,25 @@
         function updatePartialIntelligence(partialData) {
           // Only update sections that haven't been delivered via Turbo Streams
           // This serves as a fallback mechanism
-          
+
           if (partialData.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
             updateIngredientAnalysis(partialData.ingredients);
             receivedSections.add('ingredients');
             console.log('📥 Ingredients received via AJAX polling');
           }
-          
+
           if (partialData.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
             updatePriceDrivers(partialData.price_drivers);
             receivedSections.add('price_drivers');
             console.log('📥 Price drivers received via AJAX polling');
           }
-          
+
           if (partialData.forecast && !document.getElementById('forecast-bars').children.length) {
             updateForecast(partialData.forecast);
             receivedSections.add('forecast');
             console.log('📥 Forecast received via AJAX polling');
           }
-          
+
           // Note: Using AJAX polling instead of Turbo Streams for better performance
         }
 
@@ -306,9 +306,9 @@
           const loadingElement = document.getElementById('ingredients-loading');
           const contentElement = document.getElementById('ingredients-content');
           const tbody = document.querySelector('.ingredient-analysis tbody');
-          
+
           if (!tbody) return;
-          
+
           loadingElement.style.display = 'none';
           contentElement.style.display = 'block';
 
@@ -442,9 +442,9 @@
         const loadingElement = document.getElementById('price-drivers-loading');
         const contentElement = document.getElementById('price-drivers-content');
         const priceDriversList = document.querySelector('.price-drivers-list');
-        
+
         if (!priceDriversList) return;
-        
+
         loadingElement.style.display = 'none';
         contentElement.style.display = 'block';
 
@@ -541,13 +541,13 @@
           strategiesData.forEach((strategy, index) => {
             const listItem = document.createElement('li');
             listItem.style.cssText = 'margin-bottom: 0.75rem;';
-            
+
             // Priority color
-            const priorityColor = strategy.priority === 'high' ? '#EF4444' : 
+            const priorityColor = strategy.priority === 'high' ? '#EF4444' :
                                 (strategy.priority === 'low' ? '#10B981' : '#FBBF24');
-            
+
             listItem.innerHTML = `
-              <strong style="color: ${priorityColor};">${strategy.title}</strong> 
+              <strong style="color: ${priorityColor};">${strategy.title}</strong>
               <span style="font-size: 0.75rem; color: #9CA3AF;">(${strategy.timeframe})</span>
               - ${strategy.description}
             `;
@@ -595,7 +595,7 @@
         // Monitor for recommendation updates via Turbo Stream
         document.addEventListener('turbo:before-stream-render', function(event) {
           // Check if this is our AI recommendation stream
-          if (event.detail.streamElement.getAttribute('action') === 'update' && 
+          if (event.detail.streamElement.getAttribute('action') === 'update' &&
               event.detail.streamElement.getAttribute('target') === 'ai-content') {
             receivedSections.add('recommendation');
             hasReceivedRecommendation = true;
@@ -608,14 +608,14 @@
         setTimeout(() => {
           const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-              if (mutation.target.id === 'ai-content' || 
+              if (mutation.target.id === 'ai-content' ||
                   mutation.target.closest('.ingredient-analysis') ||
                   mutation.target.closest('.price-drivers-list')) {
                 detectCompletedSections();
               }
             });
           });
-          
+
           observer.observe(document.body, {
             childList: true,
             subtree: true,
@@ -629,26 +629,26 @@
         if (document.getElementById('ai-content').style.display !== 'none') {
           receivedSections.add('recommendation');
         }
-        
+
         if (document.querySelector('.ingredient-analysis tbody tr')) {
           receivedSections.add('ingredients');
         }
-        
+
         if (document.querySelector('.price-drivers-list li')) {
           receivedSections.add('price_drivers');
         }
-        
+
         checkForCompleteSections();
       }
 
       function checkForCompleteSections() {
         console.log(`📊 Sections received: ${Array.from(receivedSections).join(', ')}`);
-        
+
         // Check if we have all 3 expected sections
         if (expectedSections.every(section => receivedSections.has(section))) {
           console.log('✅ All expected sections received, disconnecting Turbo Stream');
           disconnectTurboStream();
-          
+
           // Also stop polling since we have everything we need
           if (pollInterval) {
             clearInterval(pollInterval);
@@ -841,7 +841,7 @@
 <section class="ingredient-analysis" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      🧪 Top 5 Ingredient Analysis
+      <span style="padding-right: 24px;">🧪</span>Top 5 Ingredient Analysis
     </h2>
   </header>
 
@@ -920,7 +920,7 @@
 <section class="price-forecast" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      📈 6-Month Ingredient Price Forecast
+      <span style="padding-right: 24px;">📈</span> 6-Month Ingredient Price Forecast
     </h2>
   </header>
 
@@ -928,7 +928,7 @@
     <!-- Forecast Chart - AI Powered -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;" id="forecast-title">6-Month Price Forecast</h4>
-      
+
       <!-- Loading State for Forecast -->
       <div id="forecast-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
         <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
@@ -936,7 +936,7 @@
         </div>
         Generating price forecast timeline...
       </div>
-      
+
       <!-- Dynamic chart container -->
       <div id="forecast-chart-container" style="display: none; position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
         <!-- Month labels - dynamically populated -->
@@ -988,7 +988,7 @@
 <section class="risk-intelligence" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      ⚠️ Risk Intelligence Dashboard
+    <span style="padding-right: 24px;">⚠️</span> Risk Intelligence Dashboard
     </h2>
   </header>
 
@@ -1040,7 +1040,7 @@
 <section class="market-intelligence-summary" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem; margin-bottom: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      🎯 Negotiation Strategy Recommendations
+      <span style="padding-right: 24px;">🎯</span> Negotiation Strategy Recommendations
     </h2>
   </header>
 
