@@ -1,12 +1,27 @@
 @import "config/bootstrap_variables"; // bring in your color vars
 
 /* ================================================================
+   Shared transition + pop & glow for all buttons
+   ================================================================ */
+.btn-main,
+.btn-blue,
+.btn-review,
+.btn-reneg {
+  transition:
+    background-color 200ms ease-in-out 100ms,
+    border-color     200ms ease-in-out 100ms,
+    color            200ms ease-in-out 100ms,
+    transform        200ms ease-in-out 100ms,
+    box-shadow       200ms ease-in-out 100ms;
+}
+
+/* ================================================================
    Main site button – grey bg, orange border, white text
    ================================================================ */
 .btn-main {
-  background-color: #4d494c;    // grey background
-  border:           1px solid #FF7518; // orange border
-  color:            $light !important; // white text
+  background-color: #4d494c;
+  border:           1px solid #FF7518;
+  color:            $light !important;
 
   padding:          0.2rem 0.8rem;
   font-weight:      500;
@@ -17,17 +32,19 @@
 
   &:hover,
   &:focus {
-    background-color: #FF7518;    // orange on hover
-    border-color:     #FF7518;
-    color:            $light !important;
-    text-decoration:  none;
+    background-color: #FF7518;
+    border-color:     #131B3F;
+    color:            #131B3F !important;
+
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(255, 117, 24, 0.4);
   }
 }
 
 .btn-blue {
-  background-color: #131B3F;    // grey background
-  border:           1px solid #131B3F; // orange border
-  color:            $light !important; // white text
+  background-color: #131B3F;
+  border:           1px solid #131B3F;
+  color:            $light !important;
 
   padding:          0.2rem 0.8rem;
   font-weight:      500;
@@ -41,14 +58,18 @@
     background-color: #0A0F2E;
     border-color:     #0A0F2E;
     color:            $light !important;
-    text-decoration:  none;
+
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(10, 15, 46, 0.4);
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 
 .btn-green {
   background-color: #1f5c0d;
   border:           1px solid #1f5c0d;
-  color:            $light !important; // white text
+  color:            $light !important;
 
   padding:          0.2rem 0.8rem;
   font-weight:      500;
@@ -57,20 +78,28 @@
   text-align:       center;
   text-decoration:  none;
 
+  // only these three now
+  transition:
+    background-color 200ms ease-in-out 100ms,
+    border-color     200ms ease-in-out 100ms,
+    color            200ms ease-in-out 100ms;
+
   &:hover,
   &:focus {
     background-color: #195008;
     border-color:     #195008;
     color:            $light !important;
-    text-decoration:  none;
+
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 
-.btn-review
-{
+
+.btn-review {
   background-color: #131B3F;
   border:           1px solid $light;
-  color:            $light !important; // white text
+  color:            $light !important;
 
   padding:          0.2rem 0.8rem;
   font-weight:      500;
@@ -84,15 +113,16 @@
     background-color: #0A0F2E;
     border:           1px solid $light;
     color:            $light !important;
-    text-decoration:  none;
+
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.4);
   }
 }
 
-.btn-reneg
-{
-  background-color: #FF7518;
-  border:           1px solid $light;
-  color:           $light !important; // white text
+.btn-reneg {
+  background-color: #FF7518;      // orange bg
+  border:           1px solid $light;  // white border
+  color:            $light !important; // white text
 
   padding:          0.2rem 0.8rem;
   font-weight:      500;
@@ -101,11 +131,15 @@
   text-align:       center;
   text-decoration:  none;
 
+  // uses the shared transition + pop & glow you already have
+
   &:hover,
   &:focus {
-    background-color: #FF7518;
-    border-color:     #FF7518;
-    color:           $light !important;
-    text-decoration:  none;
+    background-color: #FF7518;      // stay orange
+    border-color:     #131B3F;      // navy border
+    color:            #131B3F !important; // navy text
+
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(255, 117, 24, 0.4);
   }
 }

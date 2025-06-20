@@ -5,72 +5,138 @@
   <div class="wrapper-that-freezes-things">
     <div class="products-header">
       <div class="page-title">
-        <span class="page-title__text">
-          Renegotiation Thread
-        </span>
+        <span class="page-title__text">Renegotiation Thread</span>
       </div>
-      <%= link_to "← Back to products",
-                  products_path,
-                  class: "import-btn" %>
     </div>
   </div>
 
   <div class="row mt-4">
     <!-- 1) Chatbox skeleton -->
     <div class="col-md-8">
-      <div id="ai-chatbox" class="card mb-4" style="height:70vh; display:flex; flex-direction:column;" >
-        <div class="card-header">
-          <strong>Chat with our negotiator to renew the contract for <%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %></strong>
-        </div>
-        <div class="card-body" style="flex:1 1 auto; display:flex; flex-direction:column;">
-          <div class="container chatbot">
-            <div id="questions">
-              <!-- 1) Initial AI “bubble” -->
+      <div id="ai-chatbox"
+           class="card mb-4"
+           style="
+             background: #131B3F;              /* slate-navy body */
+             color: #ffffff;                   /* white text */
+             border: 1px solid rgba(19,27,63,0.1);
+             border-radius: 0.5rem;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+             height: 70vh;
+             display: flex;
+             flex-direction: column;
+           ">
+            <!-- header -->
+            <div class="card-header"
+                style="
+                  background: #0A0F2E;   /* dark-navy header */
+                  color: #ffffff;        /* white text */
+                  padding: 1rem;
+                ">
+              <div class="card-header-text">
+                <strong>Chat with our AI negotiator to renew the contract for:</strong><br>
+                <span><%= @product.name %> between <%= @supplier.company_name %> and <%= @renegotiation.buyer.company_name %></span>
+              </div>
+            </div>
+
+
+
+        <!-- body -->
+        <div class="card-body"
+             style="
+               flex: 1 1 auto;
+               display: flex;
+               flex-direction: column;
+               background: #131B3F;           /* slate-navy body */
+               color: #ffffff;                /* white text */
+               padding: 0;
+             ">
+          <div class="container chatbot"
+               style="
+                 flex: 1;
+                 display: flex;
+                 flex-direction: column;
+                 background: #131B3F;           /* slate-navy fill */
+               ">
+            <div id="questions"
+                 style="
+                   flex:1;
+                   overflow-y:auto;
+                   padding:1rem;
+                   display:flex;
+                   flex-direction:column;
+                   gap:1.5rem;
+                   background: #131B3F;       /* slate-navy fill */
+                 ">
+              <!-- initial AI "bubble" -->
               <div id="initial-ai-message" class="message-group">
                 <div class="message message--ai">
-                  <div class="message__sender">John</div>
-                  <div class="message__bubble">
-                    Hi <%= @supplier.contact %>,
-                    I’ll be handling the renegotiation on behalf of <%= @renegotiation.buyer.company_name %>.
-                    Our current contract for <%= @product.name %> is approaching its renewal date on <%= @product.contract_end_date.strftime("%B %d, %Y") %>.
-                    We’ve been very satisfied with the quality of the product and value our collaboration so far.
-                    However, considering current market trends and our internal cost optimization efforts, we believe a price adjustment is reasonable.
-                    We propose renewing the contract at a revised unit price of <%= number_to_currency(@renegotiation.min_target) %>.
-                    Let us know your thoughts or if there’s any additional context we should consider.
+                  <div class="message__sender" style="color:rgba(255,255,255,0.7);">
+                    John
+                  </div>
+                  <div class="message__bubble" style="background:white; color:#333;">
+                    Hi <%= @supplier.contact %>,<br>
+                    I’ll be handling the renegotiation on behalf of
+                    <%= @renegotiation.buyer.company_name %>. Our current
+                    contract for <%= @product.name %> is up on
+                    <%= @product.contract_end_date.strftime("%B %d, %Y") %>.
+                    We’ve valued our partnership so far, but given market
+                    trends we propose a revised unit price of
+                    <%= number_to_currency(@renegotiation.min_target) %>.
                   </div>
                 </div>
               </div>
-              <!-- end of initial AI message -->
-              <div id="chat-container"><!-- JS widget mounts here -->
-                  <%= render partial: "renegotiations/question", collection: @questions, as: :question %>
-              </div>
+              <!-- historic messages -->
+              <div id="chat-container"></div>
             </div>
-              <!-- question input form -->
+
+            <!-- input pinned bottom -->
+            <div id="new_question"
+                 style="
+                   border-top:1px solid rgba(19,27,63,0.1);
+                   padding:0rem;
+                   background: #131B3F;         /* slate-navy fill */
+                 ">
               <%= render "form", question: @question, id: "new_question" %>
-              <!-- end of question input form -->
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </div>
 
     <!-- 2) Summary of the Agreement -->
     <div class="col-md-4">
-      <div class="card mb-4">
-        <div class="card-header">
+      <div class="card mb-4"
+           style="
+             background: #131B3F;
+             color: #ffffff;
+             border: 1px solid rgba(19,27,63,0.1);
+             border-radius: 0.5rem;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+           ">
+        <div class="card-header"
+             style="
+               background: #0A0F2E;
+               color: #ffffff;
+               padding: 1rem;
+             ">
           <strong>Summary of the Agreement</strong>
         </div>
-        <div class="card-body">
-          <p><strong>Current Price</strong><br>
-             <%= number_to_currency(@product.current_price) %>
+        <div class="card-body" style="padding:1rem;">
+          <p>
+            <strong>Current Price</strong><br>
+            <%= number_to_currency(@product.current_price) %>
           </p>
-          <p><strong>Volume</strong><br>
-             <%= @product.last_month_volume %> units
+          <p>
+            <strong>Volume (30d)</strong><br>
+            <%= @product.last_month_volume.to_i %> units
           </p>
-          <p><strong>Contract length</strong><br>
-             <%= contract_length_months(Date.today, @product.contract_end_date) %> months
+          <p>
+            <strong>Contract length</strong><br>
+            <%= contract_length_months(Date.today, @product.contract_end_date) %>
           </p>
-          <p><strong>Notes / Thread</strong><br>
-             <%= @renegotiation.thread.presence || "No notes recorded yet." %>
+          <p>
+            <strong>Notes / Thread</strong><br>
+            <%= @renegotiation.thread.presence || "No notes recorded yet." %>
           </p>
         </div>
       </div>
@@ -79,7 +145,9 @@
 
   <!-- 3) Action buttons -->
   <div class="d-flex justify-content-between mb-5">
-    <%= link_to "← Back to products", products_path, class: "btn btn-outline-secondary" %>
+    <%= link_to "← Back to products",
+                products_path,
+                class: "btn btn-outline-secondary" %>
 
     <% is_done = @renegotiation.status == "done" %>
     <button
@@ -90,7 +158,9 @@
       <%= is_done ? "Renegotiation Accepted" : "Accept & Confirm" %>
     </button>
 
-    <%= mail_to @supplier.contact_email, "Talk to a human instead!", class: "btn btn-outline-danger" %>
+    <%= mail_to @supplier.contact_email,
+                "Talk to a human instead!",
+                class: "btn btn-outline-danger" %>
   </div>
 
   <!-- Accept Confirmation Modal -->
@@ -98,19 +168,28 @@
     data-renegotiation-show-target="modal"
     class="modal"
     tabindex="-1"
-    style="display: none;
-           position: fixed; top: 0; left: 0;
-           width: 100vw; height: 100vh;
-           background: rgba(30,30,30,0.6);
-           z-index: 1050;
-           align-items: center; justify-content: center;">
-    <div style="background: #fff; padding: 2rem 2.5rem; border-radius: 1rem;
-                box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-                max-width: 420px; text-align: center;">
+    style="
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(30,30,30,0.6);
+      z-index: 1050;
+      align-items: center; justify-content: center;
+    ">
+    <div style="
+           background: #fff;
+           padding: 2rem 2.5rem;
+           border-radius: 1rem;
+           box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+           max-width: 420px;
+           text-align: center;
+         ">
       <div style="font-size: 2.5rem; color: #22C55E; margin-bottom: 1rem;">🎉</div>
       <h4 style="margin-bottom: 1rem;">Renegotiation Accepted!</h4>
       <p style="color: #333;">
-        Great! The new terms have been passed to the Buyer and they will come back to you with the draft contract soon.
+        Great! The new terms were sent to the Buyer and they will
+        come back to you with the draft contract soon.
       </p>
       <button
         data-renegotiation-show-target="closeModal"
