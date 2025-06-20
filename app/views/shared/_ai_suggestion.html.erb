@@ -45,12 +45,14 @@
 <section class="ai-dashboard" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      🤖 AI Market Intelligence
+      <span style="padding-right: 24px;">🤖</span>AI Market Intelligence
     </h2>
   </header>
 
   <!-- AI Recommendation - Moved to top -->
   <div class="ai-recommendation" id="ai-recommendation-section" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518; margin-bottom: 2rem;">
+    <%# Turbo Stream subscription commented out - using AJAX polling instead %>
+    <%#= turbo_stream_from "ai_recommendation_#{@renegotiation.id}" %>
     <h4 style="color: #FF7518; margin: 0 0 1rem 0; font-size: 1rem; font-weight: 600;">💡 AI Recommendation</h4>
 
     <!-- Loading State -->
@@ -72,97 +74,243 @@
 
     <!-- Real AJAX Implementation -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const renegotiationId = <%= @renegotiation.id %>;
+      // Use single event listener to avoid conflicts
+      document.addEventListener('turbo:load', initializeAI);
 
-        // Start the background job
-        startProductIntelligence(renegotiationId);
+      function initializeAI() {
+        // Prevent double initialization
+        if (window.aiIntelligenceInitialized) {
+          console.log('🔄 AI Intelligence already initialized, skipping...');
+          return;
+        }
 
-        // Poll for results
-        const pollInterval = setInterval(() => {
-          checkProductIntelligenceStatus(renegotiationId, pollInterval);
-        }, 2000); // Check every 2 seconds
+        window.aiIntelligenceInitialized = true;
 
-        // Timeout after 30 seconds - only if content hasn't loaded
-        setTimeout(() => {
-          clearInterval(pollInterval);
-          // Only show fallback if AI content is still hidden (meaning it never loaded)
-          if (document.getElementById('ai-content').style.display === 'none') {
-            showFallbackContent();
-          }
-        }, 30000);
-      });
+        // Local variables within function scope to prevent redeclaration errors
+        let pollInterval = null;
+        let pollAttempts = 0;
+        let hasReceivedRecommendation = false;
+        let currentPollDelay = 2000; // Start with 2 seconds for faster streaming
+        let renegotiationId = <%= @renegotiation.id %>;
 
-      function startProductIntelligence(renegotiationId) {
-        fetch(`/renegotiations/${renegotiationId}/start_product_intelligence`, {
-          method: 'POST',
-          headers: {
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json'
-          }
-        })
-        .catch(error => {
-          console.error('Error starting product intelligence:', error);
-          showFallbackContent();
-        });
-      }
+        // Track received sections for Turbo Stream disconnect
+        let receivedSections = new Set();
+        let turboStreamConnection = null;
+        const expectedSections = ['recommendation', 'ingredients', 'price_drivers']; // Only 3 working sections
 
-      function checkProductIntelligenceStatus(renegotiationId, pollInterval) {
-        fetch(`/renegotiations/${renegotiationId}/product_intelligence_status`)
-          .then(response => response.json())
+        console.log('🎯 Initializing AI Intelligence for renegotiation', renegotiationId);
+
+        // Turbo Stream monitoring commented out - using pure AJAX polling
+        // setupTurboStreamMonitoring();
+
+        // Optimized polling with backoff
+        function startPolling() {
+          pollInterval = setInterval(() => {
+            checkProductIntelligenceStatus(renegotiationId);
+          }, currentPollDelay);
+        }
+
+        function startProductIntelligence(renegotiationId) {
+          console.log('🚀 Starting OpenAI product intelligence job...');
+
+          fetch(`/renegotiations/${renegotiationId}/start_product_intelligence`, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              console.log('✅ OpenAI job started successfully');
+              return response.json();
+            } else {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+          })
           .then(data => {
-            if (data.status === 'completed') {
-              clearInterval(pollInterval);
-              updateUIWithIntelligence(data.data);
+            console.log('📊 Job response:', data);
+            if (data.status === 'processing') {
+              console.log('⏳ OpenAI job is now running in background...');
             }
           })
           .catch(error => {
-            console.error('Error checking status:', error);
-            clearInterval(pollInterval);
+            console.error('❌ Failed to start OpenAI job:', error);
             showFallbackContent();
           });
-      }
-
-      function updateUIWithIntelligence(intelligence) {
-        // Hide loading
-        document.getElementById('ai-loading').style.display = 'none';
-        document.getElementById('ai-content').style.display = 'block';
-
-        // Update recommendation text
-        const recommendationElement = document.getElementById('ai-recommendation-text');
-        if (intelligence.recommendation) {
-          recommendationElement.innerText = intelligence.recommendation;
-        } else {
-          recommendationElement.innerText = 'AI analysis completed successfully.';
         }
 
-        // Update forecast chart if data available
-        if (intelligence.forecast) {
-          updateForecastChart(intelligence.forecast);
+        function checkProductIntelligenceStatus(renegotiationId) {
+          pollAttempts++;
+
+          fetch(`/renegotiations/${renegotiationId}/product_intelligence_status`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === 'completed') {
+                // Full analysis complete - stop all polling
+                if (pollInterval) {
+                  clearInterval(pollInterval);
+                  pollInterval = null;
+                }
+                updateUIWithIntelligence(data.data);
+              } else if (data.status === 'streaming' && data.partial_data) {
+                // NEW: Show recommendation immediately when available
+                if (data.partial_data.recommendation && !hasReceivedRecommendation) {
+                  document.getElementById('ai-loading').style.display = 'none';
+                  document.getElementById('ai-content').style.display = 'block';
+                  document.getElementById('ai-recommendation-text').innerText = data.partial_data.recommendation;
+                  hasReceivedRecommendation = true;
+                  console.log('📥 Recommendation received via streaming!');
+                  console.log('💡 Recommendation text:', data.partial_data.recommendation.substring(0, 100) + '...');
+                }
+
+                // NEW: Show ingredients table immediately when available
+                if (data.partial_data.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
+                  updateIngredientAnalysis(data.partial_data.ingredients);
+                  console.log('📥 Ingredients received via streaming!');
+                  console.log('🧪 Ingredients count:', data.partial_data.ingredients.length);
+                }
+
+                // NEW: Show price drivers immediately when available
+                if (data.partial_data.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
+                  updatePriceDrivers(data.partial_data.price_drivers);
+                  console.log('📥 Price drivers received via streaming!');
+                  console.log('📊 Price drivers count:', data.partial_data.price_drivers.length);
+                }
+
+                // NEW: Show forecast timeline immediately when available
+                if (data.partial_data.forecast && document.getElementById('forecast-loading').style.display !== 'none') {
+                  updateForecast(data.partial_data.forecast);
+                  console.log('📥 Forecast received via streaming!');
+                  console.log('📈 Forecast timeline points:', data.partial_data.forecast.length);
+                }
+
+                // NEW: Show risks immediately when available
+                if (data.partial_data.risks && document.getElementById('risks-loading').style.display !== 'none') {
+                  updateRiskAssessment(data.partial_data.risks);
+                  console.log('📥 Risks received via streaming!');
+                  console.log('⚠️ Risk categories:', Object.keys(data.partial_data.risks).length);
+                }
+
+                // NEW: Show strategies immediately when available
+                if (data.partial_data.strategies && document.getElementById('strategies-loading').style.display !== 'none') {
+                  updateNegotiationStrategies(data.partial_data.strategies);
+                  console.log('📥 Strategies received via streaming!');
+                  console.log('🎯 Strategy recommendations:', data.partial_data.strategies.length);
+
+                  // Slow down polling after ALL sections received (including strategies)
+                  if (currentPollDelay < 5000) {
+                    currentPollDelay = 5000;
+                    clearInterval(pollInterval);
+                    startPolling();
+                  }
+                }
+
+                // Update any other sections when they become available
+                updatePartialIntelligence(data.partial_data);
+              } else if (pollAttempts > 3 && !hasReceivedRecommendation) {
+                // Implement exponential backoff if no progress
+                if (currentPollDelay < 15000) {
+                  if (pollInterval) {
+                    clearInterval(pollInterval);
+                  }
+                  currentPollDelay = Math.min(15000, currentPollDelay * 1.5);
+                  startPolling();
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error checking status:', error);
+              // Don't kill polling on network errors, just slow down
+              if (pollAttempts > 5) {
+                if (pollInterval) {
+                  clearInterval(pollInterval);
+                  pollInterval = null;
+                }
+                showFallbackContent();
+              }
+            });
         }
 
-        // Update other dashboard sections when data is available
-        if (intelligence.ingredients) {
-          updateIngredientAnalysis(intelligence.ingredients);
-        }
-        if (intelligence.price_drivers) {
-          updatePriceDrivers(intelligence.price_drivers);
-        }
-        // if (intelligence.risks) updateRiskAssessment(intelligence.risks);
-        // if (intelligence.strategies) updateStrategies(intelligence.strategies);
-      }
+        function updateUIWithIntelligence(intelligence) {
+          // Hide loading
+          document.getElementById('ai-loading').style.display = 'none';
+          document.getElementById('ai-content').style.display = 'block';
 
-      function showFallbackContent() {
-        document.getElementById('ai-loading').style.display = 'none';
-        document.getElementById('ai-content').style.display = 'block';
-        document.getElementById('ai-recommendation-text').innerText =
-          'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
-      }
+          // Update recommendation text
+          const recommendationElement = document.getElementById('ai-recommendation-text');
+          if (intelligence.recommendation) {
+            recommendationElement.innerText = intelligence.recommendation;
+          } else {
+            recommendationElement.innerText = 'AI analysis completed successfully.';
+          }
 
-      // Function to update ingredient analysis table with AI data
-      function updateIngredientAnalysis(ingredients) {
-        const tbody = document.querySelector('.ingredient-analysis tbody');
-        if (!tbody || !ingredients || !Array.isArray(ingredients)) return;
+          // Update forecast chart if data available
+          if (intelligence.forecast) {
+            updateForecast(intelligence.forecast);
+          }
+
+          // Update other dashboard sections when data is available
+          if (intelligence.ingredients) {
+            updateIngredientAnalysis(intelligence.ingredients);
+          }
+          if (intelligence.price_drivers) {
+            updatePriceDrivers(intelligence.price_drivers);
+          }
+          if (intelligence.risks) {
+            updateRiskAssessment(intelligence.risks);
+          }
+          if (intelligence.strategies) {
+            updateNegotiationStrategies(intelligence.strategies);
+          }
+        }
+
+        // Handle partial data updates from streaming
+        function updatePartialIntelligence(partialData) {
+          // Only update sections that haven't been delivered via Turbo Streams
+          // This serves as a fallback mechanism
+
+          if (partialData.ingredients && document.getElementById('ingredients-loading').style.display !== 'none') {
+            updateIngredientAnalysis(partialData.ingredients);
+            receivedSections.add('ingredients');
+            console.log('📥 Ingredients received via AJAX polling');
+          }
+
+          if (partialData.price_drivers && document.getElementById('price-drivers-loading').style.display !== 'none') {
+            updatePriceDrivers(partialData.price_drivers);
+            receivedSections.add('price_drivers');
+            console.log('📥 Price drivers received via AJAX polling');
+          }
+
+          if (partialData.forecast && !document.getElementById('forecast-bars').children.length) {
+            updateForecast(partialData.forecast);
+            receivedSections.add('forecast');
+            console.log('📥 Forecast received via AJAX polling');
+          }
+
+          // Note: Using AJAX polling instead of Turbo Streams for better performance
+        }
+
+        function showFallbackContent() {
+          document.getElementById('ai-loading').style.display = 'none';
+          document.getElementById('ai-content').style.display = 'block';
+          document.getElementById('ai-recommendation-text').innerText =
+            'AI analysis is taking longer than expected. Please refresh the page to see updated insights.';
+        }
+
+        // Function to update ingredient analysis table with AI data
+        function updateIngredientAnalysis(ingredients) {
+          if (!ingredients || !Array.isArray(ingredients)) return;
+
+          // Hide loading spinner and show content
+          const loadingElement = document.getElementById('ingredients-loading');
+          const contentElement = document.getElementById('ingredients-content');
+          const tbody = document.querySelector('.ingredient-analysis tbody');
+
+          if (!tbody) return;
+
+          loadingElement.style.display = 'none';
+          contentElement.style.display = 'block';
 
         // Clear existing rows
         tbody.innerHTML = '';
@@ -213,36 +361,49 @@
         });
       }
 
-      // Function to update forecast chart with AI data
-      function updateForecastChart(forecastData) {
-        if (!forecastData || !forecastData.periods) return;
+      // Function to update forecast with AI data
+      function updateForecast(forecastData) {
+        if (!forecastData || !Array.isArray(forecastData)) return;
 
+        const loadingElement = document.getElementById('forecast-loading');
+        const chartContainer = document.getElementById('forecast-chart-container');
         const labelsContainer = document.getElementById('forecast-labels');
         const barsContainer = document.getElementById('forecast-bars');
-        const titleElement = document.getElementById('forecast-title');
-        const trendElement = document.getElementById('forecast-trend');
+        const summaryElement = document.getElementById('forecast-summary');
+        const confidenceElement = document.getElementById('forecast-confidence');
 
-        // Update title if provided
-        if (forecastData.title) {
-          titleElement.textContent = forecastData.title;
-        }
+        // Hide loading and show chart
+        loadingElement.style.display = 'none';
+        chartContainer.style.display = 'block';
+        summaryElement.style.display = 'block';
 
         // Clear existing content
         labelsContainer.innerHTML = '';
         barsContainer.innerHTML = '';
 
-        // Add new labels and bars
-        forecastData.periods.forEach((period, index) => {
-          // Add label
+        let totalConfidence = 0;
+        let highestChange = 0;
+
+        // Add new labels and bars from AI data
+        forecastData.forEach((point, index) => {
+          // Add month label
           const label = document.createElement('span');
           label.style.cssText = 'color: #9CA3AF; font-size: 0.75rem;';
-          label.textContent = period.label;
+          label.textContent = point.month.split(' ')[0]; // Extract month part
           labelsContainer.appendChild(label);
 
-          // Determine color based on trend
+          // Determine color based on price change
           let color = '#6B7280'; // neutral
-          if (period.trend > 0) color = period.trend > 10 ? '#EF4444' : '#FF7518'; // red or orange for increases
-          if (period.trend < 0) color = '#10B981'; // green for decreases
+          if (point.price_change > 0) {
+            color = point.price_change > 15 ? '#EF4444' : '#FF7518'; // red for high increases, orange for moderate
+          } else if (point.price_change < 0) {
+            color = '#10B981'; // green for decreases
+          }
+
+          // Calculate bar height (base 50% + scaled change)
+          const baseHeight = 50;
+          const scaledChange = (point.price_change / 30) * 30; // Scale -30 to +30 to -30% to +30%
+          const barHeight = Math.max(10, Math.min(90, baseHeight + scaledChange));
 
           // Add bar
           const bar = document.createElement('div');
@@ -250,29 +411,42 @@
           bar.style.cssText = `
             flex: 1;
             background: ${color};
-            height: ${Math.max(10, Math.min(90, period.value))}%;
+            height: ${barHeight}%;
             opacity: 0.8;
             border-radius: 0.25rem 0.25rem 0 0;
             transition: all 0.3s ease;
+            position: relative;
           `;
-          bar.setAttribute('data-value', period.value);
-          bar.setAttribute('data-period', period.label);
-          bar.setAttribute('title', `${period.label}: ${period.trend > 0 ? '+' : ''}${period.trend}%`);
+          bar.setAttribute('title', `${point.month}: ${point.price_change > 0 ? '+' : ''}${point.price_change}% (${point.confidence}% confidence)`);
           barsContainer.appendChild(bar);
+
+          // Track metrics
+          totalConfidence += point.confidence;
+          if (Math.abs(point.price_change) > Math.abs(highestChange)) {
+            highestChange = point.price_change;
+          }
         });
 
-        // Update overall trend
-        if (forecastData.overallTrend) {
-          const trendColor = forecastData.overallTrend.value > 0 ? '#EF4444' : '#10B981';
-          trendElement.style.color = trendColor;
-          trendElement.textContent = `${forecastData.overallTrend.value > 0 ? '+' : ''}${forecastData.overallTrend.value}% ${forecastData.overallTrend.description}`;
-        }
+        // Update confidence summary
+        const avgConfidence = Math.round(totalConfidence / forecastData.length);
+        const confidenceColor = avgConfidence >= 80 ? '#10B981' : (avgConfidence >= 60 ? '#FBBF24' : '#EF4444');
+        confidenceElement.style.color = confidenceColor;
+        confidenceElement.textContent = `${avgConfidence}% average confidence`;
       }
 
       // Function to update price drivers with AI data
       function updatePriceDrivers(priceDrivers) {
+        if (!priceDrivers || !Array.isArray(priceDrivers)) return;
+
+        // Hide loading spinner and show content
+        const loadingElement = document.getElementById('price-drivers-loading');
+        const contentElement = document.getElementById('price-drivers-content');
         const priceDriversList = document.querySelector('.price-drivers-list');
-        if (!priceDriversList || !priceDrivers || !Array.isArray(priceDrivers)) return;
+
+        if (!priceDriversList) return;
+
+        loadingElement.style.display = 'none';
+        contentElement.style.display = 'block';
 
         // Clear existing items
         priceDriversList.innerHTML = '';
@@ -297,7 +471,206 @@
 
           priceDriversList.appendChild(listItem);
         });
+        }
+
+        // Function to update risk assessment with AI data
+        function updateRiskAssessment(risksData) {
+          if (!risksData) return;
+
+          const loadingElement = document.getElementById('risks-loading');
+          const gridElement = document.getElementById('risk-grid');
+
+          // Hide loading and show grid
+          loadingElement.style.display = 'none';
+          gridElement.style.display = 'grid';
+
+          // Update Geopolitical risks
+          if (risksData.geopolitical) {
+            const geopoliticalList = document.getElementById('geopolitical-list');
+            geopoliticalList.innerHTML = '';
+            risksData.geopolitical.forEach(risk => {
+              const listItem = document.createElement('li');
+              listItem.style.cssText = 'padding: 0.375rem 0;';
+              listItem.textContent = `• ${risk.description}`;
+              geopoliticalList.appendChild(listItem);
+            });
+          }
+
+          // Update Product-Specific risks
+          if (risksData.product_specific) {
+            const productSpecificList = document.getElementById('product-specific-list');
+            productSpecificList.innerHTML = '';
+            risksData.product_specific.forEach(risk => {
+              const listItem = document.createElement('li');
+              listItem.style.cssText = 'padding: 0.375rem 0;';
+              listItem.textContent = `• ${risk.description}`;
+              productSpecificList.appendChild(listItem);
+            });
+          }
+
+          // Update Supply Chain risks
+          if (risksData.supply_chain) {
+            const supplyChainList = document.getElementById('supply-chain-list');
+            supplyChainList.innerHTML = '';
+            risksData.supply_chain.forEach(risk => {
+              const listItem = document.createElement('li');
+              listItem.style.cssText = 'padding: 0.375rem 0;';
+              listItem.textContent = `• ${risk.description}`;
+              supplyChainList.appendChild(listItem);
+            });
+          }
+        }
+
+        // Function to update negotiation strategies with AI data
+        function updateNegotiationStrategies(strategiesData) {
+          if (!strategiesData || !Array.isArray(strategiesData)) return;
+
+          const loadingElement = document.getElementById('strategies-loading');
+          const contentElement = document.getElementById('strategies-content');
+          const strategiesList = document.getElementById('strategies-list');
+          const strategiesTip = document.getElementById('strategies-tip');
+
+          // Hide loading and show content
+          loadingElement.style.display = 'none';
+          contentElement.style.display = 'block';
+
+          // Clear existing strategies
+          strategiesList.innerHTML = '';
+
+          // Add new strategies
+          strategiesData.forEach((strategy, index) => {
+            const listItem = document.createElement('li');
+            listItem.style.cssText = 'margin-bottom: 0.75rem;';
+
+            // Priority color
+            const priorityColor = strategy.priority === 'high' ? '#EF4444' :
+                                (strategy.priority === 'low' ? '#10B981' : '#FBBF24');
+
+            listItem.innerHTML = `
+              <strong style="color: ${priorityColor};">${strategy.title}</strong>
+              <span style="font-size: 0.75rem; color: #9CA3AF;">(${strategy.timeframe})</span>
+              - ${strategy.description}
+            `;
+            strategiesList.appendChild(listItem);
+          });
+
+          // Update tip with AI insight
+          const highPriorityStrategies = strategiesData.filter(s => s.priority === 'high');
+          if (highPriorityStrategies.length > 0) {
+            strategiesTip.textContent = `💡 Priority focus: ${highPriorityStrategies[0].title} - act ${highPriorityStrategies[0].timeframe}ly for best results.`;
+          }
+        }
+
+        // Start the background job
+        startProductIntelligence(renegotiationId);
+
+        // Start initial polling
+        startPolling();
+
+        // Timeout after 45 seconds - extended for better reliability
+        setTimeout(() => {
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+          }
+          // Only show fallback if AI content is still hidden
+          if (document.getElementById('ai-content').style.display === 'none') {
+            showFallbackContent();
+          }
+        }, 45000);
+
+        // Clean up polling when user leaves page
+        window.addEventListener('beforeunload', function() {
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+          }
+        });
       }
+
+      // Turbo Stream monitoring and disconnect functions - COMMENTED OUT
+      // Using pure AJAX polling instead for better performance and reliability
+      /*
+      function setupTurboStreamMonitoring() {
+        // Monitor for recommendation updates via Turbo Stream
+        document.addEventListener('turbo:before-stream-render', function(event) {
+          // Check if this is our AI recommendation stream
+          if (event.detail.streamElement.getAttribute('action') === 'update' &&
+              event.detail.streamElement.getAttribute('target') === 'ai-content') {
+            receivedSections.add('recommendation');
+            hasReceivedRecommendation = true;
+            console.log('📥 AI Recommendation received via Turbo Stream');
+            checkForCompleteSections();
+          }
+        });
+
+        // Also monitor the DOM for section updates (fallback detection)
+        setTimeout(() => {
+          const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              if (mutation.target.id === 'ai-content' ||
+                  mutation.target.closest('.ingredient-analysis') ||
+                  mutation.target.closest('.price-drivers-list')) {
+                detectCompletedSections();
+              }
+            });
+          });
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+          });
+        }, 1000);
+      }
+
+      function detectCompletedSections() {
+        // Check if sections have been populated
+        if (document.getElementById('ai-content').style.display !== 'none') {
+          receivedSections.add('recommendation');
+        }
+
+        if (document.querySelector('.ingredient-analysis tbody tr')) {
+          receivedSections.add('ingredients');
+        }
+
+        if (document.querySelector('.price-drivers-list li')) {
+          receivedSections.add('price_drivers');
+        }
+
+        checkForCompleteSections();
+      }
+
+      function checkForCompleteSections() {
+        console.log(`📊 Sections received: ${Array.from(receivedSections).join(', ')}`);
+
+        // Check if we have all 3 expected sections
+        if (expectedSections.every(section => receivedSections.has(section))) {
+          console.log('✅ All expected sections received, disconnecting Turbo Stream');
+          disconnectTurboStream();
+
+          // Also stop polling since we have everything we need
+          if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            console.log('✅ Stopped polling - all sections complete');
+          }
+        }
+      }
+
+      function disconnectTurboStream() {
+        try {
+          // Find and disconnect the specific Turbo Stream subscription
+          const streamElement = document.querySelector(`turbo-cable-stream-source[channel="Turbo::StreamsChannel"][signed-stream-name*="ai_recommendation_${renegotiationId}"]`);
+          if (streamElement) {
+            streamElement.remove();
+            console.log('🔌 Turbo Stream disconnected for AI recommendation');
+          }
+        } catch (error) {
+          console.log('⚠️ Turbo Stream disconnect error (not critical):', error);
+        }
+      }
+      */
     </script>
   </div>
 
@@ -468,11 +841,19 @@
 <section class="ingredient-analysis" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      🧪 Top 5 Ingredient Analysis
+      <span style="padding-right: 24px;">🧪</span>Top 5 Ingredient Analysis
     </h2>
   </header>
 
-  <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+  <!-- Loading State for Ingredients -->
+  <div id="ingredients-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Analyzing ingredient composition...
+  </div>
+
+  <div id="ingredients-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
     <table style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr style="border-bottom: 2px solid #1F2937;">
@@ -539,44 +920,49 @@
 <section class="price-forecast" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      📈 6-Month Ingredient Price Forecast
+      <span style="padding-right: 24px;">📈</span> 6-Month Ingredient Price Forecast
     </h2>
   </header>
 
   <div class="forecast-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-    <!-- Forecast Chart - Now Dynamic -->
+    <!-- Forecast Chart - AI Powered -->
     <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
-      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;" id="forecast-title">Price Projection Timeline</h4>
+      <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;" id="forecast-title">6-Month Price Forecast</h4>
+
+      <!-- Loading State for Forecast -->
+      <div id="forecast-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        Generating price forecast timeline...
+      </div>
+
       <!-- Dynamic chart container -->
-      <div id="forecast-chart-container" style="position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
+      <div id="forecast-chart-container" style="display: none; position: relative; height: 200px; border-left: 2px solid #1F2937; border-bottom: 2px solid #1F2937; padding: 1rem;">
         <!-- Month labels - dynamically populated -->
         <div id="forecast-labels" style="position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding-top: 0.5rem;">
-          <!-- Default 6-month labels - will be overridden by AI -->
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Jan</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Feb</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Mar</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Apr</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">May</span>
-          <span style="color: #9CA3AF; font-size: 0.75rem;">Jun</span>
+          <!-- Will be populated by AI data -->
         </div>
         <!-- Forecast bars - dynamically generated -->
         <div id="forecast-bars" style="position: absolute; bottom: 2rem; left: 0; right: 0; height: 150px; display: flex; align-items: flex-end; gap: 0.5rem;">
-          <!-- Default bars - will be replaced by AI data -->
-          <div class="forecast-bar" style="flex: 1; background: #FF7518; height: 60%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="60" data-period="Jan"></div>
-          <div class="forecast-bar" style="flex: 1; background: #FF7518; height: 65%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="65" data-period="Feb"></div>
-          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 75%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="75" data-period="Mar"></div>
-          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 80%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="80" data-period="Apr"></div>
-          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 85%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="85" data-period="May"></div>
-          <div class="forecast-bar" style="flex: 1; background: #EF4444; height: 88%; opacity: 0.8; border-radius: 0.25rem 0.25rem 0 0;" data-value="88" data-period="Jun"></div>
+          <!-- Will be populated by AI data -->
         </div>
       </div>
-      <p id="forecast-summary" style="color: #9CA3AF; font-size: 0.875rem; margin-top: 1rem;">
-        Overall trend: <span id="forecast-trend" style="color: #EF4444; font-weight: 600;">+15% expected increase</span>
+      <p id="forecast-summary" style="display: none; color: #9CA3AF; font-size: 0.875rem; margin-top: 1rem;">
+        AI Confidence: <span id="forecast-confidence" style="color: #10B981; font-weight: 600;">Loading...</span>
       </p>
     </div>
 
     <!-- Forecast Summary -->
-    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
+    <!-- Loading State for Price Drivers -->
+    <div id="price-drivers-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+      <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      Identifying key price drivers...
+    </div>
+
+    <div id="price-drivers-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0;">Key Price Drivers</h4>
       <ul style="list-style: none; padding: 0; margin: 0;" class="price-drivers-list">
         <% if suggestion[:price_drivers].present? %>
@@ -602,99 +988,79 @@
 <section class="risk-intelligence" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      ⚠️ Risk Intelligence Dashboard
+    <span style="padding-right: 24px;">⚠️</span> Risk Intelligence Dashboard
     </h2>
   </header>
 
-  <div class="risk-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-    <!-- Geopolitical Risks -->
-    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
+  <!-- Loading State for Risks -->
+  <div id="risks-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Analyzing procurement risks...
+  </div>
+
+  <div class="risk-grid" id="risk-grid" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+    <!-- Geopolitical Risks - Dynamic -->
+    <div id="geopolitical-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #EF4444;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
-        <span style="background: #EF4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">HIGH</span>
+        <span id="geopolitical-level" style="background: #EF4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">HIGH</span>
         Geopolitical
       </h4>
-      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <li style="padding: 0.375rem 0;">• Ghana election uncertainty (Q2)</li>
-        <li style="padding: 0.375rem 0;">• EU-Africa trade negotiations</li>
-        <li style="padding: 0.375rem 0;">• Indonesia export restrictions</li>
+      <ul id="geopolitical-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <!-- Will be populated by AI -->
       </ul>
     </div>
 
-    <!-- Product-Specific Risks (Agricultural/Technical/Material based on product type) -->
-    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #FBBF24;">
+    <!-- Product-Specific Risks - Dynamic -->
+    <div id="product-specific-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #FBBF24;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
-        <span style="background: #FBBF24; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">MEDIUM</span>
+        <span id="product-specific-level" style="background: #FBBF24; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">MEDIUM</span>
         Product-Specific
       </h4>
-      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <!-- These will be dynamically generated based on product type -->
-        <% if @renegotiation.product.category&.downcase&.include?('food') || @renegotiation.product.category&.downcase&.include?('agricultural') %>
-          <li style="padding: 0.375rem 0;">• Cocoa crop disease outbreak</li>
-          <li style="padding: 0.375rem 0;">• Unusual weather patterns</li>
-          <li style="padding: 0.375rem 0;">• Dairy feed cost increases</li>
-        <% elsif @renegotiation.product.category&.downcase&.include?('electronic') || @renegotiation.product.category&.downcase&.include?('tech') %>
-          <li style="padding: 0.375rem 0;">• Semiconductor shortage risk</li>
-          <li style="padding: 0.375rem 0;">• Rare earth mineral dependencies</li>
-          <li style="padding: 0.375rem 0;">• Manufacturing capacity constraints</li>
-        <% elsif @renegotiation.product.category&.downcase&.include?('industrial') || @renegotiation.product.category&.downcase&.include?('machinery') %>
-          <li style="padding: 0.375rem 0;">• Steel price volatility</li>
-          <li style="padding: 0.375rem 0;">• Energy cost fluctuations</li>
-          <li style="padding: 0.375rem 0;">• Manufacturing delays</li>
-        <% else %>
-          <!-- Default/Generic risks -->
-          <li style="padding: 0.375rem 0;">• Raw material availability</li>
-          <li style="padding: 0.375rem 0;">• Quality control variations</li>
-          <li style="padding: 0.375rem 0;">• Production capacity limits</li>
-        <% end %>
+      <ul id="product-specific-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <!-- Will be populated by AI -->
       </ul>
     </div>
 
-    <!-- Supply Chain Risks -->
-    <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #10B981;">
+    <!-- Supply Chain Risks - Dynamic -->
+    <div id="supply-chain-risks" style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #1F2937; border-top: 4px solid #10B981;">
       <h4 style="color: #E5E4E2; margin: 0 0 1rem 0; display: flex; align-items: center;">
-        <span style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">LOW</span>
+        <span id="supply-chain-level" style="background: #10B981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-right: 0.5rem;">LOW</span>
         Supply Chain
       </h4>
-      <ul style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
-        <li style="padding: 0.375rem 0;">• Shipping routes stable</li>
-        <li style="padding: 0.375rem 0;">• Port congestion clearing</li>
-        <li style="padding: 0.375rem 0;">• Container availability improving</li>
+      <ul id="supply-chain-list" style="list-style: none; padding: 0; margin: 0; color: #E5E4E2; font-size: 0.875rem;">
+        <!-- Will be populated by AI -->
       </ul>
     </div>
   </div>
 </section>
 
-<!-- Market Intelligence Summary -->
+<!-- Negotiation Strategy Recommendations -->
 <section class="market-intelligence-summary" style="background: #131B3F; border-radius: 0.5rem; padding: 2rem; color: #E5E4E2; margin-top: 2rem; margin-bottom: 2rem;">
   <header style="margin-bottom: 2rem; border-bottom: 2px solid #FF7518; padding-bottom: 1rem;">
     <h2 style="color: #E5E4E2; margin: 0; font-size: 1.5rem; font-weight: 700;">
-      🎯 Negotiation Strategy Recommendations
+      <span style="padding-right: 24px;">🎯</span> Negotiation Strategy Recommendations
     </h2>
   </header>
 
-  <div style="background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
-    <h4 style="color: #FF7518; margin: 0 0 1rem 0;">Based on Product Intelligence Analysis:</h4>
-    <ol style="color: #E5E4E2; line-height: 1.8; padding-left: 1.5rem;">
-      <li style="margin-bottom: 0.75rem;">
-        <strong>Lock in Q1 prices immediately</strong> - Cocoa prices expected to rise 15% by June due to West African drought
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong>Negotiate volume discounts</strong> - Supplier has excess sugar inventory, leverage for 5-7% additional discount
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong>Request price protection clause</strong> - Include 90-day price freeze given high geopolitical risks
-      </li>
-      <li style="margin-bottom: 0.75rem;">
-        <strong>Consider alternative origins</strong> - Explore South American cocoa sources to reduce Ghana dependency
-      </li>
-      <li style="margin-bottom: 0;">
-        <strong>Timing advantage</strong> - Current market conditions favor buyers, but window closing in 30-45 days
-      </li>
+  <!-- Loading State for Strategies -->
+  <div id="strategies-loading" style="display: block; text-align: center; padding: 2rem; color: #9CA3AF;">
+    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    Generating negotiation strategies...
+  </div>
+
+  <div id="strategies-content" style="display: none; background: #0A0F2E; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #FF7518; border-left: 4px solid #FF7518;">
+    <h4 style="color: #FF7518; margin: 0 0 1rem 0;">AI-Powered Strategy Recommendations:</h4>
+    <ol id="strategies-list" style="color: #E5E4E2; line-height: 1.8; padding-left: 1.5rem;">
+      <!-- Will be populated by AI -->
     </ol>
 
-    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1F2937;">
+    <div id="strategies-summary" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1F2937;">
       <p style="color: #9CA3AF; font-size: 0.875rem; margin: 0;">
-        <em>💡 Pro tip: Use the sugar surplus as your primary negotiation leverage. Your supplier needs to move inventory before new Brazilian harvest arrives in April.</em>
+        <em id="strategies-tip">💡 Strategic insights will appear here based on AI analysis...</em>
       </p>
     </div>
   </div>
